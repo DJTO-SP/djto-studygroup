@@ -3,7 +3,7 @@
  *
  * [초기 설정]
  * 1. Google Sheets 새 파일 생성 → 아래 시트들 자동 생성됨 (setupAllSheets 실행)
- *    - 동아리 / 신청 / 활동 / 결과보고서 / 지난결과
+ *    - 동아리 / 신청 / 활동 / 결과보고서 / 지난결과 / 공지사항
  * 2. Google Drive 폴더 생성 → 폴더 ID 복사 → DRIVE_FOLDER_ID에 입력
  * 3. SHEET_ID에 Sheets 파일 ID 입력 (URL 중간의 긴 문자열)
  * 4. ADMIN_PW에 관리자 비밀번호 설정
@@ -41,7 +41,6 @@ function doGet(e) {
       case 'getActivities':      result = getActivities(p.clubId, p.year); break;
       case 'getReports':         result = checkAdmin(p.pw) ? getReports(p.year) : {error:'권한 없음'}; break;
       case 'getPastResults':     result = getPastResults(p.year, p.clubId); break;
-      case 'getAllFiles':         result = checkAdmin(p.pw) ? getAllFiles() : {error:'권한 없음'}; break;
       case 'getStats':           result = getStats(); break;
       case 'getNotices':         result = getNotices(); break;
       default:                   result = {error: 'Unknown action'};
@@ -68,7 +67,8 @@ function doPost(e) {
       case 'saveClub':          result = checkAdmin(d.pw) ? saveClub(d) : {error:'권한 없음'}; break;
       case 'deleteClub':        result = checkAdmin(d.pw) ? deleteClub(d.clubId) : {error:'권한 없음'}; break;
       case 'deleteFile':        result = checkAdmin(d.pw) ? deleteFile(d.id, d.sheetName) : {error:'권한 없음'}; break;
-      case 'saveNotice':        result = checkAdmin(d.pw) ? saveNotice(d) : {error:'권한 없음'}; break;
+      // 공지: 관리자 pw 또는 동아리 코드 인증으로 등록 가능
+      case 'saveNotice':        result = saveNoticeAuth(d); break;
       case 'deleteNotice':      result = checkAdmin(d.pw) ? deleteNoticeById(d.id) : {error:'권한 없음'}; break;
       default:                  result = {error: 'Unknown action'};
     }
@@ -194,12 +194,12 @@ function saveClub(d) {
   if (d.rowId) {
     updateRowById(S_CLUBS, d.rowId, {
       name:d.name, type:d.type, desc:d.desc||'',
-      color:d.color||'#16a34a', code:d.code||'', status:d.status||'운영중'
+      color:d.color||'#A5CD39', code:d.code||'', status:d.status||'운영중'
     });
   } else {
     saveToSheet(S_CLUBS, {
       id:uid(), name:d.name, type:d.type||'학습동아리',
-      desc:d.desc||'', color:d.color||'#16a34a',
+      desc:d.desc||'', color:d.color||'#A5CD39',
       code:d.code||uid().substring(0,6).toUpperCase(),
       status:d.status||'운영중', createdAt:now()
     });
@@ -264,7 +264,6 @@ function reviewApplication(d) {
 // 활동현황 (고유 코드 인증)
 // ══════════════════════════════════════════
 function uploadActivity(d) {
-  // 서버 측 코드 검증
   const v = verifyClubCode(d.clubId, d.clubCode);
   if (!v.ok) return { error: '동아리 코드가 올바르지 않습니다.' };
 
@@ -295,7 +294,6 @@ function getActivities(clubId, year) {
 // 성과보고서 (고유 코드 인증)
 // ══════════════════════════════════════════
 function uploadReport(d) {
-  // 서버 측 코드 검증
   const v = verifyClubCode(d.clubId, d.clubCode);
   if (!v.ok) return { error: '동아리 코드가 올바르지 않습니다.' };
 
@@ -323,9 +321,11 @@ function getReports(year) {
 
 // ══════════════════════════════════════════
 // 지난결과 (관리자 등록, 전체 공개)
+// 필드: id, year, clubName, title, desc, reviewResult, period,
+//        fileId, driveUrl, fileName, fileType, fileSize, uploadedAt
 // ══════════════════════════════════════════
 function savePastResult(d) {
-  initSheet(S_PAST, ['id','year','clubName','title','desc','fileId','driveUrl','fileName','fileType','fileSize','uploadedAt']);
+  initSheet(S_PAST, ['id','year','clubName','title','desc','reviewResult','period','fileId','driveUrl','fileName','fileType','fileSize','uploadedAt']);
   let fileId='', driveUrl='', fileName='', fileType='', fileSize=0;
   if (d.fileData) {
     const saved = saveToDrive(d.fileData, d.fileName, d.fileType, '지난결과/' + d.year);
@@ -333,13 +333,17 @@ function savePastResult(d) {
     fileName = d.fileName; fileType = d.fileType; fileSize = d.fileSize||0;
   }
   if (d.rowId) {
-    const updates = { year:d.year, clubName:d.clubName, title:d.title, desc:d.desc||'' };
+    const updates = {
+      year:d.year, clubName:d.clubName, title:d.title, desc:d.desc||'',
+      reviewResult:d.reviewResult||'', period:d.period||''
+    };
     if (fileId) Object.assign(updates, { fileId, driveUrl, fileName, fileType, fileSize });
     updateRowById(S_PAST, d.rowId, updates);
   } else {
     saveToSheet(S_PAST, {
       id:uid(), year:d.year, clubName:d.clubName||'',
       title:d.title, desc:d.desc||'',
+      reviewResult:d.reviewResult||'', period:d.period||'',
       fileId, driveUrl, fileName, fileType, fileSize, uploadedAt:now()
     });
   }
@@ -355,55 +359,79 @@ function getPastResults(year, clubId) {
     return new Date(b.uploadedAt) - new Date(a.uploadedAt);
   }).map(r => ({
     id:r.id, year:r.year, clubName:r.clubName,
-    title:r.title, desc:r.desc, driveUrl:r.driveUrl,
+    title:r.title, desc:r.desc,
+    reviewResult:r.reviewResult||'', period:r.period||'',
+    driveUrl:r.driveUrl, fileId:r.fileId||'',
     fileType:r.fileType, fileName:r.fileName, uploadedAt:r.uploadedAt
   }));
 }
 
 // ══════════════════════════════════════════
 // 공지사항
+// 필드: id, title, content, createdBy, clubName, fileId, driveUrl, fileName, createdAt
+// 등록: 관리자 pw 또는 동아리 코드 인증
+// 삭제: 관리자만 가능
 // ══════════════════════════════════════════
 function getNotices() {
   try {
     return sheetToObjects(S_NOTICE)
       .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
-      .map(n => ({ id: n.id, title: n.title, content: n.content, createdAt: n.createdAt }));
+      .map(n => ({
+        id: n.id, title: n.title, content: n.content,
+        createdBy: n.createdBy||'', clubName: n.clubName||'',
+        driveUrl: n.driveUrl||'', fileName: n.fileName||'',
+        fileId: n.fileId||'',
+        createdAt: n.createdAt
+      }));
   } catch(e) { return []; }
 }
 
-function saveNotice(d) {
-  initSheet(S_NOTICE, ['id','title','content','createdAt']);
+// 공지 등록: 관리자 pw 또는 동아리 코드 인증
+function saveNoticeAuth(d) {
+  initSheet(S_NOTICE, ['id','title','content','createdBy','clubName','fileId','driveUrl','fileName','createdAt']);
+  const isAdmin = checkAdmin(d.pw);
+  let authorClubName = '';
+  let authorName = d.createdBy || '';
+
+  if (!isAdmin) {
+    // 동아리 코드 인증
+    if (!d.clubId || !d.clubCode) return { error: '권한이 없습니다. 관리자 비밀번호 또는 동아리 코드를 입력하세요.' };
+    const v = verifyClubCode(d.clubId, d.clubCode);
+    if (!v.ok) return { error: '동아리 코드가 올바르지 않습니다.' };
+    authorClubName = v.clubName;
+  }
+
+  let fileId='', driveUrl='', fileName='';
+  if (d.fileData && d.fileName) {
+    const saved = saveToDrive(d.fileData, d.fileName, d.fileType, '공지첨부');
+    fileId = saved.fileId; driveUrl = saved.driveUrl; fileName = d.fileName;
+  }
+
   if (d.id) {
-    updateRowById(S_NOTICE, d.id, { title: d.title, content: d.content });
+    const updates = { title: d.title, content: d.content };
+    if (fileId) Object.assign(updates, { fileId, driveUrl, fileName });
+    updateRowById(S_NOTICE, d.id, updates);
   } else {
-    saveToSheet(S_NOTICE, { id: uid(), title: d.title, content: d.content, createdAt: now() });
+    saveToSheet(S_NOTICE, {
+      id: uid(), title: d.title, content: d.content,
+      createdBy: authorName, clubName: authorClubName,
+      fileId, driveUrl, fileName, createdAt: now()
+    });
   }
   return { ok: true };
 }
 
 function deleteNoticeById(id) {
+  // Drive 파일도 함께 삭제
+  try {
+    const list = sheetToObjects(S_NOTICE);
+    const item = list.find(r => r.id === id);
+    if (item?.fileId) {
+      try { DriveApp.getFileById(item.fileId).setTrashed(true); } catch(e) {}
+    }
+  } catch(e) {}
   deleteRowById(S_NOTICE, id);
   return { ok: true };
-}
-
-// ══════════════════════════════════════════
-// 전체 파일 목록 (관리자)
-// ══════════════════════════════════════════
-function getAllFiles() {
-  const results = [];
-  [[S_ACTIVITY,'활동자료'], [S_REPORT,'성과보고서'], [S_APPLY,'신청서'], [S_PAST,'지난결과']].forEach(([sName, label]) => {
-    sheetToObjects(sName).forEach(r => {
-      if (!r.driveUrl) return;
-      results.push({
-        id: r.id, sheetName: sName, fileType_label: label,
-        clubName: r.clubName||'', title: r.title||r.clubName||'',
-        uploadedBy: r.uploadedBy||r.name||'',
-        driveUrl: r.driveUrl, fileName: r.fileName||'',
-        uploadedAt: r.uploadedAt||r.submittedAt||''
-      });
-    });
-  });
-  return results.sort((a,b) => new Date(b.uploadedAt) - new Date(a.uploadedAt));
 }
 
 // ══════════════════════════════════════════
@@ -428,13 +456,13 @@ function initSheet(name, headers) {
     const ns = ss().insertSheet(name);
     ns.appendRow(headers);
     ns.setFrozenRows(1);
-    ns.getRange(1, 1, 1, headers.length).setFontWeight('bold').setBackground('#16a34a').setFontColor('#ffffff');
+    ns.getRange(1, 1, 1, headers.length).setFontWeight('bold').setBackground('#A5CD39').setFontColor('#ffffff');
     return;
   }
   if (s.getLastRow() === 0) {
     s.appendRow(headers);
     s.setFrozenRows(1);
-    s.getRange(1, 1, 1, headers.length).setFontWeight('bold').setBackground('#16a34a').setFontColor('#ffffff');
+    s.getRange(1, 1, 1, headers.length).setFontWeight('bold').setBackground('#A5CD39').setFontColor('#ffffff');
   }
 }
 
@@ -443,7 +471,7 @@ function setupAllSheets() {
   initSheet(S_APPLY,    ['id','type','clubName','name','dept','contact','fileId','driveUrl','fileName','status','comment','submittedAt']);
   initSheet(S_ACTIVITY, ['id','clubId','clubName','title','category','desc','uploadedBy','fileId','driveUrl','fileName','fileType','fileSize','uploadedAt']);
   initSheet(S_REPORT,   ['id','clubId','clubName','year','title','uploadedBy','fileId','driveUrl','fileName','fileType','fileSize','uploadedAt']);
-  initSheet(S_PAST,     ['id','year','clubName','title','desc','fileId','driveUrl','fileName','fileType','fileSize','uploadedAt']);
-  initSheet(S_NOTICE,   ['id','title','content','createdAt']);
+  initSheet(S_PAST,     ['id','year','clubName','title','desc','reviewResult','period','fileId','driveUrl','fileName','fileType','fileSize','uploadedAt']);
+  initSheet(S_NOTICE,   ['id','title','content','createdBy','clubName','fileId','driveUrl','fileName','createdAt']);
   SpreadsheetApp.getUi().alert('✅ 시트 초기화 완료!');
 }
