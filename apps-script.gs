@@ -24,6 +24,7 @@ const S_APPLY    = '신청';
 const S_ACTIVITY = '활동';
 const S_REPORT   = '결과보고서';
 const S_PAST     = '지난결과';
+const S_NOTICE   = '공지사항';
 
 // ══════════════════════════════════════════
 // GET 라우터
@@ -42,6 +43,7 @@ function doGet(e) {
       case 'getPastResults':     result = getPastResults(p.year, p.clubId); break;
       case 'getAllFiles':         result = checkAdmin(p.pw) ? getAllFiles() : {error:'권한 없음'}; break;
       case 'getStats':           result = getStats(); break;
+      case 'getNotices':         result = getNotices(); break;
       default:                   result = {error: 'Unknown action'};
     }
   } catch(err) {
@@ -66,6 +68,8 @@ function doPost(e) {
       case 'saveClub':          result = checkAdmin(d.pw) ? saveClub(d) : {error:'권한 없음'}; break;
       case 'deleteClub':        result = checkAdmin(d.pw) ? deleteClub(d.clubId) : {error:'권한 없음'}; break;
       case 'deleteFile':        result = checkAdmin(d.pw) ? deleteFile(d.id, d.sheetName) : {error:'권한 없음'}; break;
+      case 'saveNotice':        result = checkAdmin(d.pw) ? saveNotice(d) : {error:'권한 없음'}; break;
+      case 'deleteNotice':      result = checkAdmin(d.pw) ? deleteNoticeById(d.id) : {error:'권한 없음'}; break;
       default:                  result = {error: 'Unknown action'};
     }
   } catch(err) {
@@ -357,6 +361,32 @@ function getPastResults(year, clubId) {
 }
 
 // ══════════════════════════════════════════
+// 공지사항
+// ══════════════════════════════════════════
+function getNotices() {
+  try {
+    return sheetToObjects(S_NOTICE)
+      .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+      .map(n => ({ id: n.id, title: n.title, content: n.content, createdAt: n.createdAt }));
+  } catch(e) { return []; }
+}
+
+function saveNotice(d) {
+  initSheet(S_NOTICE, ['id','title','content','createdAt']);
+  if (d.id) {
+    updateRowById(S_NOTICE, d.id, { title: d.title, content: d.content });
+  } else {
+    saveToSheet(S_NOTICE, { id: uid(), title: d.title, content: d.content, createdAt: now() });
+  }
+  return { ok: true };
+}
+
+function deleteNoticeById(id) {
+  deleteRowById(S_NOTICE, id);
+  return { ok: true };
+}
+
+// ══════════════════════════════════════════
 // 전체 파일 목록 (관리자)
 // ══════════════════════════════════════════
 function getAllFiles() {
@@ -414,5 +444,6 @@ function setupAllSheets() {
   initSheet(S_ACTIVITY, ['id','clubId','clubName','title','category','desc','uploadedBy','fileId','driveUrl','fileName','fileType','fileSize','uploadedAt']);
   initSheet(S_REPORT,   ['id','clubId','clubName','year','title','uploadedBy','fileId','driveUrl','fileName','fileType','fileSize','uploadedAt']);
   initSheet(S_PAST,     ['id','year','clubName','title','desc','fileId','driveUrl','fileName','fileType','fileSize','uploadedAt']);
+  initSheet(S_NOTICE,   ['id','title','content','createdAt']);
   SpreadsheetApp.getUi().alert('✅ 시트 초기화 완료!');
 }

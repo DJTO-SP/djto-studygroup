@@ -9,34 +9,29 @@
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
-      --navy: #1e3a6e; --navy2: #2d5499;
+      --navy: #1e3a6e;
       --green: #16a34a; --green2: #15803d; --green-bg: #f0fdf4;
-      --orange: #e8610a;
       --bg: #f5f6f8; --surface: #fff;
       --text: #1a2035; --sub: #64748b;
       --border: #dde5f0;
-      --danger: #ef4444; --warn: #f59e0b;
+      --danger: #ef4444;
     }
     body { font-family: 'Noto Sans KR','Malgun Gothic',sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
 
     /* ── Title Bar ── */
-    .title-bar { background: #fff; border-bottom: 2px solid #e8edf5; min-height: 100px; display: block; overflow: hidden; }
-    .title-inner { max-width: 1100px; margin: 0 auto; width: 100%; display: flex; align-items: flex-end; justify-content: space-between; padding: 50px 32px 14px 32px; box-sizing: border-box; }
-    .title-text .main { font-size: 26px; font-weight: 900; color: #1a2035; letter-spacing: -1px; line-height: 1; white-space: nowrap; }
+    .title-bar { background: #fff; border-bottom: 2px solid #e8edf5; overflow: hidden; }
+    .title-inner { max-width: 1100px; margin: 0 auto; display: flex; align-items: flex-end; justify-content: space-between; padding: 50px 32px 14px; }
+    .title-text .main { font-size: 26px; font-weight: 900; color: var(--text); letter-spacing: -1px; line-height: 1; }
     .title-text .main em { color: var(--green); font-style: normal; }
     .title-text .sub { font-size: 14px; font-weight: 500; color: var(--sub); margin-top: 7px; display: block; }
     .title-logo-img { height: 80px; object-fit: contain; cursor: pointer; }
-    .title-logo-img:hover { animation: bounce 0.7s ease; }
-    @keyframes bounce {
-      0%,100% { transform: translateY(0); }
-      30% { transform: translateY(-10px) rotate(-4deg); }
-      60% { transform: translateY(-6px) rotate(3deg); }
-    }
+    .title-logo-img:hover { animation: bounce .7s ease; }
+    @keyframes bounce { 0%,100%{transform:translateY(0)} 30%{transform:translateY(-10px) rotate(-4deg)} 60%{transform:translateY(-6px) rotate(3deg)} }
 
     /* ── Nav Bar ── */
     .nav-bar { background: var(--green); }
     .nav-inner { max-width: 1100px; margin: 0 auto; display: flex; align-items: center; justify-content: center; padding: 0 32px; height: 48px; gap: 2px; }
-    .nav-btn { background: transparent; border: none; color: rgba(255,255,255,.85); padding: 0 18px; height: 40px; margin: 4px 3px; border-radius: 8px; cursor: pointer; font-size: 14px; font-weight: 600; font-family: inherit; display: flex; align-items: center; gap: 7px; transition: all .15s; white-space: nowrap; }
+    .nav-btn { background: transparent; border: none; color: rgba(255,255,255,.85); padding: 0 20px; height: 40px; margin: 4px 2px; border-radius: 8px; cursor: pointer; font-size: 14px; font-weight: 600; font-family: inherit; display: flex; align-items: center; gap: 6px; transition: all .15s; white-space: nowrap; }
     .nav-btn:hover { background: rgba(255,255,255,.15); color: #fff; }
     .nav-btn.active { background: #fff; color: var(--green2); font-weight: 800; }
 
@@ -48,41 +43,45 @@
     .card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; box-shadow: 0 2px 12px rgba(0,0,0,.06); padding: 24px; }
     .card + .card { margin-top: 16px; }
 
-    .section-title {
-      font-size: 15px; font-weight: 800; color: var(--navy);
-      margin-bottom: 16px; display: flex; align-items: center; gap: 8px;
-    }
+    .section-title { font-size: 15px; font-weight: 800; color: var(--navy); margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
     .section-title::before { content: ''; display: inline-block; width: 4px; height: 17px; border-radius: 2px; background: var(--green); }
+
+    /* ── Year Tabs ── */
+    .year-tabs { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 20px; }
+    .year-tab-btn { border: 1.5px solid var(--border); background: var(--surface); color: var(--sub); font-family: inherit; font-size: 13px; font-weight: 700; padding: 7px 20px; border-radius: 20px; cursor: pointer; transition: all .18s; }
+    .year-tab-btn.active { background: var(--green); color: #fff; border-color: var(--green); }
+    .year-tab-btn:hover:not(.active) { border-color: var(--green); color: var(--green2); }
+
+    /* ── Activity List ── */
+    .activity-list { display: flex; flex-direction: column; gap: 10px; }
+    .activity-item { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 14px 18px; display: flex; align-items: center; gap: 14px; transition: box-shadow .18s; }
+    .activity-item:hover { box-shadow: 0 3px 12px rgba(0,0,0,.08); }
+    .act-icon { width: 42px; height: 42px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; background: var(--green-bg); }
+    .act-info { flex: 1; min-width: 0; }
+    .act-info h4 { font-size: 14px; font-weight: 700; margin-bottom: 4px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .act-meta { font-size: 12px; color: var(--sub); display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+    .btn-dl { flex-shrink: 0; display: inline-flex; align-items: center; gap: 4px; background: var(--green); color: #fff; border: none; cursor: pointer; font-family: inherit; font-size: 12px; font-weight: 700; padding: 7px 14px; border-radius: 7px; text-decoration: none; transition: background .18s; }
+    .btn-dl:hover { background: var(--green2); }
+
+    /* ── Divider Label ── */
+    .list-divider { font-size: 12px; font-weight: 700; color: var(--sub); padding: 10px 4px 6px; letter-spacing: .04em; border-bottom: 1px solid var(--border); margin-bottom: 8px; margin-top: 8px; }
+    .list-divider:first-child { margin-top: 0; }
 
     /* ── Buttons ── */
     .btn { border: none; cursor: pointer; font-family: inherit; font-size: 13px; font-weight: 700; padding: 9px 18px; border-radius: 8px; transition: filter .18s; display: inline-flex; align-items: center; gap: 5px; }
     .btn:hover { filter: brightness(1.08); }
-    .btn-navy    { background: var(--navy); color: #fff; }
-    .btn-green   { background: var(--green); color: #fff; }
-    .btn-orange  { background: var(--orange); color: #fff; }
-    .btn-danger  { background: var(--danger); color: #fff; }
-    .btn-gray    { background: #e2e8f0; color: var(--sub); }
+    .btn-navy  { background: var(--navy); color: #fff; }
+    .btn-green { background: var(--green); color: #fff; }
+    .btn-danger{ background: var(--danger); color: #fff; }
+    .btn-gray  { background: #e2e8f0; color: var(--sub); }
     .btn-sm { padding: 5px 12px; font-size: 12px; border-radius: 6px; }
     .btn-lg { padding: 13px 28px; font-size: 15px; border-radius: 10px; }
 
-    /* ── Sub-tabs ── */
-    .sub-tabs { display: flex; gap: 0; border-bottom: 2px solid var(--border); margin-bottom: 20px; }
-    .sub-tab {
-      background: none; border: none; font-family: inherit; font-size: 14px; font-weight: 700;
-      color: var(--sub); padding: 10px 22px; cursor: pointer;
-      border-bottom: 3px solid transparent; margin-bottom: -2px; transition: all .18s;
-    }
-    .sub-tab.active { color: var(--green2); border-bottom-color: var(--green); }
-
     /* ── Form ── */
     .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-    .form-row.col3 { grid-template-columns: 1fr 1fr 1fr; }
     .form-group { margin-bottom: 14px; }
     .form-group label { display: block; font-size: 13px; font-weight: 700; margin-bottom: 6px; color: var(--navy); }
-    .form-group input, .form-group select, .form-group textarea {
-      width: 100%; border: 1.5px solid var(--border); border-radius: 8px; padding: 10px 12px;
-      font-family: inherit; font-size: 14px; color: var(--text); background: #fafbfc; outline: none; transition: border-color .18s;
-    }
+    .form-group input, .form-group select, .form-group textarea { width: 100%; border: 1.5px solid var(--border); border-radius: 8px; padding: 10px 12px; font-family: inherit; font-size: 14px; color: var(--text); background: #fafbfc; outline: none; transition: border-color .18s; }
     .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: var(--green); background: #fff; }
     .form-group textarea { resize: vertical; min-height: 70px; }
     .field-req { color: var(--danger); }
@@ -90,107 +89,29 @@
 
     /* ── Badge ── */
     .badge { display: inline-flex; align-items: center; font-size: 11px; font-weight: 700; padding: 2px 9px; border-radius: 8px; white-space: nowrap; }
-    .b-wait   { background: #fef9c3; color: #854d0e; }
     .b-ok     { background: #dcfce7; color: var(--green2); }
+    .b-wait   { background: #fef9c3; color: #854d0e; }
     .b-no     { background: #fee2e2; color: #b91c1c; }
     .b-navy   { background: #eff6ff; color: var(--navy); }
     .b-green  { background: #dcfce7; color: var(--green2); }
     .b-gray   { background: #f1f5f9; color: var(--sub); }
-    .b-orange { background: #fff7ed; color: var(--orange); }
+    .b-past   { background: #f5f3ff; color: #6d28d9; }
 
     /* ── File Drop ── */
-    .file-drop {
-      border: 2px dashed var(--border); border-radius: 10px; padding: 28px 20px;
-      text-align: center; cursor: pointer; transition: all .2s; background: #fafbfc;
-    }
+    .file-drop { border: 2px dashed var(--border); border-radius: 10px; padding: 28px 20px; text-align: center; cursor: pointer; transition: all .2s; background: #fafbfc; }
     .file-drop:hover, .file-drop.over { border-color: var(--green); background: var(--green-bg); }
     .file-drop .drop-ico { font-size: 28px; margin-bottom: 6px; }
     .file-drop p { font-size: 13px; color: var(--sub); }
     .file-drop .picked { margin-top: 8px; font-size: 13px; font-weight: 700; color: var(--green2); display: none; }
     .file-limit { font-size: 11px; color: #94a3b8; margin-top: 4px; }
 
-    /* ── Step ── */
-    .steps { display: flex; margin-bottom: 24px; }
-    .step-item { flex: 1; text-align: center; position: relative; }
-    .step-item:not(:last-child)::after {
-      content: ''; position: absolute; top: 15px; left: 50%; width: 100%; height: 2px; background: var(--border); z-index: 0;
-    }
-    .step-dot {
-      width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
-      font-size: 12px; font-weight: 800; margin: 0 auto 6px; position: relative; z-index: 1;
-      background: var(--bg); border: 2px solid var(--border); color: var(--sub); transition: all .3s;
-    }
-    .step-dot.done   { background: var(--green); border-color: var(--green); color: #fff; }
-    .step-dot.active { background: var(--navy); border-color: var(--navy); color: #fff; }
-    .step-lbl { font-size: 11px; font-weight: 700; color: var(--sub); }
-    .step-lbl.active { color: var(--navy); }
-    .step-panel { display: none; }
-    .step-panel.active { display: block; }
+    /* ── Code Verify ── */
+    .verify-box { background: var(--green-bg); border: 1.5px solid #86efac; border-radius: 10px; padding: 12px 14px; margin-bottom: 14px; font-size: 13px; color: var(--green2); display: none; }
 
-    /* ── Type Selector ── */
-    .type-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 20px; }
-    .type-card {
-      border: 2px solid var(--border); border-radius: 12px; padding: 20px 18px; cursor: pointer;
-      transition: all .2s; background: #fafbfc; text-align: center;
-    }
-    .type-card:hover { border-color: var(--green); background: var(--green-bg); }
-    .type-card.selected { border-color: var(--green); background: var(--green-bg); }
-    .type-card .type-ico { font-size: 28px; margin-bottom: 8px; }
-    .type-card h3 { font-size: 15px; font-weight: 800; color: var(--navy); margin-bottom: 4px; }
-    .type-card p  { font-size: 12px; color: var(--sub); line-height: 1.6; }
-
-    /* ── Code verify box ── */
-    .verify-box {
-      background: var(--green-bg); border: 1.5px solid #86efac;
-      border-radius: 10px; padding: 12px 14px; margin-bottom: 14px;
-      font-size: 13px; color: var(--green2); display: none;
-    }
-
-    /* ── Activity ── */
-    .club-tabs { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 20px; }
-    .club-tab-btn {
-      border: 1.5px solid var(--border); background: var(--surface); color: var(--sub);
-      font-family: inherit; font-size: 13px; font-weight: 700; padding: 7px 16px;
-      border-radius: 20px; cursor: pointer; transition: all .18s;
-    }
-    .club-tab-btn.active { background: var(--green); color: #fff; border-color: var(--green); }
-    .club-tab-btn:hover:not(.active) { border-color: var(--green); color: var(--green2); }
-
-    .activity-list { display: flex; flex-direction: column; gap: 10px; }
-    .activity-item {
-      background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
-      padding: 14px 18px; display: flex; align-items: center; gap: 14px;
-    }
-    .activity-item:hover { box-shadow: 0 3px 12px rgba(0,0,0,.08); }
-    .act-icon { width: 42px; height: 42px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; background: var(--green-bg); }
-    .act-info { flex: 1; min-width: 0; }
-    .act-info h4 { font-size: 14px; font-weight: 700; margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .act-meta { font-size: 12px; color: var(--sub); display: flex; flex-wrap: wrap; gap: 8px; }
-    .btn-dl {
-      flex-shrink: 0; display: inline-flex; align-items: center; gap: 4px;
-      background: var(--green); color: #fff; border: none; cursor: pointer;
-      font-family: inherit; font-size: 12px; font-weight: 700; padding: 7px 14px;
-      border-radius: 7px; text-decoration: none; transition: background .18s;
-    }
-    .btn-dl:hover { background: var(--green2); }
-
-    /* ── Past Results ── */
-    .past-year-section { margin-bottom: 28px; }
-    .past-year-label {
-      font-size: 15px; font-weight: 800; color: var(--green2);
-      margin-bottom: 12px; padding-bottom: 8px;
-      border-bottom: 2px solid #bbf7d0; display: flex; align-items: center; gap: 8px;
-    }
-    .past-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
-    .past-card {
-      background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
-      padding: 18px; transition: box-shadow .2s;
-    }
-    .past-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,.10); }
-    .past-card-top { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 10px; }
-    .past-ico { font-size: 24px; flex-shrink: 0; }
-    .past-info h4 { font-size: 14px; font-weight: 700; color: var(--navy); line-height: 1.4; }
-    .past-info .past-meta { font-size: 12px; color: var(--sub); margin-top: 3px; }
+    /* ── Info Box ── */
+    .info-box { background: #eff6ff; border: 1px solid #bfdbfe; border-left: 4px solid var(--navy); border-radius: 10px; padding: 14px 16px; font-size: 13px; color: #1e40af; line-height: 1.7; margin-bottom: 16px; }
+    .info-box.green { background: var(--green-bg); border-color: #86efac; border-left-color: var(--green); color: var(--green2); }
+    .info-box.orange { background: #fff7ed; border-color: #fed7aa; border-left-color: #e8610a; color: #92400e; }
 
     /* ── Table ── */
     .tbl-wrap { overflow-x: auto; }
@@ -201,11 +122,7 @@
 
     /* ── Admin ── */
     .admin-nav { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 20px; }
-    .admin-nav-btn {
-      border: 1.5px solid var(--border); background: var(--surface); color: var(--sub);
-      font-family: inherit; font-size: 13px; font-weight: 700; padding: 8px 18px;
-      border-radius: 8px; cursor: pointer; transition: all .18s;
-    }
+    .admin-nav-btn { border: 1.5px solid var(--border); background: var(--surface); color: var(--sub); font-family: inherit; font-size: 13px; font-weight: 700; padding: 8px 18px; border-radius: 8px; cursor: pointer; transition: all .18s; }
     .admin-nav-btn.active { background: var(--navy); color: #fff; border-color: var(--navy); }
     .admin-panel { display: none; }
     .admin-panel.active { display: block; }
@@ -213,18 +130,19 @@
     /* ── Misc ── */
     .empty { text-align: center; padding: 50px 20px; color: var(--sub); font-size: 14px; }
     .empty div { font-size: 36px; margin-bottom: 10px; }
-    .info-box { background: #eff6ff; border: 1px solid #bfdbfe; border-left: 4px solid var(--navy); border-radius: 10px; padding: 14px 16px; font-size: 13px; color: #1e40af; line-height: 1.7; margin-bottom: 16px; }
-    .info-box.green { background: var(--green-bg); border-color: #86efac; border-left-color: var(--green); color: var(--green2); }
-    .info-box.orange { background: #fff7ed; border-color: #fed7aa; border-left-color: var(--orange); color: #92400e; }
     .divider { height: 1px; background: var(--border); margin: 20px 0; }
     .text-sub { font-size: 12px; color: var(--sub); }
     .flex-between { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; margin-bottom: 16px; }
 
-    /* ── Stat cards ── */
-    .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 14px; margin-bottom: 20px; }
-    .stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 18px; text-align: center; }
-    .stat-card .stat-num { font-size: 30px; font-weight: 900; color: var(--green); }
-    .stat-card .stat-lbl { font-size: 12px; color: var(--sub); margin-top: 4px; font-weight: 600; }
+    /* ── Notice ── */
+    .notice-item { border: 1px solid var(--border); border-radius: 10px; padding: 18px 20px; margin-bottom: 10px; background: var(--surface); transition: box-shadow .18s; }
+    .notice-item:hover { box-shadow: 0 3px 12px rgba(0,0,0,.08); }
+    .notice-item .notice-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 8px; }
+    .notice-item .notice-title { font-size: 15px; font-weight: 700; color: var(--text); line-height: 1.4; }
+    .notice-item .notice-date { font-size: 12px; color: var(--sub); white-space: nowrap; flex-shrink: 0; padding-top: 2px; }
+    .notice-item .notice-content { font-size: 13px; color: var(--sub); line-height: 1.7; white-space: pre-wrap; word-break: break-word; }
+    .notice-item.notice-pinned { border-left: 4px solid var(--green); background: var(--green-bg); }
+    .notice-item.notice-pinned .notice-title::before { content: '📌 '; }
 
     /* ── Modal ── */
     .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.45); z-index: 9998; display: none; align-items: center; justify-content: center; }
@@ -246,14 +164,12 @@
     @keyframes spin { to { transform: rotate(360deg); } }
     .loading-msg { font-size: 14px; color: var(--sub); font-weight: 700; }
 
-    /* ── Responsive ── */
     @media (max-width: 640px) {
-      .nav-bar button { font-size: 12px; padding: 9px 10px; }
-      .form-row, .form-row.col3 { grid-template-columns: 1fr; }
-      .type-grid { grid-template-columns: 1fr; }
-      .activity-item { flex-wrap: wrap; }
-      .btn-dl { width: 100%; justify-content: center; }
-      .stat-grid { grid-template-columns: 1fr 1fr; }
+      .title-inner { padding: 50px 20px 12px; }
+      .nav-inner { padding: 0 8px; }
+      .nav-btn { padding: 0 12px; font-size: 13px; }
+      .page { padding: 20px 16px 60px; }
+      .form-row { grid-template-columns: 1fr; }
     }
   </style>
 </head>
@@ -262,9 +178,9 @@
 <!-- Title Bar -->
 <div class="title-bar">
   <div class="title-inner">
-    <div class="title-text" onclick="showPage('home', document.querySelector('.nav-btn.active') || document.querySelector('.nav-btn'))" style="cursor:pointer">
+    <div class="title-text" style="cursor:pointer" onclick="showPage('activity', document.querySelector('.nav-btn'))">
       <div class="main">대전관광공사 <em>학습동아리</em></div>
-      <div class="sub">동아리 신청 · 활동현황 · 성과보고서 · 지난결과 통합 관리</div>
+      <div class="sub">동아리 신청 · 활동현황 · 성과보고서 통합 관리</div>
     </div>
     <img class="title-logo-img" src="https://djto-sp.github.io/djto-mileage2026/image-logo.png" alt="꿈씨패밀리">
   </div>
@@ -273,275 +189,173 @@
 <!-- Nav Bar -->
 <div class="nav-bar">
   <div class="nav-inner">
-    <button class="nav-btn active" onclick="showPage('home',this)"><span>🏠</span> 홈</button>
-    <button class="nav-btn" onclick="showPage('submit',this)"><span>📋</span> 신청·제출</button>
-    <button class="nav-btn" onclick="showPage('activity',this)"><span>📁</span> 활동현황</button>
-    <button class="nav-btn" onclick="showPage('past',this)"><span>📚</span> 지난결과</button>
+    <button class="nav-btn active" onclick="showPage('activity',this)"><span>📋</span> 활동현황</button>
+    <button class="nav-btn" onclick="showPage('apply',this)"><span>📝</span> 신청</button>
+    <button class="nav-btn" onclick="showPage('report',this)"><span>📊</span> 보고서 제출</button>
+    <button class="nav-btn" onclick="showPage('notice',this)"><span>📢</span> 공지사항</button>
     <button class="nav-btn" onclick="showPage('admin',this)"><span>⚙️</span> 관리자</button>
   </div>
 </div>
 
-<!-- ═══════════════════ 홈 ═══════════════════ -->
-<div id="page-home" class="page active">
-
-  <!-- 통계 -->
-  <div class="stat-grid" id="stat-grid">
-    <div class="stat-card"><div class="stat-num" id="st-clubs">-</div><div class="stat-lbl">운영 중인 동아리</div></div>
-    <div class="stat-card"><div class="stat-num" id="st-acts">-</div><div class="stat-lbl">활동 자료</div></div>
-    <div class="stat-card"><div class="stat-num" id="st-reports">-</div><div class="stat-lbl">성과보고서</div></div>
-    <div class="stat-card"><div class="stat-num" id="st-pending">-</div><div class="stat-lbl">신청 대기</div></div>
-  </div>
-
-  <!-- 빠른 안내 -->
-  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;margin-bottom:20px;">
-    <div class="card" style="border-top:4px solid var(--green);cursor:pointer;" onclick="showPage('submit',document.querySelectorAll('.nav-bar button')[1])">
-      <div style="font-size:28px;margin-bottom:10px;">📋</div>
-      <h3 style="font-size:15px;font-weight:800;color:var(--navy);margin-bottom:6px;">신청·제출</h3>
-      <p style="font-size:13px;color:var(--sub);line-height:1.7;">동아리를 신청하거나<br>성과보고서를 제출합니다.</p>
-    </div>
-    <div class="card" style="border-top:4px solid var(--navy);cursor:pointer;" onclick="showPage('activity',document.querySelectorAll('.nav-bar button')[2])">
-      <div style="font-size:28px;margin-bottom:10px;">📁</div>
-      <h3 style="font-size:15px;font-weight:800;color:var(--navy);margin-bottom:6px;">활동현황</h3>
-      <p style="font-size:13px;color:var(--sub);line-height:1.7;">동아리별 활동 자료를<br>업로드·조회합니다.</p>
-    </div>
-    <div class="card" style="border-top:4px solid var(--orange);cursor:pointer;" onclick="showPage('past',document.querySelectorAll('.nav-bar button')[3])">
-      <div style="font-size:28px;margin-bottom:10px;">📚</div>
-      <h3 style="font-size:15px;font-weight:800;color:var(--navy);margin-bottom:6px;">지난결과</h3>
-      <p style="font-size:13px;color:var(--sub);line-height:1.7;">지난 연도 학습동아리<br>결과물을 다운로드합니다.</p>
-    </div>
-  </div>
-
-  <!-- 운영 중인 동아리 -->
-  <div class="card">
-    <div class="section-title">운영 중인 동아리</div>
-    <div id="home-club-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px;">
-      <div class="empty"><div>⏳</div>불러오는 중...</div>
-    </div>
-  </div>
-</div>
-
-<!-- ═══════════════════ 신청·제출 ═══════════════════ -->
-<div id="page-submit" class="page">
-
-  <div class="sub-tabs">
-    <button class="sub-tab active" onclick="showSubTab('apply',this)">📝 동아리 신청</button>
-    <button class="sub-tab" onclick="showSubTab('report',this)">📊 성과보고서 제출</button>
-  </div>
-
-  <!-- ─── 동아리 신청 ─── -->
-  <div id="sub-apply">
-    <div class="card">
-      <div class="section-title">동아리 신청</div>
-      <div class="steps">
-        <div class="step-item"><div class="step-dot active" id="sd1">1</div><div class="step-lbl active" id="sl1">유형 선택</div></div>
-        <div class="step-item"><div class="step-dot" id="sd2">2</div><div class="step-lbl" id="sl2">서식 제출</div></div>
-        <div class="step-item"><div class="step-dot" id="sd3">3</div><div class="step-lbl" id="sl3">신청 완료</div></div>
-      </div>
-
-      <!-- Step 1 -->
-      <div id="apply-step1" class="step-panel active">
-        <p style="font-size:13px;color:var(--sub);margin-bottom:16px;line-height:1.7;">신청할 동아리 유형을 선택하세요.</p>
-        <div class="type-grid">
-          <div class="type-card" id="type-study" onclick="selectApplyType('학습동아리')">
-            <div class="type-ico">📖</div>
-            <h3>학습동아리</h3>
-            <p>특정 주제를 함께 공부하는<br>학습 중심 동아리</p>
-          </div>
-          <div class="type-card" id="type-free" onclick="selectApplyType('자율기획형')">
-            <div class="type-ico">💡</div>
-            <h3>자율기획형 동아리</h3>
-            <p>자유로운 주제로 기획하는<br>창의·혁신 동아리</p>
-          </div>
-        </div>
-        <div class="err" id="err-type" style="display:block;text-align:center;"></div>
-        <button class="btn btn-navy" onclick="applyNext(2)" style="width:100%;justify-content:center;margin-top:4px;">다음 →</button>
-      </div>
-
-      <!-- Step 2 -->
-      <div id="apply-step2" class="step-panel">
-        <div class="info-box green">
-          📎 신청서식을 다운로드하여 작성 완료 후 업로드하세요.
-        </div>
-        <div style="text-align:center;margin-bottom:20px;">
-          <a href="서식/학습동아리_서식.hwpx" download class="btn btn-navy btn-lg">⬇️ 신청서식 다운로드 (.hwpx)</a>
-          <div class="text-sub" style="margin-top:8px;">※ 한글(HWP)에서 작성 후 업로드해주세요</div>
-        </div>
-        <div class="divider"></div>
-        <div class="form-row">
-          <div class="form-group">
-            <label>신청자 이름 <span class="field-req">*</span></label>
-            <input type="text" id="ap-name" placeholder="홍길동">
-            <div class="err" id="err-ap-name">이름을 입력해주세요.</div>
-          </div>
-          <div class="form-group">
-            <label>소속 부서 <span class="field-req">*</span></label>
-            <input type="text" id="ap-dept" placeholder="전략기획팀">
-          </div>
-        </div>
-        <div class="form-row">
-          <div class="form-group">
-            <label>희망 동아리명 <span class="field-req">*</span></label>
-            <input type="text" id="ap-clubname" placeholder="예) 독서토론 동아리">
-            <div class="err" id="err-ap-clubname">동아리 이름을 입력해주세요.</div>
-          </div>
-          <div class="form-group">
-            <label>연락처 (내선)</label>
-            <input type="text" id="ap-contact" placeholder="예) 1148">
-          </div>
-        </div>
-        <div class="form-group">
-          <label>작성 완료된 신청서식 파일 <span class="field-req">*</span></label>
-          <div class="file-drop" id="ap-drop" onclick="document.getElementById('ap-file').click()"
-               ondragover="dropOver(event,'ap-drop')" ondragleave="dropLeave('ap-drop')" ondrop="dropFile(event,'ap-drop','ap-file-obj')">
-            <div class="drop-ico">📎</div>
-            <p>클릭하거나 파일을 드래그하세요</p>
-            <div class="file-limit">HWP, HWPX, PDF (최대 20MB)</div>
-            <div class="picked" id="ap-picked"></div>
-          </div>
-          <input type="file" id="ap-file" accept=".hwp,.hwpx,.pdf" style="display:none" onchange="pickFile(event,'ap-picked','ap-file-obj','ap-drop')">
-          <div class="err" id="err-ap-file">파일을 첨부해주세요.</div>
-        </div>
-        <div style="display:flex;gap:10px;">
-          <button class="btn btn-gray" onclick="goApplyStep(1)">← 이전</button>
-          <button class="btn btn-green" onclick="submitApply()" style="flex:1;justify-content:center;">신청 제출</button>
-        </div>
-      </div>
-
-      <!-- Step 3 -->
-      <div id="apply-step3" class="step-panel" style="text-align:center;padding:20px 0;">
-        <div style="font-size:50px;margin-bottom:16px;">🎉</div>
-        <h3 style="font-size:18px;font-weight:800;color:var(--navy);margin-bottom:8px;">신청이 완료되었습니다!</h3>
-        <p style="font-size:14px;color:var(--sub);line-height:1.7;margin-bottom:24px;">
-          담당자 검토 후 승인 여부를 안내해드립니다.
-        </p>
-        <button class="btn btn-navy" onclick="goApplyStep(1)">새 신청하기</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- ─── 성과보고서 제출 ─── -->
-  <div id="sub-report" style="display:none;">
-    <div class="card">
-      <div class="section-title">성과보고서 제출</div>
-      <div class="info-box green">
-        📌 성과보고서는 동아리별 <strong>고유 코드</strong>로 인증 후 제출합니다.<br>
-        코드를 모르는 경우 동아리 리더 또는 담당자(📞1148)에게 문의하세요.
-      </div>
-
-      <!-- 코드 인증 -->
-      <div id="rp-auth-section">
-        <div class="form-row">
-          <div class="form-group">
-            <label>동아리 선택 <span class="field-req">*</span></label>
-            <select id="rp-club-sel" onchange="rpResetVerify()">
-              <option value="">-- 동아리를 선택하세요 --</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label>동아리 고유 코드 <span class="field-req">*</span></label>
-            <input type="text" id="rp-code" placeholder="코드 입력" oninput="rpResetVerify()">
-          </div>
-        </div>
-        <div class="verify-box" id="rp-verified-box">✅ 코드 인증 완료 — <strong id="rp-verified-name"></strong></div>
-        <div class="err" id="err-rp-code" style="display:none;margin-bottom:10px;"></div>
-        <button class="btn btn-green btn-sm" id="rp-verify-btn" onclick="verifyReportCode()">코드 확인</button>
-      </div>
-
-      <div id="rp-form" style="display:none;">
-        <div class="divider"></div>
-        <div class="form-row">
-          <div class="form-group">
-            <label>제출자 이름 <span class="field-req">*</span></label>
-            <input type="text" id="rp-name" placeholder="홍길동">
-            <div class="err" id="err-rp-name">이름을 입력해주세요.</div>
-          </div>
-          <div class="form-group">
-            <label>연도 <span class="field-req">*</span></label>
-            <select id="rp-year">
-              <option>2026</option><option>2025</option><option>2024</option>
-              <option>2023</option><option>2022</option>
-            </select>
-          </div>
-        </div>
-        <div class="form-group">
-          <label>보고서 제목 <span class="field-req">*</span></label>
-          <input type="text" id="rp-title" placeholder="예) 2026년 독서토론 동아리 성과보고서">
-          <div class="err" id="err-rp-title">제목을 입력해주세요.</div>
-        </div>
-        <div class="form-group">
-          <label>성과보고서 파일 <span class="field-req">*</span></label>
-          <div class="file-drop" id="rp-drop" onclick="document.getElementById('rp-file').click()"
-               ondragover="dropOver(event,'rp-drop')" ondragleave="dropLeave('rp-drop')" ondrop="dropFile(event,'rp-drop','rp-file-obj')">
-            <div class="drop-ico">📎</div>
-            <p>클릭하거나 파일을 드래그하세요</p>
-            <div class="file-limit">HWP, HWPX, PDF (최대 20MB)</div>
-            <div class="picked" id="rp-picked"></div>
-          </div>
-          <input type="file" id="rp-file" accept=".hwp,.hwpx,.pdf" style="display:none" onchange="pickFile(event,'rp-picked','rp-file-obj','rp-drop')">
-          <div class="err" id="err-rp-file">파일을 첨부해주세요.</div>
-        </div>
-        <button class="btn btn-green" onclick="submitReport()" style="width:100%;justify-content:center;">성과보고서 제출</button>
-      </div>
-    </div>
-  </div>
-
-</div>
-
 <!-- ═══════════════════ 활동현황 ═══════════════════ -->
-<div id="page-activity" class="page">
-
-  <div class="info-box">
-    📁 동아리를 선택하여 활동 자료를 조회하세요. 동아리 코드 인증 후 자료를 업로드할 수 있습니다.
-  </div>
+<div id="page-activity" class="page active">
 
   <div class="card">
     <div class="flex-between">
-      <div class="section-title" style="margin:0;">동아리 선택</div>
+      <div class="section-title" style="margin:0;">연도 선택</div>
       <button class="btn btn-green btn-sm" onclick="openUploadModal()">⬆️ 자료 올리기</button>
     </div>
-    <div class="club-tabs" id="club-tabs">
-      <button class="club-tab-btn active" onclick="selectClub('',this)">전체</button>
+    <div class="year-tabs" id="year-tabs">
+      <!-- JS로 채워짐 -->
     </div>
   </div>
 
   <div class="card">
-    <div class="flex-between">
-      <div class="section-title" style="margin:0;" id="activity-club-title">전체 활동 자료</div>
-      <select id="act-year-filter" onchange="loadActivities()" style="border:1.5px solid var(--border);border-radius:8px;padding:6px 12px;font-family:inherit;font-size:13px;outline:none;background:#fff;">
-        <option value="">전체 연도</option>
-      </select>
-    </div>
+    <div class="section-title" id="activity-year-title">전체 활동 자료</div>
     <div id="activity-list" class="activity-list">
       <div class="empty"><div>⏳</div>불러오는 중...</div>
     </div>
   </div>
+
 </div>
 
-<!-- ═══════════════════ 지난결과 ═══════════════════ -->
-<div id="page-past" class="page">
+<!-- ═══════════════════ 신청 ═══════════════════ -->
+<div id="page-apply" class="page">
+  <div class="card">
+    <div class="section-title">동아리 신청</div>
+    <div class="info-box green">
+      📎 신청서식을 다운로드하여 작성 완료 후 업로드해주세요.
+    </div>
+    <div style="text-align:center;margin-bottom:20px;">
+      <a href="서식/학습동아리_서식.hwpx" download class="btn btn-navy btn-lg">⬇️ 신청서식 다운로드 (.hwpx)</a>
+      <div class="text-sub" style="margin-top:8px;">※ 한글(HWP)에서 작성 후 업로드해주세요</div>
+    </div>
+    <div class="divider"></div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>신청자 이름 <span class="field-req">*</span></label>
+        <input type="text" id="ap-name" placeholder="홍길동">
+        <div class="err" id="err-ap-name">이름을 입력해주세요.</div>
+      </div>
+      <div class="form-group">
+        <label>소속 부서 <span class="field-req">*</span></label>
+        <input type="text" id="ap-dept" placeholder="전략기획팀">
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>희망 동아리명 <span class="field-req">*</span></label>
+        <input type="text" id="ap-clubname" placeholder="예) 독서토론 동아리">
+        <div class="err" id="err-ap-clubname">동아리 이름을 입력해주세요.</div>
+      </div>
+      <div class="form-group">
+        <label>연락처 (내선)</label>
+        <input type="text" id="ap-contact" placeholder="예) 1148">
+      </div>
+    </div>
+    <div class="form-group">
+      <label>작성 완료된 신청서식 파일 <span class="field-req">*</span></label>
+      <div class="file-drop" id="ap-drop" onclick="document.getElementById('ap-file').click()"
+           ondragover="dropOver(event,'ap-drop')" ondragleave="dropLeave('ap-drop')" ondrop="dropFile(event,'ap-drop','ap-file-obj')">
+        <div class="drop-ico">📎</div>
+        <p>클릭하거나 파일을 드래그하세요</p>
+        <div class="file-limit">HWP, HWPX, PDF (최대 20MB)</div>
+        <div class="picked" id="ap-picked"></div>
+      </div>
+      <input type="file" id="ap-file" accept=".hwp,.hwpx,.pdf" style="display:none" onchange="pickFile(event,'ap-picked','ap-file-obj','ap-drop')">
+      <div class="err" id="err-ap-file">파일을 첨부해주세요.</div>
+    </div>
+    <button class="btn btn-green" onclick="submitApply()" style="width:100%;justify-content:center;">신청 제출</button>
 
-  <div class="info-box green">
-    📚 역대 학습동아리 활동 결과물을 연도별로 확인하고 다운로드할 수 있습니다.
-  </div>
-
-  <div class="card" style="margin-bottom:16px;">
-    <div class="flex-between" style="margin:0;">
-      <div class="section-title" style="margin:0;">연도 선택</div>
-      <select id="past-year-filter" onchange="loadPastResults()" style="border:1.5px solid var(--border);border-radius:8px;padding:6px 12px;font-family:inherit;font-size:13px;outline:none;background:#fff;">
-        <option value="">전체 연도</option>
-      </select>
+    <!-- 완료 메시지 -->
+    <div id="apply-done" style="display:none;text-align:center;padding:30px 0;">
+      <div style="font-size:48px;margin-bottom:14px;">🎉</div>
+      <h3 style="font-size:18px;font-weight:800;color:var(--navy);margin-bottom:8px;">신청이 완료되었습니다!</h3>
+      <p style="font-size:14px;color:var(--sub);line-height:1.7;margin-bottom:20px;">담당자 검토 후 안내해드립니다.</p>
+      <button class="btn btn-navy" onclick="resetApply()">새로 신청하기</button>
     </div>
   </div>
+</div>
 
-  <div id="past-area">
-    <div class="empty"><div>⏳</div>불러오는 중...</div>
+<!-- ═══════════════════ 보고서 제출 ═══════════════════ -->
+<div id="page-report" class="page">
+  <div class="card">
+    <div class="section-title">성과보고서 제출</div>
+    <div class="info-box green">
+      📌 성과보고서는 동아리별 <strong>고유 코드</strong>로 인증 후 제출합니다.<br>
+      코드를 모르는 경우 담당자(📞1148)에게 문의하세요.
+    </div>
+
+    <!-- 코드 인증 -->
+    <div id="rp-auth-section">
+      <div class="form-row">
+        <div class="form-group">
+          <label>동아리 선택 <span class="field-req">*</span></label>
+          <select id="rp-club-sel" onchange="rpResetVerify()">
+            <option value="">-- 동아리를 선택하세요 --</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>동아리 고유 코드 <span class="field-req">*</span></label>
+          <input type="text" id="rp-code" placeholder="코드 입력" oninput="rpResetVerify()">
+        </div>
+      </div>
+      <div class="verify-box" id="rp-verified-box">✅ 코드 인증 완료 — <strong id="rp-verified-name"></strong></div>
+      <div class="err" id="err-rp-code" style="margin-bottom:10px;"></div>
+      <button class="btn btn-green btn-sm" onclick="verifyReportCode()">코드 확인</button>
+    </div>
+
+    <div id="rp-form" style="display:none;">
+      <div class="divider"></div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>제출자 이름 <span class="field-req">*</span></label>
+          <input type="text" id="rp-name" placeholder="홍길동">
+          <div class="err" id="err-rp-name">이름을 입력해주세요.</div>
+        </div>
+        <div class="form-group">
+          <label>연도 <span class="field-req">*</span></label>
+          <select id="rp-year">
+            <option>2026</option><option>2025</option><option>2024</option>
+            <option>2023</option><option>2022</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>보고서 제목 <span class="field-req">*</span></label>
+        <input type="text" id="rp-title" placeholder="예) 2026년 독서토론 동아리 성과보고서">
+        <div class="err" id="err-rp-title">제목을 입력해주세요.</div>
+      </div>
+      <div class="form-group">
+        <label>성과보고서 파일 <span class="field-req">*</span></label>
+        <div class="file-drop" id="rp-drop" onclick="document.getElementById('rp-file').click()"
+             ondragover="dropOver(event,'rp-drop')" ondragleave="dropLeave('rp-drop')" ondrop="dropFile(event,'rp-drop','rp-file-obj')">
+          <div class="drop-ico">📎</div>
+          <p>클릭하거나 파일을 드래그하세요</p>
+          <div class="file-limit">HWP, HWPX, PDF (최대 20MB)</div>
+          <div class="picked" id="rp-picked"></div>
+        </div>
+        <input type="file" id="rp-file" accept=".hwp,.hwpx,.pdf" style="display:none" onchange="pickFile(event,'rp-picked','rp-file-obj','rp-drop')">
+        <div class="err" id="err-rp-file">파일을 첨부해주세요.</div>
+      </div>
+      <button class="btn btn-green" onclick="submitReport()" style="width:100%;justify-content:center;">성과보고서 제출</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════ 공지사항 ═══════════════════ -->
+<div id="page-notice" class="page">
+  <div class="card">
+    <div class="section-title">공지사항</div>
+    <div id="notice-list">
+      <div class="empty"><div>⏳</div>불러오는 중...</div>
+    </div>
   </div>
 </div>
 
 <!-- ═══════════════════ 관리자 ═══════════════════ -->
 <div id="page-admin" class="page">
 
-  <!-- 로그인 -->
   <div id="admin-lock" class="card" style="text-align:center;padding:40px 20px;max-width:380px;margin:0 auto;">
     <div style="font-size:40px;margin-bottom:14px;">🔒</div>
     <div class="section-title" style="justify-content:center;">관리자 로그인</div>
@@ -554,11 +368,12 @@
 
   <div id="admin-panel" style="display:none;">
     <div class="admin-nav">
-      <button class="admin-nav-btn active" onclick="showAdminPanel('adm-applications',this)">📋 신청 관리</button>
+      <button class="admin-nav-btn active" onclick="showAdminPanel('adm-applications',this)">📝 신청 관리</button>
       <button class="admin-nav-btn" onclick="showAdminPanel('adm-clubs',this)">🏷️ 동아리 관리</button>
       <button class="admin-nav-btn" onclick="showAdminPanel('adm-reports',this)">📊 보고서 현황</button>
-      <button class="admin-nav-btn" onclick="showAdminPanel('adm-past',this)">📚 지난결과 관리</button>
-      <button class="admin-nav-btn" onclick="showAdminPanel('adm-files',this)">📁 전체 자료</button>
+      <button class="admin-nav-btn" onclick="showAdminPanel('adm-past',this)">📚 지난결과 등록</button>
+      <button class="admin-nav-btn" onclick="showAdminPanel('adm-notices',this);loadAdmNotices()">📢 공지사항 관리</button>
+      <button class="admin-nav-btn" onclick="showAdminPanel('adm-files',this);loadAllFiles()">📁 전체 자료</button>
     </div>
 
     <!-- 신청 관리 -->
@@ -572,7 +387,7 @@
         </div>
         <div class="tbl-wrap">
           <table>
-            <thead><tr><th>신청일</th><th>유형</th><th>동아리명</th><th>신청자</th><th>부서</th><th>서식</th><th>상태</th><th>관리</th></tr></thead>
+            <thead><tr><th>신청일</th><th>동아리명</th><th>신청자</th><th>부서</th><th>서식</th><th>상태</th><th>관리</th></tr></thead>
             <tbody id="app-tbody"></tbody>
           </table>
         </div>
@@ -588,7 +403,7 @@
         </div>
         <div class="tbl-wrap">
           <table>
-            <thead><tr><th>동아리명</th><th>유형</th><th>고유 코드</th><th>운영상태</th><th>관리</th></tr></thead>
+            <thead><tr><th>동아리명</th><th>고유 코드</th><th>운영상태</th><th>관리</th></tr></thead>
             <tbody id="club-tbody"></tbody>
           </table>
         </div>
@@ -613,7 +428,7 @@
       </div>
     </div>
 
-    <!-- 지난결과 관리 -->
+    <!-- 지난결과 등록 -->
     <div id="adm-past" class="admin-panel">
       <div class="card">
         <div class="flex-between">
@@ -621,12 +436,31 @@
           <button class="btn btn-green btn-sm" onclick="openPastModal()">+ 등록</button>
         </div>
         <div class="info-box orange" style="margin-bottom:12px;">
-          등록한 자료는 "지난결과" 탭에 즉시 공개됩니다.
+          등록 즉시 활동현황 탭 해당 연도에 공개됩니다.
         </div>
         <div class="tbl-wrap">
           <table>
             <thead><tr><th>연도</th><th>동아리</th><th>제목</th><th>파일</th><th>등록일</th><th>관리</th></tr></thead>
             <tbody id="past-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- 공지사항 관리 -->
+    <div id="adm-notices" class="admin-panel">
+      <div class="card">
+        <div class="flex-between">
+          <div class="section-title" style="margin:0;">공지사항 관리</div>
+          <button class="btn btn-green btn-sm" onclick="openNoticeModal()">+ 등록</button>
+        </div>
+        <div class="info-box orange" style="margin-bottom:12px;">
+          등록 즉시 공지사항 탭에 공개됩니다.
+        </div>
+        <div class="tbl-wrap">
+          <table>
+            <thead><tr><th>등록일</th><th>제목</th><th>내용 (요약)</th><th>관리</th></tr></thead>
+            <tbody id="notice-tbody"></tbody>
           </table>
         </div>
       </div>
@@ -647,26 +481,23 @@
   </div>
 </div>
 
-<!-- ═══ MODAL: 활동 자료 올리기 ═══ -->
+<!-- ═══ MODAL: 자료 올리기 ═══ -->
 <div class="modal-overlay" id="modal-upload">
   <div class="modal">
     <h3>⬆️ 활동 자료 올리기</h3>
-    <p class="modal-sub">동아리 고유 코드를 입력하여 인증 후 자료를 등록합니다.</p>
-
-    <div id="up-auth-section">
-      <div class="form-group">
-        <label>동아리 선택 <span class="field-req">*</span></label>
-        <select id="up-club-sel" onchange="upResetVerify()">
-          <option value="">-- 동아리를 선택하세요 --</option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label>동아리 고유 코드 <span class="field-req">*</span></label>
-        <input type="text" id="up-code" placeholder="코드 입력" oninput="upResetVerify()">
-      </div>
-      <div class="verify-box" id="up-verified-box">✅ 코드 인증 완료 — <strong id="up-verified-name"></strong></div>
-      <div class="err" id="err-up-code" style="display:none;margin-bottom:8px;"></div>
+    <p class="modal-sub">동아리 고유 코드 인증 후 자료를 등록합니다.</p>
+    <div class="form-group">
+      <label>동아리 선택 <span class="field-req">*</span></label>
+      <select id="up-club-sel" onchange="upResetVerify()">
+        <option value="">-- 동아리를 선택하세요 --</option>
+      </select>
     </div>
+    <div class="form-group">
+      <label>동아리 고유 코드 <span class="field-req">*</span></label>
+      <input type="text" id="up-code" placeholder="코드 입력" oninput="upResetVerify()">
+    </div>
+    <div class="verify-box" id="up-verified-box">✅ 코드 인증 완료 — <strong id="up-verified-name"></strong></div>
+    <div class="err" id="err-up-code" style="margin-bottom:8px;"></div>
 
     <div id="up-form" style="display:none;">
       <div class="divider" style="margin:12px 0;"></div>
@@ -677,7 +508,7 @@
       </div>
       <div class="form-group">
         <label>자료 제목 <span class="field-req">*</span></label>
-        <input type="text" id="up-title" placeholder="예) 2026년 1월 독서토론 회의자료">
+        <input type="text" id="up-title" placeholder="예) 1월 독서토론 회의자료">
         <div class="err" id="err-up-title">제목을 입력해주세요.</div>
       </div>
       <div class="form-group">
@@ -715,7 +546,7 @@
 <div class="modal-overlay" id="modal-club">
   <div class="modal">
     <h3 id="club-modal-title">동아리 추가</h3>
-    <p class="modal-sub">동아리 정보와 업로드 인증에 사용할 고유 코드를 설정하세요.</p>
+    <p class="modal-sub">고유 코드는 리더·총무에게 공유하는 업로드 인증 코드입니다.</p>
     <input type="hidden" id="c-rowid">
     <div class="form-group"><label>동아리 이름 <span class="field-req">*</span></label><input type="text" id="c-name" placeholder="예) 독서토론 동아리"></div>
     <div class="form-group"><label>유형</label>
@@ -725,16 +556,12 @@
     <div class="form-row">
       <div class="form-group">
         <label>고유 코드 <span class="field-req">*</span></label>
-        <input type="text" id="c-code" placeholder="예) READ2026" style="font-family:monospace;letter-spacing:.05em;">
-        <div class="text-sub" style="margin-top:4px;">리더·총무에게 공유하는 업로드 인증 코드</div>
+        <input type="text" id="c-code" placeholder="예) READ2026" style="font-family:monospace;">
       </div>
       <div class="form-group">
-        <label>대표 색상</label>
-        <input type="color" id="c-color" value="#16a34a" style="height:42px;padding:4px 8px;cursor:pointer;">
+        <label>운영 상태</label>
+        <select id="c-status"><option>운영중</option><option>종료</option></select>
       </div>
-    </div>
-    <div class="form-group"><label>운영 상태</label>
-      <select id="c-status"><option>운영중</option><option>종료</option></select>
     </div>
     <div class="modal-footer">
       <button class="btn btn-gray" onclick="closeModal('modal-club')">취소</button>
@@ -764,8 +591,8 @@
 <!-- ═══ MODAL: 지난결과 등록 ═══ -->
 <div class="modal-overlay" id="modal-past">
   <div class="modal">
-    <h3 id="past-modal-title">지난결과 등록</h3>
-    <p class="modal-sub">등록한 자료는 지난결과 탭에 공개됩니다.</p>
+    <h3>지난결과 등록</h3>
+    <p class="modal-sub">등록 즉시 활동현황 탭 해당 연도에 공개됩니다.</p>
     <input type="hidden" id="p-rowid">
     <div class="form-row">
       <div class="form-group">
@@ -789,13 +616,12 @@
       <label>파일 <span class="field-req">*</span></label>
       <div class="file-drop" id="p-drop" onclick="document.getElementById('p-file').click()"
            ondragover="dropOver(event,'p-drop')" ondragleave="dropLeave('p-drop')" ondrop="dropFile(event,'p-drop','p-file-obj')">
-        <div class="drop-ico">📎</div>
-        <p>클릭하거나 파일을 드래그하세요</p>
+        <div class="drop-ico">📎</div><p>클릭하거나 파일을 드래그하세요</p>
         <div class="file-limit">최대 20MB</div>
         <div class="picked" id="p-picked"></div>
       </div>
       <input type="file" id="p-file" style="display:none" onchange="pickFile(event,'p-picked','p-file-obj','p-drop')">
-      <div class="err" id="err-p-file" style="display:none;">파일을 첨부해주세요.</div>
+      <div class="err" id="err-p-file">파일을 첨부해주세요.</div>
     </div>
     <div class="modal-footer">
       <button class="btn btn-gray" onclick="closeModal('modal-past')">취소</button>
@@ -804,42 +630,51 @@
   </div>
 </div>
 
-<!-- Loading / Toast -->
+<!-- ═══ MODAL: 공지사항 등록/수정 ═══ -->
+<div class="modal-overlay" id="modal-notice">
+  <div class="modal">
+    <h3 id="notice-modal-title">📢 공지사항 등록</h3>
+    <p class="modal-sub">등록 즉시 공지사항 탭에 공개됩니다.</p>
+    <input type="hidden" id="n-id">
+    <div class="form-group">
+      <label>제목 <span class="field-req">*</span></label>
+      <input type="text" id="n-title" placeholder="예) 2026년 학습동아리 활동 안내">
+    </div>
+    <div class="form-group">
+      <label>내용 <span class="field-req">*</span></label>
+      <textarea id="n-content" placeholder="공지 내용을 입력하세요" rows="6"></textarea>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-gray" onclick="closeModal('modal-notice')">취소</button>
+      <button class="btn btn-green" onclick="saveNotice()">등록</button>
+    </div>
+  </div>
+</div>
+
 <div class="loading-overlay" id="loading"><div class="spinner"></div><div class="loading-msg" id="loading-msg">처리 중...</div></div>
 <div class="toast" id="toast"></div>
 
 <script>
-// ══════════════════════════════════════════
-// 설정  ← 배포 후 실제 URL로 교체
-// ══════════════════════════════════════════
 const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzYrzo-6wSIxs7x6d32RS0fTLpKkc5mF9EqEKpa1rqFT4Fs3-1uVA4LRMxSrb6YiwAQEg/exec';
 
-// ══════════════════════════════════════════
-// 상태
-// ══════════════════════════════════════════
+// ── 상태 ──
 let clubs = [];
-let currentClubId = '';
-let selectedApplyType = '';
-let upVerified = null;   // { clubId, clubName }
-let rpVerified = null;   // { clubId, clubName }
+let currentYear = String(new Date().getFullYear());
+let upVerified = null;
+let rpVerified = null;
 let upStep = 'verify';
 let adminPw = '';
 const fileObjs = {};
 
-// ══════════════════════════════════════════
-// 초기 로드
-// ══════════════════════════════════════════
+// ── 초기 로드 ──
 document.addEventListener('DOMContentLoaded', async () => {
+  buildYearTabs();
   await loadClubs();
   loadActivities();
-  loadPastResults();
-  loadStats();
   populateYearFilters();
 });
 
-// ══════════════════════════════════════════
-// API
-// ══════════════════════════════════════════
+// ── API ──
 async function api(params) {
   const r = await fetch(SCRIPT_URL + '?' + new URLSearchParams(params));
   return r.json();
@@ -849,29 +684,15 @@ async function apiPost(body) {
   return r.json();
 }
 
-// ══════════════════════════════════════════
-// 탭 전환
-// ══════════════════════════════════════════
+// ── 탭 전환 ──
 function showPage(id, btn) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
   document.getElementById('page-' + id).classList.add('active');
   if (btn) btn.classList.add('active');
-  if (id === 'admin' && adminPw) {
-    loadApplications();
-    loadAdmClubs();
-    loadAdmReports();
-    loadAdmPast();
-  }
+  if (id === 'notice') { loadNotices(); }
+  if (id === 'admin' && adminPw) { loadApplications(); loadAdmClubs(); loadAdmReports(); loadAdmPast(); loadAdmNotices(); }
 }
-
-function showSubTab(id, btn) {
-  document.querySelectorAll('#page-submit > div[id^="sub-"]').forEach(el => el.style.display = 'none');
-  document.querySelectorAll('.sub-tab').forEach(b => b.classList.remove('active'));
-  document.getElementById('sub-' + id).style.display = 'block';
-  btn.classList.add('active');
-}
-
 function showAdminPanel(id, btn) {
   document.querySelectorAll('.admin-panel').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.admin-nav-btn').forEach(b => b.classList.remove('active'));
@@ -879,221 +700,102 @@ function showAdminPanel(id, btn) {
   btn.classList.add('active');
 }
 
-// ══════════════════════════════════════════
-// 동아리 목록
-// ══════════════════════════════════════════
+// ── 연도 탭 ──
+function buildYearTabs() {
+  const cur = new Date().getFullYear();
+  const years = Array.from({length: cur - 2021}, (_, i) => cur - i);
+  const container = document.getElementById('year-tabs');
+  container.innerHTML = years.map(y =>
+    `<button class="year-tab-btn${y == currentYear ? ' active' : ''}" onclick="selectYear(${y},this)">${y}년</button>`
+  ).join('');
+}
+
+function selectYear(year, btn) {
+  currentYear = String(year);
+  document.querySelectorAll('.year-tab-btn').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  document.getElementById('activity-year-title').textContent = year + '년 활동 자료';
+  loadActivities();
+}
+
+// ── 동아리 목록 (코드 채우기용) ──
 async function loadClubs() {
   try { clubs = await api({ action: 'getClubs' }); }
   catch(e) { clubs = []; }
-  renderHomeClubs();
-  renderClubTabs();
   populateClubSelects();
-}
-
-async function loadStats() {
-  try {
-    const s = await api({ action: 'getStats' });
-    document.getElementById('st-clubs').textContent   = s.clubCount   ?? '-';
-    document.getElementById('st-acts').textContent    = s.activityCount ?? '-';
-    document.getElementById('st-reports').textContent = s.reportCount  ?? '-';
-    document.getElementById('st-pending').textContent = s.applyCount   ?? '-';
-  } catch(e) {}
-}
-
-function renderHomeClubs() {
-  const el = document.getElementById('home-club-grid');
-  const active = clubs.filter(c => c.status !== '종료');
-  if (!active.length) { el.innerHTML = '<div class="empty"><div>🌱</div>운영 중인 동아리가 없습니다.</div>'; return; }
-  el.innerHTML = active.map(c => `
-    <div style="border:1px solid var(--border);border-radius:12px;padding:18px;background:var(--surface);cursor:pointer;transition:box-shadow .2s;"
-         onmouseover="this.style.boxShadow='0 4px 16px rgba(0,0,0,.1)'" onmouseout="this.style.boxShadow=''"
-         onclick="showPage('activity',document.querySelectorAll('.nav-bar button')[2]);setTimeout(()=>selectClubById('${c.id}'),80)">
-      <div style="height:4px;border-radius:2px;background:${c.color||'#16a34a'};margin-bottom:14px;"></div>
-      <h3 style="font-size:15px;font-weight:800;color:var(--navy);margin-bottom:6px;">${esc(c.name)}</h3>
-      <span class="badge ${c.type==='자율기획형'?'b-orange':'b-green'}" style="margin-bottom:8px;">${esc(c.type||'학습동아리')}</span>
-      <p style="font-size:12px;color:var(--sub);line-height:1.6;margin-top:6px;">${esc(c.desc||'')}</p>
-    </div>
-  `).join('');
-}
-
-function renderClubTabs() {
-  const container = document.getElementById('club-tabs');
-  container.innerHTML = '<button class="club-tab-btn active" onclick="selectClub(\'\',this)">전체</button>' +
-    clubs.filter(c => c.status !== '종료').map(c =>
-      `<button class="club-tab-btn" onclick="selectClub('${c.id}',this)">${esc(c.name)}</button>`
-    ).join('');
 }
 
 function populateClubSelects() {
   const opts = clubs.map(c => `<option value="${c.id}">${esc(c.name)}</option>`).join('');
-  ['up-club-sel','rp-club-sel'].forEach(id => {
+  ['up-club-sel', 'rp-club-sel'].forEach(id => {
     const el = document.getElementById(id);
     if (el) el.innerHTML = '<option value="">-- 동아리를 선택하세요 --</option>' + opts;
   });
 }
 
-function selectClub(clubId, btn) {
-  currentClubId = clubId;
-  document.querySelectorAll('.club-tab-btn').forEach(b => b.classList.remove('active'));
-  if (btn) btn.classList.add('active');
-  const club = clubs.find(c => c.id === clubId);
-  document.getElementById('activity-club-title').textContent =
-    clubId ? (club?.name || '동아리') + ' 활동 자료' : '전체 활동 자료';
-  loadActivities();
-}
-
-function selectClubById(clubId) {
-  const btns = document.querySelectorAll('#club-tabs .club-tab-btn');
-  btns.forEach(btn => {
-    const id = btn.getAttribute('onclick')?.match(/'([^']+)'/)?.[1];
-    if (id === clubId) selectClub(clubId, btn);
-  });
-}
-
-// ══════════════════════════════════════════
-// 동아리 신청
-// ══════════════════════════════════════════
-function selectApplyType(type) {
-  selectedApplyType = type;
-  document.getElementById('type-study').classList.toggle('selected', type === '학습동아리');
-  document.getElementById('type-free').classList.toggle('selected',  type === '자율기획형');
-  document.getElementById('err-type').textContent = '';
-}
-
-function applyNext(step) {
-  if (step === 2 && !selectedApplyType) {
-    document.getElementById('err-type').textContent = '동아리 유형을 선택해주세요.';
-    return;
-  }
-  goApplyStep(step);
-}
-
-function goApplyStep(n) {
-  [1,2,3].forEach(i => {
-    document.getElementById('apply-step' + i).classList.toggle('active', i === n);
-    const dot = document.getElementById('sd' + i);
-    const lbl = document.getElementById('sl' + i);
-    dot.classList.remove('active','done');
-    lbl.classList.remove('active');
-    if (i < n) dot.classList.add('done');
-    if (i === n) { dot.classList.add('active'); lbl.classList.add('active'); }
-  });
-}
-
-async function submitApply() {
-  const name  = v('ap-name'), dept = v('ap-dept'), cname = v('ap-clubname');
-  const contact = v('ap-contact');
-  const file  = fileObjs['ap-file-obj'];
-  let ok = true;
-  if (!name)  { show('err-ap-name', true); ok=false; }    else show('err-ap-name', false);
-  if (!cname) { show('err-ap-clubname', true); ok=false; } else show('err-ap-clubname', false);
-  if (!file)  { show('err-ap-file', true); ok=false; }    else show('err-ap-file', false);
-  if (!ok) return;
-  loading('신청서 제출 중...');
-  try {
-    const b64 = await toB64(file);
-    const res = await apiPost({ action:'submitApplication', type:selectedApplyType, name, dept, contact, clubName:cname, fileName:file.name, fileType:file.type, fileSize:file.size, fileData:b64 });
-    hide();
-    if (res.ok) { toast('신청이 완료되었습니다!','ok'); goApplyStep(3); }
-    else toast(res.error || '오류가 발생했습니다.','err');
-  } catch(e) { hide(); toast('오류가 발생했습니다.','err'); }
-}
-
-// ══════════════════════════════════════════
-// 성과보고서 - 코드 인증
-// ══════════════════════════════════════════
-function rpResetVerify() {
-  rpVerified = null;
-  document.getElementById('rp-verified-box').style.display = 'none';
-  document.getElementById('rp-form').style.display = 'none';
-  document.getElementById('err-rp-code').style.display = 'none';
-}
-
-async function verifyReportCode() {
-  const clubId = document.getElementById('rp-club-sel').value;
-  const code   = v('rp-code');
-  if (!clubId || !code) { showErrEl('err-rp-code', '동아리와 코드를 모두 입력해주세요.'); return; }
-  loading('코드 확인 중...');
-  try {
-    const res = await api({ action:'verifyClubCode', clubId, code });
-    hide();
-    if (res.ok) {
-      rpVerified = { clubId, clubName: res.clubName };
-      document.getElementById('rp-verified-name').textContent = res.clubName;
-      document.getElementById('rp-verified-box').style.display = 'block';
-      document.getElementById('rp-form').style.display = 'block';
-      document.getElementById('err-rp-code').style.display = 'none';
-    } else {
-      showErrEl('err-rp-code', '코드가 올바르지 않습니다. 다시 확인해주세요.');
-    }
-  } catch(e) { hide(); toast('오류가 발생했습니다.','err'); }
-}
-
-async function submitReport() {
-  if (!rpVerified) { toast('코드 인증을 먼저 완료해주세요.','err'); return; }
-  const name  = v('rp-name'), title = v('rp-title');
-  const year  = v('rp-year');
-  const file  = fileObjs['rp-file-obj'];
-  let ok = true;
-  if (!name)  { show('err-rp-name', true); ok=false; }  else show('err-rp-name', false);
-  if (!title) { show('err-rp-title', true); ok=false; } else show('err-rp-title', false);
-  if (!file)  { show('err-rp-file', true); ok=false; }  else show('err-rp-file', false);
-  if (!ok) return;
-  loading('성과보고서 제출 중...');
-  try {
-    const b64 = await toB64(file);
-    const res = await apiPost({
-      action:'uploadReport', clubId:rpVerified.clubId, clubName:rpVerified.clubName,
-      clubCode:v('rp-code'), year, title, uploadedBy:name,
-      fileName:file.name, fileType:file.type, fileSize:file.size, fileData:b64
-    });
-    hide();
-    if (res.ok) {
-      toast('성과보고서가 제출되었습니다!','ok');
-      rpResetVerify();
-      document.getElementById('rp-club-sel').value = '';
-      document.getElementById('rp-code').value = '';
-      fileObjs['rp-file-obj'] = null;
-      document.getElementById('rp-picked').style.display = 'none';
-    } else toast(res.error || '오류가 발생했습니다.','err');
-  } catch(e) { hide(); toast('오류가 발생했습니다.','err'); }
-}
-
-// ══════════════════════════════════════════
-// 활동현황
-// ══════════════════════════════════════════
+// ── 활동현황 로드 (활동자료 + 지난결과 통합) ──
 async function loadActivities() {
   const el = document.getElementById('activity-list');
   el.innerHTML = '<div class="empty"><div>⏳</div>불러오는 중...</div>';
   try {
-    const year = document.getElementById('act-year-filter').value;
-    const data = await api({ action:'getActivities', clubId: currentClubId, year });
-    if (!data.length) { el.innerHTML = '<div class="empty"><div>📭</div>활동 자료가 없습니다.</div>'; return; }
-    el.innerHTML = data.map(a => `
-      <div class="activity-item">
-        <div class="act-icon">${catIcon(a.category)}</div>
-        <div class="act-info">
-          <h4>${esc(a.title)}</h4>
-          <div class="act-meta">
-            <span class="badge b-green">${esc(a.clubName)}</span>
-            <span class="badge b-gray">${esc(a.category||'활동자료')}</span>
-            <span>📅 ${fmtDate(a.uploadedAt)}</span>
-            ${a.uploadedBy?`<span>👤 ${esc(a.uploadedBy)}</span>`:''}
-          </div>
-          ${a.desc?`<div style="font-size:12px;color:var(--sub);margin-top:4px;">${esc(a.desc)}</div>`:''}
-        </div>
-        ${a.driveUrl?`<a href="${a.driveUrl}" target="_blank" class="btn-dl">⬇️ 열기</a>`:''}
-      </div>
-    `).join('');
-  } catch(e) { el.innerHTML = '<div class="empty"><div>⚠️</div>오류가 발생했습니다.</div>'; }
+    const [acts, pasts] = await Promise.all([
+      api({ action: 'getActivities', year: currentYear }),
+      api({ action: 'getPastResults', year: currentYear })
+    ]);
+
+    const allItems = [
+      ...acts.map(a => ({ ...a, _type: 'activity' })),
+      ...pasts.map(p => ({ ...p, _type: 'past' }))
+    ].sort((a, b) => new Date(b.uploadedAt||b.submittedAt) - new Date(a.uploadedAt||a.submittedAt));
+
+    if (!allItems.length) {
+      el.innerHTML = '<div class="empty"><div>📭</div>' + currentYear + '년 자료가 없습니다.</div>';
+      return;
+    }
+
+    el.innerHTML = allItems.map(item => {
+      if (item._type === 'past') {
+        return `
+          <div class="activity-item">
+            <div class="act-icon" style="background:#f5f3ff;">📚</div>
+            <div class="act-info">
+              <h4>${esc(item.title)}</h4>
+              <div class="act-meta">
+                <span class="badge b-past">지난결과</span>
+                <span class="badge b-gray">${esc(item.clubName||'')}</span>
+                ${item.desc ? `<span>${esc(item.desc)}</span>` : ''}
+              </div>
+            </div>
+            ${item.driveUrl ? `<a href="${item.driveUrl}" target="_blank" class="btn-dl">⬇️ 다운로드</a>` : ''}
+          </div>`;
+      } else {
+        return `
+          <div class="activity-item">
+            <div class="act-icon">${catIcon(item.category)}</div>
+            <div class="act-info">
+              <h4>${esc(item.title)}</h4>
+              <div class="act-meta">
+                <span class="badge b-green">${esc(item.clubName||'')}</span>
+                <span class="badge b-gray">${esc(item.category||'활동자료')}</span>
+                <span>📅 ${fmtDate(item.uploadedAt)}</span>
+                ${item.uploadedBy ? `<span>👤 ${esc(item.uploadedBy)}</span>` : ''}
+              </div>
+              ${item.desc ? `<div style="font-size:12px;color:var(--sub);margin-top:4px;">${esc(item.desc)}</div>` : ''}
+            </div>
+            ${item.driveUrl ? `<a href="${item.driveUrl}" target="_blank" class="btn-dl">⬇️ 열기</a>` : ''}
+          </div>`;
+      }
+    }).join('');
+  } catch(e) {
+    el.innerHTML = '<div class="empty"><div>⚠️</div>오류가 발생했습니다.</div>';
+  }
 }
 
 function catIcon(cat) {
-  const m = {'활동자료':'📄','회의록':'📝','발표자료':'📊','참고자료':'📖','기타':'📦'};
-  return m[cat] || '📄';
+  return {'활동자료':'📄','회의록':'📝','발표자료':'📊','참고자료':'📖','기타':'📦'}[cat] || '📄';
 }
 
-// ── 활동 업로드 모달 ──
+// ── 자료 올리기 (활동현황) ──
 function openUploadModal() {
   upVerified = null; upStep = 'verify';
   document.getElementById('up-verified-box').style.display = 'none';
@@ -1120,11 +822,11 @@ function upResetVerify() {
 async function uploadVerifyOrSubmit() {
   if (upStep === 'verify') {
     const clubId = document.getElementById('up-club-sel').value;
-    const code   = v('up-code');
-    if (!clubId || !code) { showErrEl('err-up-code', '동아리와 코드를 모두 입력해주세요.'); return; }
+    const code = v('up-code');
+    if (!clubId || !code) { showErr('err-up-code', '동아리와 코드를 모두 입력해주세요.'); return; }
     loading('코드 확인 중...');
     try {
-      const res = await api({ action:'verifyClubCode', clubId, code });
+      const res = await api({ action: 'verifyClubCode', clubId, code });
       hide();
       if (res.ok) {
         upVerified = { clubId, clubName: res.clubName };
@@ -1134,10 +836,8 @@ async function uploadVerifyOrSubmit() {
         document.getElementById('err-up-code').style.display = 'none';
         document.getElementById('up-btn').textContent = '자료 올리기';
         upStep = 'upload';
-      } else {
-        showErrEl('err-up-code', '코드가 올바르지 않습니다.');
-      }
-    } catch(e) { hide(); toast('오류가 발생했습니다.','err'); }
+      } else { showErr('err-up-code', '코드가 올바르지 않습니다.'); }
+    } catch(e) { hide(); toast('오류가 발생했습니다.', 'err'); }
   } else {
     await submitActivity();
   }
@@ -1145,116 +845,148 @@ async function uploadVerifyOrSubmit() {
 
 async function submitActivity() {
   if (!upVerified) return;
-  const name  = v('up-name'), title = v('up-title');
-  const file  = fileObjs['up-file-obj'];
+  const name = v('up-name'), title = v('up-title'), file = fileObjs['up-file-obj'];
   let ok = true;
-  if (!name)  { show('err-up-name', true); ok=false; }  else show('err-up-name', false);
-  if (!title) { show('err-up-title', true); ok=false; } else show('err-up-title', false);
-  if (!file)  { show('err-up-file', true); ok=false; }  else show('err-up-file', false);
+  if (!name)  { show('err-up-name', true); ok = false; } else show('err-up-name', false);
+  if (!title) { show('err-up-title', true); ok = false; } else show('err-up-title', false);
+  if (!file)  { show('err-up-file', true); ok = false; } else show('err-up-file', false);
   if (!ok) return;
-  loading('자료 업로드 중...');
+  loading('업로드 중...');
   try {
     const b64 = await toB64(file);
     const res = await apiPost({
-      action:'uploadActivity', clubId:upVerified.clubId, clubName:upVerified.clubName,
-      clubCode:v('up-code'), title, category:v('up-category'), desc:v('up-desc'),
-      uploadedBy:name, fileName:file.name, fileType:file.type, fileSize:file.size, fileData:b64
+      action: 'uploadActivity', clubId: upVerified.clubId, clubName: upVerified.clubName,
+      clubCode: v('up-code'), title, category: v('up-category'), desc: v('up-desc'),
+      uploadedBy: name, fileName: file.name, fileType: file.type, fileSize: file.size, fileData: b64
+    });
+    hide();
+    if (res.ok) { toast('자료가 업로드되었습니다!', 'ok'); closeModal('modal-upload'); loadActivities(); }
+    else toast(res.error || '오류가 발생했습니다.', 'err');
+  } catch(e) { hide(); toast('오류가 발생했습니다.', 'err'); }
+}
+
+// ── 신청 ──
+async function submitApply() {
+  const name = v('ap-name'), dept = v('ap-dept'), cname = v('ap-clubname'), contact = v('ap-contact');
+  const file = fileObjs['ap-file-obj'];
+  let ok = true;
+  if (!name)  { show('err-ap-name', true); ok = false; }    else show('err-ap-name', false);
+  if (!cname) { show('err-ap-clubname', true); ok = false; } else show('err-ap-clubname', false);
+  if (!file)  { show('err-ap-file', true); ok = false; }    else show('err-ap-file', false);
+  if (!ok) return;
+  loading('신청서 제출 중...');
+  try {
+    const b64 = await toB64(file);
+    const res = await apiPost({ action: 'submitApplication', type: '학습동아리', name, dept, contact, clubName: cname, fileName: file.name, fileType: file.type, fileSize: file.size, fileData: b64 });
+    hide();
+    if (res.ok) {
+      document.getElementById('apply-done').style.display = 'block';
+      document.querySelector('#page-apply .card > *:not(#apply-done)') &&
+        document.querySelectorAll('#page-apply .card > *:not(#apply-done)').forEach(el => el.style.display = 'none');
+      toast('신청이 완료되었습니다!', 'ok');
+    } else toast(res.error || '오류가 발생했습니다.', 'err');
+  } catch(e) { hide(); toast('오류가 발생했습니다.', 'err'); }
+}
+
+function resetApply() {
+  document.querySelectorAll('#page-apply .card > *').forEach(el => el.style.display = '');
+  document.getElementById('apply-done').style.display = 'none';
+  document.getElementById('ap-name').value = '';
+  document.getElementById('ap-dept').value = '';
+  document.getElementById('ap-clubname').value = '';
+  document.getElementById('ap-contact').value = '';
+  fileObjs['ap-file-obj'] = null;
+  document.getElementById('ap-picked').style.display = 'none';
+}
+
+// ── 보고서 - 코드 인증 ──
+function rpResetVerify() {
+  rpVerified = null;
+  document.getElementById('rp-verified-box').style.display = 'none';
+  document.getElementById('rp-form').style.display = 'none';
+  document.getElementById('err-rp-code').style.display = 'none';
+}
+
+async function verifyReportCode() {
+  const clubId = document.getElementById('rp-club-sel').value;
+  const code = v('rp-code');
+  if (!clubId || !code) { showErr('err-rp-code', '동아리와 코드를 모두 입력해주세요.'); return; }
+  loading('코드 확인 중...');
+  try {
+    const res = await api({ action: 'verifyClubCode', clubId, code });
+    hide();
+    if (res.ok) {
+      rpVerified = { clubId, clubName: res.clubName };
+      document.getElementById('rp-verified-name').textContent = res.clubName;
+      document.getElementById('rp-verified-box').style.display = 'block';
+      document.getElementById('rp-form').style.display = 'block';
+      document.getElementById('err-rp-code').style.display = 'none';
+    } else { showErr('err-rp-code', '코드가 올바르지 않습니다.'); }
+  } catch(e) { hide(); toast('오류가 발생했습니다.', 'err'); }
+}
+
+async function submitReport() {
+  if (!rpVerified) { toast('코드 인증을 먼저 완료해주세요.', 'err'); return; }
+  const name = v('rp-name'), title = v('rp-title'), year = v('rp-year'), file = fileObjs['rp-file-obj'];
+  let ok = true;
+  if (!name)  { show('err-rp-name', true); ok = false; }  else show('err-rp-name', false);
+  if (!title) { show('err-rp-title', true); ok = false; } else show('err-rp-title', false);
+  if (!file)  { show('err-rp-file', true); ok = false; }  else show('err-rp-file', false);
+  if (!ok) return;
+  loading('성과보고서 제출 중...');
+  try {
+    const b64 = await toB64(file);
+    const res = await apiPost({
+      action: 'uploadReport', clubId: rpVerified.clubId, clubName: rpVerified.clubName,
+      clubCode: v('rp-code'), year, title, uploadedBy: name,
+      fileName: file.name, fileType: file.type, fileSize: file.size, fileData: b64
     });
     hide();
     if (res.ok) {
-      toast('자료가 업로드되었습니다!','ok');
-      closeModal('modal-upload');
-      loadActivities();
-    } else toast(res.error || '오류가 발생했습니다.','err');
-  } catch(e) { hide(); toast('오류가 발생했습니다.','err'); }
+      toast('성과보고서가 제출되었습니다!', 'ok');
+      rpResetVerify();
+      ['rp-club-sel','rp-code','rp-name','rp-title'].forEach(id => document.getElementById(id).value = '');
+      fileObjs['rp-file-obj'] = null;
+      document.getElementById('rp-picked').style.display = 'none';
+    } else toast(res.error || '오류가 발생했습니다.', 'err');
+  } catch(e) { hide(); toast('오류가 발생했습니다.', 'err'); }
 }
 
-// ══════════════════════════════════════════
-// 지난결과
-// ══════════════════════════════════════════
-async function loadPastResults() {
-  const el = document.getElementById('past-area');
-  el.innerHTML = '<div class="empty"><div>⏳</div>불러오는 중...</div>';
-  try {
-    const year = document.getElementById('past-year-filter')?.value || '';
-    const data = await api({ action:'getPastResults', year });
-    if (!data.length) { el.innerHTML = '<div class="empty"><div>📚</div>등록된 지난결과가 없습니다.</div>'; return; }
-
-    // year 별로 그룹화
-    const byYear = {};
-    data.forEach(r => {
-      const y = r.year || '연도 미상';
-      if (!byYear[y]) byYear[y] = [];
-      byYear[y].push(r);
-    });
-
-    el.innerHTML = Object.keys(byYear).sort((a,b)=>b-a).map(yr => `
-      <div class="past-year-section">
-        <div class="past-year-label">📅 ${yr}년</div>
-        <div class="past-grid">
-          ${byYear[yr].map(r => `
-            <div class="past-card">
-              <div class="past-card-top">
-                <div class="past-ico">📄</div>
-                <div class="past-info">
-                  <h4>${esc(r.title)}</h4>
-                  <div class="past-meta">${esc(r.clubName||'')}${r.desc?` · ${esc(r.desc)}`:''}</div>
-                </div>
-              </div>
-              ${r.driveUrl?`<a href="${r.driveUrl}" target="_blank" class="btn-dl" style="width:100%;justify-content:center;">⬇️ 다운로드</a>`:'<span class="text-sub">파일 없음</span>'}
-            </div>
-          `).join('')}
-        </div>
-      </div>
-    `).join('');
-  } catch(e) { el.innerHTML = '<div class="empty"><div>⚠️</div>오류가 발생했습니다.</div>'; }
-}
-
-// ══════════════════════════════════════════
-// 관리자
-// ══════════════════════════════════════════
+// ── 관리자 ──
 async function adminLogin() {
   const pw = document.getElementById('adm-pw').value;
   if (!pw) return;
-  // 관리자 인증은 서버 측에서 처리됨. 여기서는 간단히 테스트 요청
   loading('인증 중...');
   try {
-    const res = await api({ action:'getApplications', pw, status:'' });
+    const res = await api({ action: 'getApplications', pw, status: '' });
     hide();
-    if (res.error) {
-      document.getElementById('err-adm-pw').textContent = '비밀번호가 올바르지 않습니다.';
-    } else {
+    if (res.error) { document.getElementById('err-adm-pw').textContent = '비밀번호가 올바르지 않습니다.'; }
+    else {
       adminPw = pw;
       document.getElementById('admin-lock').style.display = 'none';
       document.getElementById('admin-panel').style.display = 'block';
       renderAppTable(res);
-      loadAdmClubs();
-      loadAdmReports();
-      loadAdmPast();
+      loadAdmClubs(); loadAdmReports(); loadAdmPast(); loadAdmNotices();
     }
-  } catch(e) { hide(); toast('오류가 발생했습니다.','err'); }
+  } catch(e) { hide(); toast('오류가 발생했습니다.', 'err'); }
 }
 
 async function loadApplications() {
   if (!adminPw) return;
   const status = document.getElementById('app-status-filter').value;
-  try {
-    const data = await api({ action:'getApplications', pw:adminPw, status });
-    renderAppTable(data);
-  } catch(e) {}
+  try { renderAppTable(await api({ action: 'getApplications', pw: adminPw, status })); } catch(e) {}
 }
 
 function renderAppTable(data) {
   const tbody = document.getElementById('app-tbody');
-  if (!data.length) { tbody.innerHTML = '<tr><td colspan="8" class="empty" style="padding:30px;">신청 내역이 없습니다.</td></tr>'; return; }
+  if (!data || !data.length) { tbody.innerHTML = '<tr><td colspan="7" class="empty" style="padding:24px;">신청 내역이 없습니다.</td></tr>'; return; }
   tbody.innerHTML = data.map(a => `
     <tr>
       <td>${fmtDate(a.submittedAt)}</td>
-      <td><span class="badge b-navy">${esc(a.type||'')}</span></td>
-      <td>${esc(a.clubName)}</td>
+      <td><strong>${esc(a.clubName)}</strong></td>
       <td>${esc(a.name)}</td>
       <td>${esc(a.dept||'')}</td>
-      <td>${a.driveUrl?`<a href="${a.driveUrl}" target="_blank" class="btn-dl btn-sm">열기</a>`:'—'}</td>
+      <td>${a.driveUrl ? `<a href="${a.driveUrl}" target="_blank" class="btn-dl btn-sm">열기</a>` : '—'}</td>
       <td><span class="badge ${a.status==='승인'?'b-ok':a.status==='반려'?'b-no':'b-wait'}">${esc(a.status||'대기')}</span></td>
       <td><button class="btn btn-gray btn-sm" onclick="openAppReview('${a.id}','${esc(a.clubName)}','${esc(a.name)}')">검토</button></td>
     </tr>
@@ -1271,29 +1003,28 @@ function openAppReview(id, clubName, name) {
 async function reviewApp(status) {
   const id = document.getElementById('app-review-id').value;
   const comment = document.getElementById('app-comment').value;
-  if (status === '반려' && !comment) { toast('반려 사유를 입력해주세요.','err'); return; }
+  if (status === '반려' && !comment) { toast('반려 사유를 입력해주세요.', 'err'); return; }
   loading('처리 중...');
   try {
-    const res = await apiPost({ action:'reviewApplication', pw:adminPw, id, status, comment });
+    const res = await apiPost({ action: 'reviewApplication', pw: adminPw, id, status, comment });
     hide();
-    if (res.ok) { toast(`${status} 처리되었습니다.`,'ok'); closeModal('modal-app-review'); loadApplications(); }
-    else toast(res.error||'오류','err');
-  } catch(e) { hide(); toast('오류가 발생했습니다.','err'); }
+    if (res.ok) { toast(`${status} 처리되었습니다.`, 'ok'); closeModal('modal-app-review'); loadApplications(); }
+    else toast(res.error || '오류', 'err');
+  } catch(e) { hide(); toast('오류가 발생했습니다.', 'err'); }
 }
 
 async function loadAdmClubs() {
   if (!adminPw) return;
   try {
-    const data = await api({ action:'getClubsAdmin', pw:adminPw });
+    const data = await api({ action: 'getClubsAdmin', pw: adminPw });
     const tbody = document.getElementById('club-tbody');
-    if (!data.length) { tbody.innerHTML = '<tr><td colspan="5" class="empty" style="padding:30px;">동아리가 없습니다.</td></tr>'; return; }
+    if (!data || !data.length) { tbody.innerHTML = '<tr><td colspan="4" class="empty" style="padding:24px;">동아리가 없습니다.</td></tr>'; return; }
     tbody.innerHTML = data.map(c => `
       <tr>
-        <td><strong>${esc(c.name)}</strong></td>
-        <td><span class="badge b-navy">${esc(c.type||'')}</span></td>
-        <td><code style="background:#f1f5f9;padding:2px 7px;border-radius:5px;font-size:12px;">${esc(c.code||'')}</code></td>
+        <td><strong>${esc(c.name)}</strong> <span class="badge b-gray">${esc(c.type||'')}</span></td>
+        <td><code style="background:#f1f5f9;padding:2px 8px;border-radius:5px;font-size:12px;">${esc(c.code||'')}</code></td>
         <td><span class="badge ${c.status==='운영중'?'b-ok':'b-gray'}">${esc(c.status||'')}</span></td>
-        <td><button class="btn btn-gray btn-sm" onclick="openClubModal(${JSON.stringify(c).replace(/"/g,'&quot;')})">수정</button></td>
+        <td><button class="btn btn-gray btn-sm" onclick='openClubModal(${JSON.stringify(c)})'>수정</button></td>
       </tr>
     `).join('');
   } catch(e) {}
@@ -1306,7 +1037,6 @@ function openClubModal(c) {
   document.getElementById('c-type').value   = c?.type || '학습동아리';
   document.getElementById('c-desc').value   = c?.desc || '';
   document.getElementById('c-code').value   = c?.code || '';
-  document.getElementById('c-color').value  = c?.color || '#16a34a';
   document.getElementById('c-status').value = c?.status || '운영중';
   openModal('modal-club');
 }
@@ -1314,38 +1044,34 @@ function openClubModal(c) {
 async function saveClub() {
   const name = document.getElementById('c-name').value.trim();
   const code = document.getElementById('c-code').value.trim();
-  if (!name || !code) { toast('동아리 이름과 코드를 입력해주세요.','err'); return; }
+  if (!name || !code) { toast('동아리 이름과 코드를 입력해주세요.', 'err'); return; }
   loading('저장 중...');
   try {
     const res = await apiPost({
-      action:'saveClub', pw:adminPw,
+      action: 'saveClub', pw: adminPw,
       rowId: document.getElementById('c-rowid').value || null,
-      name, type:document.getElementById('c-type').value,
-      desc:document.getElementById('c-desc').value,
-      code, color:document.getElementById('c-color').value,
-      status:document.getElementById('c-status').value
+      name, type: document.getElementById('c-type').value,
+      desc: document.getElementById('c-desc').value,
+      code, status: document.getElementById('c-status').value
     });
     hide();
-    if (res.ok) { toast('저장되었습니다.','ok'); closeModal('modal-club'); loadAdmClubs(); await loadClubs(); }
-    else toast(res.error||'오류','err');
-  } catch(e) { hide(); toast('오류가 발생했습니다.','err'); }
+    if (res.ok) { toast('저장되었습니다.', 'ok'); closeModal('modal-club'); loadAdmClubs(); await loadClubs(); }
+    else toast(res.error || '오류', 'err');
+  } catch(e) { hide(); toast('오류가 발생했습니다.', 'err'); }
 }
 
 async function loadAdmReports() {
   if (!adminPw) return;
   const year = document.getElementById('rpt-year-filter')?.value || '';
   try {
-    const data = await api({ action:'getReports', pw:adminPw, year });
+    const data = await api({ action: 'getReports', pw: adminPw, year });
     const tbody = document.getElementById('report-tbody');
-    if (!data || !data.length) { tbody.innerHTML = '<tr><td colspan="6" class="empty" style="padding:30px;">제출된 보고서가 없습니다.</td></tr>'; return; }
+    if (!data || !data.length) { tbody.innerHTML = '<tr><td colspan="6" class="empty" style="padding:24px;">제출된 보고서가 없습니다.</td></tr>'; return; }
     tbody.innerHTML = data.map(r => `
       <tr>
-        <td>${r.year||'—'}</td>
-        <td>${esc(r.clubName)}</td>
-        <td>${esc(r.title)}</td>
-        <td>${esc(r.uploadedBy||'')}</td>
-        <td>${fmtDate(r.uploadedAt)}</td>
-        <td>${r.driveUrl?`<a href="${r.driveUrl}" target="_blank" class="btn-dl btn-sm">열기</a>`:'—'}</td>
+        <td>${r.year||'—'}</td><td>${esc(r.clubName)}</td><td>${esc(r.title)}</td>
+        <td>${esc(r.uploadedBy||'')}</td><td>${fmtDate(r.uploadedAt)}</td>
+        <td>${r.driveUrl ? `<a href="${r.driveUrl}" target="_blank" class="btn-dl btn-sm">열기</a>` : '—'}</td>
       </tr>
     `).join('');
   } catch(e) {}
@@ -1354,26 +1080,21 @@ async function loadAdmReports() {
 async function loadAdmPast() {
   if (!adminPw) return;
   try {
-    const data = await api({ action:'getPastResults' });
+    const data = await api({ action: 'getPastResults' });
     const tbody = document.getElementById('past-tbody');
-    if (!data.length) { tbody.innerHTML = '<tr><td colspan="6" class="empty" style="padding:30px;">등록된 자료가 없습니다.</td></tr>'; return; }
+    if (!data || !data.length) { tbody.innerHTML = '<tr><td colspan="6" class="empty" style="padding:24px;">등록된 자료가 없습니다.</td></tr>'; return; }
     tbody.innerHTML = data.map(r => `
       <tr>
-        <td>${r.year}</td>
-        <td>${esc(r.clubName||'')}</td>
-        <td>${esc(r.title)}</td>
-        <td>${r.driveUrl?`<a href="${r.driveUrl}" target="_blank" class="btn-dl btn-sm">열기</a>`:'—'}</td>
+        <td>${r.year}</td><td>${esc(r.clubName||'')}</td><td>${esc(r.title)}</td>
+        <td>${r.driveUrl ? `<a href="${r.driveUrl}" target="_blank" class="btn-dl btn-sm">열기</a>` : '—'}</td>
         <td>${fmtDate(r.uploadedAt)}</td>
-        <td>
-          <button class="btn btn-danger btn-sm" onclick="deletePastResult('${r.id}')">삭제</button>
-        </td>
+        <td><button class="btn btn-danger btn-sm" onclick="deletePastResult('${r.id}')">삭제</button></td>
       </tr>
     `).join('');
   } catch(e) {}
 }
 
 function openPastModal() {
-  document.getElementById('past-modal-title').textContent = '지난결과 등록';
   document.getElementById('p-rowid').value = '';
   document.getElementById('p-year').value = new Date().getFullYear() - 1;
   document.getElementById('p-clubname').value = '';
@@ -1381,59 +1102,55 @@ function openPastModal() {
   document.getElementById('p-desc').value = '';
   fileObjs['p-file-obj'] = null;
   document.getElementById('p-picked').style.display = 'none';
+  show('err-p-file', false);
   openModal('modal-past');
 }
 
 async function savePastResult() {
-  const year    = document.getElementById('p-year').value;
+  const year = document.getElementById('p-year').value;
   const clubName = document.getElementById('p-clubname').value.trim();
-  const title   = document.getElementById('p-title').value.trim();
-  const file    = fileObjs['p-file-obj'];
-  if (!year || !clubName || !title) { toast('연도, 동아리명, 제목을 입력해주세요.','err'); return; }
-  const rowId = document.getElementById('p-rowid').value;
-  if (!rowId && !file) { show('err-p-file', true); return; } else show('err-p-file', false);
+  const title = document.getElementById('p-title').value.trim();
+  const file = fileObjs['p-file-obj'];
+  if (!year || !clubName || !title) { toast('연도, 동아리명, 제목을 입력해주세요.', 'err'); return; }
+  if (!file) { show('err-p-file', true); return; }
+  show('err-p-file', false);
   loading('등록 중...');
   try {
-    const body = {
-      action:'savePastResult', pw:adminPw, rowId: rowId||null,
-      year, clubName, title, desc: document.getElementById('p-desc').value
-    };
-    if (file) {
-      body.fileData = await toB64(file);
-      body.fileName = file.name; body.fileType = file.type; body.fileSize = file.size;
-    }
-    const res = await apiPost(body);
+    const b64 = await toB64(file);
+    const res = await apiPost({
+      action: 'savePastResult', pw: adminPw,
+      year, clubName, title, desc: document.getElementById('p-desc').value,
+      fileData: b64, fileName: file.name, fileType: file.type, fileSize: file.size
+    });
     hide();
-    if (res.ok) { toast('등록되었습니다.','ok'); closeModal('modal-past'); loadAdmPast(); loadPastResults(); }
-    else toast(res.error||'오류','err');
-  } catch(e) { hide(); toast('오류가 발생했습니다.','err'); }
+    if (res.ok) { toast('등록되었습니다.', 'ok'); closeModal('modal-past'); loadAdmPast(); loadActivities(); }
+    else toast(res.error || '오류', 'err');
+  } catch(e) { hide(); toast('오류가 발생했습니다.', 'err'); }
 }
 
 async function deletePastResult(id) {
   if (!confirm('이 자료를 삭제하시겠습니까?')) return;
   loading('삭제 중...');
   try {
-    const res = await apiPost({ action:'deleteFile', pw:adminPw, id, sheetName:'지난결과' });
+    const res = await apiPost({ action: 'deleteFile', pw: adminPw, id, sheetName: '지난결과' });
     hide();
-    if (res.ok) { toast('삭제되었습니다.','ok'); loadAdmPast(); loadPastResults(); }
-    else toast(res.error||'오류','err');
-  } catch(e) { hide(); toast('오류가 발생했습니다.','err'); }
+    if (res.ok) { toast('삭제되었습니다.', 'ok'); loadAdmPast(); loadActivities(); }
+    else toast(res.error || '오류', 'err');
+  } catch(e) { hide(); toast('오류가 발생했습니다.', 'err'); }
 }
 
 async function loadAllFiles() {
   if (!adminPw) return;
   try {
-    const data = await api({ action:'getAllFiles', pw:adminPw });
+    const data = await api({ action: 'getAllFiles', pw: adminPw });
     const tbody = document.getElementById('all-files-tbody');
-    if (!data.length) { tbody.innerHTML = '<tr><td colspan="7" class="empty" style="padding:30px;">자료가 없습니다.</td></tr>'; return; }
+    if (!data || !data.length) { tbody.innerHTML = '<tr><td colspan="7" class="empty" style="padding:24px;">자료가 없습니다.</td></tr>'; return; }
     tbody.innerHTML = data.map(r => `
       <tr>
         <td><span class="badge b-gray">${esc(r.fileType_label)}</span></td>
-        <td>${esc(r.clubName||'')}</td>
-        <td>${esc(r.title||'')}</td>
-        <td>${esc(r.uploadedBy||'')}</td>
-        <td>${fmtDate(r.uploadedAt)}</td>
-        <td>${r.driveUrl?`<a href="${r.driveUrl}" target="_blank" class="btn-dl btn-sm">열기</a>`:'—'}</td>
+        <td>${esc(r.clubName||'')}</td><td>${esc(r.title||'')}</td>
+        <td>${esc(r.uploadedBy||'')}</td><td>${fmtDate(r.uploadedAt)}</td>
+        <td>${r.driveUrl ? `<a href="${r.driveUrl}" target="_blank" class="btn-dl btn-sm">열기</a>` : '—'}</td>
         <td><button class="btn btn-danger btn-sm" onclick="deleteFile('${r.id}','${r.sheetName}')">삭제</button></td>
       </tr>
     `).join('');
@@ -1441,41 +1158,113 @@ async function loadAllFiles() {
 }
 
 async function deleteFile(id, sheetName) {
-  if (!confirm('이 파일을 삭제하시겠습니까? Drive에서도 삭제됩니다.')) return;
+  if (!confirm('이 파일을 삭제하시겠습니까?')) return;
   loading('삭제 중...');
   try {
-    const res = await apiPost({ action:'deleteFile', pw:adminPw, id, sheetName });
+    const res = await apiPost({ action: 'deleteFile', pw: adminPw, id, sheetName });
     hide();
-    if (res.ok) { toast('삭제되었습니다.','ok'); loadAllFiles(); }
-    else toast(res.error||'오류','err');
-  } catch(e) { hide(); toast('오류가 발생했습니다.','err'); }
+    if (res.ok) { toast('삭제되었습니다.', 'ok'); loadAllFiles(); }
+    else toast(res.error || '오류', 'err');
+  } catch(e) { hide(); toast('오류가 발생했습니다.', 'err'); }
 }
 
-// ══════════════════════════════════════════
-// 연도 필터 채우기
-// ══════════════════════════════════════════
+// ── 공지사항 (공개) ──
+async function loadNotices() {
+  const el = document.getElementById('notice-list');
+  el.innerHTML = '<div class="empty"><div>⏳</div>불러오는 중...</div>';
+  try {
+    const data = await api({ action: 'getNotices' });
+    if (!data || !data.length) {
+      el.innerHTML = '<div class="empty"><div>📭</div>등록된 공지사항이 없습니다.</div>';
+      return;
+    }
+    el.innerHTML = data.map(n => `
+      <div class="notice-item">
+        <div class="notice-header">
+          <div class="notice-title">${esc(n.title)}</div>
+          <div class="notice-date">📅 ${fmtDate(n.createdAt)}</div>
+        </div>
+        <div class="notice-content">${esc(n.content)}</div>
+      </div>
+    `).join('');
+  } catch(e) {
+    el.innerHTML = '<div class="empty"><div>⚠️</div>오류가 발생했습니다.</div>';
+  }
+}
+
+// ── 공지사항 관리 (관리자) ──
+async function loadAdmNotices() {
+  if (!adminPw) return;
+  try {
+    const data = await api({ action: 'getNotices' });
+    const tbody = document.getElementById('notice-tbody');
+    if (!data || !data.length) {
+      tbody.innerHTML = '<tr><td colspan="4" class="empty" style="padding:24px;">등록된 공지사항이 없습니다.</td></tr>';
+      return;
+    }
+    tbody.innerHTML = data.map(n => `
+      <tr>
+        <td>${fmtDate(n.createdAt)}</td>
+        <td><strong>${esc(n.title)}</strong></td>
+        <td style="max-width:300px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc(n.content)}</td>
+        <td><button class="btn btn-danger btn-sm" onclick="deleteNotice('${n.id}')">삭제</button></td>
+      </tr>
+    `).join('');
+  } catch(e) {}
+}
+
+function openNoticeModal() {
+  document.getElementById('n-id').value = '';
+  document.getElementById('n-title').value = '';
+  document.getElementById('n-content').value = '';
+  document.getElementById('notice-modal-title').textContent = '📢 공지사항 등록';
+  openModal('modal-notice');
+}
+
+async function saveNotice() {
+  const title = document.getElementById('n-title').value.trim();
+  const content = document.getElementById('n-content').value.trim();
+  if (!title || !content) { toast('제목과 내용을 입력해주세요.', 'err'); return; }
+  loading('등록 중...');
+  try {
+    const res = await apiPost({
+      action: 'saveNotice', pw: adminPw,
+      id: document.getElementById('n-id').value || null,
+      title, content
+    });
+    hide();
+    if (res.ok) { toast('공지사항이 등록되었습니다.', 'ok'); closeModal('modal-notice'); loadAdmNotices(); }
+    else toast(res.error || '오류가 발생했습니다.', 'err');
+  } catch(e) { hide(); toast('오류가 발생했습니다.', 'err'); }
+}
+
+async function deleteNotice(id) {
+  if (!confirm('이 공지사항을 삭제하시겠습니까?')) return;
+  loading('삭제 중...');
+  try {
+    const res = await apiPost({ action: 'deleteNotice', pw: adminPw, id });
+    hide();
+    if (res.ok) { toast('삭제되었습니다.', 'ok'); loadAdmNotices(); }
+    else toast(res.error || '오류', 'err');
+  } catch(e) { hide(); toast('오류가 발생했습니다.', 'err'); }
+}
+
+// ── 연도 필터 채우기 ──
 function populateYearFilters() {
   const cur = new Date().getFullYear();
-  const years = Array.from({length: cur - 2021}, (_, i) => cur - i);
-  const opts = years.map(y => `<option value="${y}">${y}년</option>`).join('');
-  ['act-year-filter','past-year-filter','rpt-year-filter'].forEach(id => {
-    const el = document.getElementById(id);
-    if (el) el.innerHTML = '<option value="">전체 연도</option>' + opts;
-  });
+  const opts = Array.from({length: cur - 2021}, (_, i) => cur - i).map(y => `<option value="${y}">${y}년</option>`).join('');
+  const el = document.getElementById('rpt-year-filter');
+  if (el) el.innerHTML = '<option value="">전체 연도</option>' + opts;
 }
 
-// ══════════════════════════════════════════
-// 모달
-// ══════════════════════════════════════════
+// ── 모달 ──
 function openModal(id) { document.getElementById(id).classList.add('show'); }
 function closeModal(id) { document.getElementById(id).classList.remove('show'); }
 document.querySelectorAll('.modal-overlay').forEach(ov => {
   ov.addEventListener('click', e => { if (e.target === ov) ov.classList.remove('show'); });
 });
 
-// ══════════════════════════════════════════
-// 파일 처리
-// ══════════════════════════════════════════
+// ── 파일 처리 ──
 function pickFile(event, pickedId, objKey, dropId) {
   const file = event.target.files[0];
   if (!file) return;
@@ -1483,7 +1272,6 @@ function pickFile(event, pickedId, objKey, dropId) {
   const el = document.getElementById(pickedId);
   el.textContent = `✅ ${file.name} (${(file.size/1024/1024).toFixed(2)}MB)`;
   el.style.display = 'block';
-  document.getElementById(dropId).classList.remove('over');
 }
 function dropOver(e, id) { e.preventDefault(); document.getElementById(id).classList.add('over'); }
 function dropLeave(id) { document.getElementById(id).classList.remove('over'); }
@@ -1497,50 +1285,34 @@ function dropFile(e, dropId, objKey) {
   if (el) { el.textContent = `✅ ${file.name} (${(file.size/1024/1024).toFixed(2)}MB)`; el.style.display = 'block'; }
   document.getElementById(dropId).classList.remove('over');
 }
-
 function toB64(file) {
-  return new Promise((resolve, reject) => {
+  return new Promise((res, rej) => {
     const r = new FileReader();
-    r.onload = e => resolve(e.target.result.split(',')[1]);
-    r.onerror = reject;
+    r.onload = e => res(e.target.result.split(',')[1]);
+    r.onerror = rej;
     r.readAsDataURL(file);
   });
 }
 
-// ══════════════════════════════════════════
-// 유틸
-// ══════════════════════════════════════════
+// ── 유틸 ──
 function v(id) { return (document.getElementById(id)?.value || '').trim(); }
 function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 function show(id, visible) { document.getElementById(id).style.display = visible ? 'block' : 'none'; }
-function showErrEl(id, msg) {
-  const el = document.getElementById(id);
-  el.textContent = msg; el.style.display = 'block';
-}
+function showErr(id, msg) { const el = document.getElementById(id); el.textContent = msg; el.style.display = 'block'; }
 function fmtDate(iso) {
   if (!iso) return '—';
   const d = new Date(iso);
   return isNaN(d) ? String(iso).substring(0,10) : `${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')}`;
 }
-
 let toastTimer;
 function toast(msg, type) {
   const el = document.getElementById('toast');
-  el.textContent = msg; el.className = 'toast show' + (type?' '+type:'');
+  el.textContent = msg; el.className = 'toast show' + (type ? ' ' + type : '');
   clearTimeout(toastTimer);
   toastTimer = setTimeout(() => el.className = 'toast', 3000);
 }
-
-function loading(msg) {
-  document.getElementById('loading-msg').textContent = msg || '처리 중...';
-  document.getElementById('loading').classList.add('show');
-}
+function loading(msg) { document.getElementById('loading-msg').textContent = msg || '처리 중...'; document.getElementById('loading').classList.add('show'); }
 function hide() { document.getElementById('loading').classList.remove('show'); }
-
-// 전체자료 탭 클릭 시 로드
-document.querySelector('[onclick="showAdminPanel(\'adm-files\',this)"]')
-  ?.addEventListener('click', () => setTimeout(loadAllFiles, 50));
 </script>
-
 </body>
 </html>
