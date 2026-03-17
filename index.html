@@ -1,0 +1,1442 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>학습동아리 · 대전관광공사</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://djto-sp.github.io/djto-portal/portal-nav.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --navy: #1e3a6e; --navy2: #2d5499;
+      --green: #16a34a; --green2: #15803d;
+      --orange: #e8610a;
+      --purple: #7c3aed;
+      --bg: #f0f3f8; --surface: #fff;
+      --text: #1a2035; --sub: #64748b;
+      --border: #dde5f0;
+      --danger: #ef4444; --warn: #f59e0b;
+    }
+    body { font-family: 'Noto Sans KR','Malgun Gothic',sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+
+    /* ── Title ── */
+    .title-bar { background: var(--navy); padding: 22px 20px 0; text-align: center; }
+    .title-bar h1 { color: #fff; font-size: 20px; font-weight: 800; display: flex; align-items: center; justify-content: center; gap: 8px; }
+    .title-bar p  { color: rgba(255,255,255,.65); font-size: 13px; margin-top: 4px; }
+    .nav-bar { background: var(--navy); display: flex; justify-content: center; gap: 4px; padding: 14px 20px 0; }
+    .nav-bar button {
+      background: rgba(255,255,255,.12); border: none; color: rgba(255,255,255,.7);
+      font-family: inherit; font-size: 13px; font-weight: 600;
+      padding: 10px 18px; border-radius: 8px 8px 0 0; cursor: pointer; transition: all .18s;
+    }
+    .nav-bar button.active { background: var(--bg); color: var(--navy); font-weight: 800; }
+    .nav-bar button:hover:not(.active) { background: rgba(255,255,255,.2); color: #fff; }
+
+    /* ── Pages ── */
+    .page { display: none; max-width: 1080px; margin: 0 auto; padding: 28px 20px 60px; }
+    .page.active { display: block; }
+
+    /* ── Card ── */
+    .card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; box-shadow: 0 2px 12px rgba(0,0,0,.06); padding: 24px; }
+    .card + .card, .card + .sub-card, .sub-card + .card { margin-top: 16px; }
+    .sub-card { background: #f8fafc; border: 1px solid var(--border); border-radius: 10px; padding: 18px 20px; margin-top: 12px; }
+
+    .section-title {
+      font-size: 15px; font-weight: 800; color: var(--navy);
+      margin-bottom: 16px; display: flex; align-items: center; gap: 8px;
+    }
+    .section-title::before { content: ''; display: inline-block; width: 4px; height: 17px; border-radius: 2px; background: var(--green); }
+
+    /* ── Buttons ── */
+    .btn { border: none; cursor: pointer; font-family: inherit; font-size: 13px; font-weight: 700; padding: 9px 18px; border-radius: 8px; transition: filter .18s; display: inline-flex; align-items: center; gap: 5px; }
+    .btn:hover { filter: brightness(1.1); }
+    .btn-navy    { background: var(--navy); color: #fff; }
+    .btn-green   { background: var(--green); color: #fff; }
+    .btn-orange  { background: var(--orange); color: #fff; }
+    .btn-purple  { background: var(--purple); color: #fff; }
+    .btn-danger  { background: var(--danger); color: #fff; }
+    .btn-gray    { background: #e2e8f0; color: var(--sub); }
+    .btn-outline { background: #fff; border: 1.5px solid var(--border); color: var(--text); }
+    .btn-sm { padding: 5px 12px; font-size: 12px; border-radius: 6px; }
+    .btn-lg { padding: 13px 28px; font-size: 15px; border-radius: 10px; }
+
+    /* ── Form ── */
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .form-row.col3 { grid-template-columns: 1fr 1fr 1fr; }
+    .form-group { margin-bottom: 14px; }
+    .form-group label { display: block; font-size: 13px; font-weight: 700; margin-bottom: 6px; color: var(--navy); }
+    .form-group input, .form-group select, .form-group textarea {
+      width: 100%; border: 1.5px solid var(--border); border-radius: 8px; padding: 10px 12px;
+      font-family: inherit; font-size: 14px; color: var(--text); background: #fafbfc; outline: none; transition: border-color .18s;
+    }
+    .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: var(--green); background: #fff; }
+    .form-group textarea { resize: vertical; min-height: 70px; }
+    .field-req { color: var(--danger); }
+    .err { color: var(--danger); font-size: 12px; margin-top: 4px; display: none; }
+
+    /* ── Badge / Tag ── */
+    .badge { display: inline-flex; align-items: center; font-size: 11px; font-weight: 700; padding: 2px 9px; border-radius: 8px; white-space: nowrap; }
+    .b-wait   { background: #fef9c3; color: #854d0e; }
+    .b-ok     { background: #dcfce7; color: var(--green2); }
+    .b-no     { background: #fee2e2; color: #b91c1c; }
+    .b-navy   { background: #eff6ff; color: var(--navy); }
+    .b-purple { background: #f5f3ff; color: var(--purple); }
+    .b-gray   { background: #f1f5f9; color: var(--sub); }
+    .b-orange { background: #fff7ed; color: var(--orange); }
+
+    /* ── File Drop ── */
+    .file-drop {
+      border: 2px dashed var(--border); border-radius: 10px; padding: 28px 20px;
+      text-align: center; cursor: pointer; transition: all .2s; background: #fafbfc;
+    }
+    .file-drop:hover, .file-drop.over { border-color: var(--green); background: #f0fdf4; }
+    .file-drop .drop-ico { font-size: 28px; margin-bottom: 6px; }
+    .file-drop p { font-size: 13px; color: var(--sub); }
+    .file-drop .picked { margin-top: 8px; font-size: 13px; font-weight: 700; color: var(--green2); display: none; }
+    .file-limit { font-size: 11px; color: #94a3b8; margin-top: 4px; }
+
+    /* ── Step ── */
+    .steps { display: flex; margin-bottom: 24px; }
+    .step-item { flex: 1; text-align: center; position: relative; }
+    .step-item:not(:last-child)::after {
+      content: ''; position: absolute; top: 15px; left: 50%; width: 100%; height: 2px; background: var(--border); z-index: 0;
+    }
+    .step-dot {
+      width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+      font-size: 12px; font-weight: 800; margin: 0 auto 6px; position: relative; z-index: 1;
+      background: var(--bg); border: 2px solid var(--border); color: var(--sub); transition: all .3s;
+    }
+    .step-dot.done   { background: var(--green); border-color: var(--green); color: #fff; }
+    .step-dot.active { background: var(--navy); border-color: var(--navy); color: #fff; }
+    .step-lbl { font-size: 11px; font-weight: 700; color: var(--sub); }
+    .step-lbl.active { color: var(--navy); }
+    .step-panel { display: none; }
+    .step-panel.active { display: block; }
+
+    /* ── Type Selector ── */
+    .type-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 20px; }
+    .type-card {
+      border: 2px solid var(--border); border-radius: 12px; padding: 20px 18px; cursor: pointer;
+      transition: all .2s; background: #fafbfc; text-align: center;
+    }
+    .type-card:hover { border-color: var(--navy); background: #eff6ff; }
+    .type-card.selected { border-color: var(--navy); background: #eff6ff; }
+    .type-card .type-ico { font-size: 28px; margin-bottom: 8px; }
+    .type-card h3 { font-size: 15px; font-weight: 800; color: var(--navy); margin-bottom: 4px; }
+    .type-card p  { font-size: 12px; color: var(--sub); line-height: 1.6; }
+
+    /* ── Application List ── */
+    .app-list { display: flex; flex-direction: column; gap: 10px; }
+    .app-item {
+      border: 1px solid var(--border); border-radius: 10px; padding: 14px 18px;
+      display: flex; align-items: center; gap: 12px; background: var(--surface);
+    }
+    .app-info { flex: 1; min-width: 0; }
+    .app-info h4 { font-size: 14px; font-weight: 700; margin-bottom: 4px; }
+    .app-meta { font-size: 12px; color: var(--sub); display: flex; flex-wrap: wrap; gap: 8px; }
+    .app-comment { font-size: 12px; color: var(--sub); margin-top: 6px; font-style: italic; }
+
+    /* ── Activity (활동현황) ── */
+    .club-tabs { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 20px; }
+    .club-tab-btn {
+      border: 1.5px solid var(--border); background: var(--surface); color: var(--sub);
+      font-family: inherit; font-size: 13px; font-weight: 700; padding: 7px 16px;
+      border-radius: 20px; cursor: pointer; transition: all .18s;
+    }
+    .club-tab-btn.active { background: var(--navy); color: #fff; border-color: var(--navy); }
+    .club-tab-btn:hover:not(.active) { border-color: var(--navy); color: var(--navy); }
+
+    .activity-list { display: flex; flex-direction: column; gap: 10px; }
+    .activity-item {
+      background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
+      padding: 14px 18px; display: flex; align-items: center; gap: 14px;
+    }
+    .activity-item:hover { box-shadow: 0 3px 12px rgba(0,0,0,.08); }
+    .act-icon { width: 42px; height: 42px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
+    .act-info { flex: 1; min-width: 0; }
+    .act-info h4 { font-size: 14px; font-weight: 700; margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .act-meta { font-size: 12px; color: var(--sub); display: flex; flex-wrap: wrap; gap: 8px; }
+    .btn-dl {
+      flex-shrink: 0; display: inline-flex; align-items: center; gap: 4px;
+      background: var(--navy); color: #fff; border: none; cursor: pointer;
+      font-family: inherit; font-size: 12px; font-weight: 700; padding: 7px 14px;
+      border-radius: 7px; text-decoration: none; transition: background .18s;
+    }
+    .btn-dl:hover { background: var(--green2); }
+
+    /* ── Result (활동결과) ── */
+    .result-tabs { display: flex; gap: 6px; margin-bottom: 18px; border-bottom: 2px solid var(--border); padding-bottom: 0; }
+    .result-tab {
+      background: none; border: none; font-family: inherit; font-size: 14px; font-weight: 700;
+      color: var(--sub); padding: 8px 20px; cursor: pointer; border-bottom: 3px solid transparent;
+      margin-bottom: -2px; transition: all .18s;
+    }
+    .result-tab.active { color: var(--navy); border-bottom-color: var(--navy); }
+
+    /* ── Table ── */
+    .tbl-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    th { background: var(--bg); color: var(--navy); font-weight: 700; padding: 10px 12px; text-align: left; white-space: nowrap; }
+    td { padding: 10px 12px; border-top: 1px solid var(--border); vertical-align: middle; }
+    tr:hover td { background: #f8fafc; }
+
+    /* ── Admin ── */
+    .admin-nav { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 20px; }
+    .admin-nav-btn {
+      border: 1.5px solid var(--border); background: var(--surface); color: var(--sub);
+      font-family: inherit; font-size: 13px; font-weight: 700; padding: 8px 18px;
+      border-radius: 8px; cursor: pointer; transition: all .18s;
+    }
+    .admin-nav-btn.active { background: var(--navy); color: #fff; border-color: var(--navy); }
+    .admin-panel { display: none; }
+    .admin-panel.active { display: block; }
+
+    /* ── Misc ── */
+    .empty { text-align: center; padding: 50px 20px; color: var(--sub); font-size: 14px; }
+    .empty div { font-size: 36px; margin-bottom: 10px; }
+    .info-box { background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 10px; padding: 14px 16px; font-size: 13px; color: #1e40af; line-height: 1.7; margin-bottom: 16px; }
+    .info-box.orange { background: #fff7ed; border-color: #fed7aa; color: #92400e; }
+    .divider { height: 1px; background: var(--border); margin: 20px 0; }
+    .text-sub { font-size: 12px; color: var(--sub); }
+    .flex-between { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; margin-bottom: 16px; }
+
+    /* ── Modal ── */
+    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.45); z-index: 9998; display: none; align-items: center; justify-content: center; }
+    .modal-overlay.show { display: flex; }
+    .modal { background: var(--surface); border-radius: 16px; padding: 30px 26px; width: 90%; max-width: 480px; box-shadow: 0 20px 60px rgba(0,0,0,.25); max-height: 90vh; overflow-y: auto; }
+    .modal h3 { font-size: 17px; font-weight: 800; color: var(--navy); margin-bottom: 6px; }
+    .modal .modal-sub { font-size: 13px; color: var(--sub); margin-bottom: 18px; line-height: 1.6; }
+    .modal-footer { display: flex; gap: 10px; margin-top: 8px; }
+    .modal-footer .btn { flex: 1; justify-content: center; }
+
+    /* ── Toast / Loading ── */
+    .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(80px); background: var(--navy); color: #fff; font-size: 14px; font-weight: 700; padding: 12px 24px; border-radius: 30px; box-shadow: 0 6px 24px rgba(0,0,0,.2); transition: transform .3s, opacity .3s; opacity: 0; z-index: 99999; white-space: nowrap; }
+    .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+    .toast.ok  { background: var(--green2); }
+    .toast.err { background: var(--danger); }
+    .loading-overlay { position: fixed; inset: 0; background: rgba(255,255,255,.85); z-index: 9997; display: none; flex-direction: column; align-items: center; justify-content: center; gap: 16px; }
+    .loading-overlay.show { display: flex; }
+    .spinner { width: 40px; height: 40px; border: 4px solid var(--border); border-top-color: var(--navy); border-radius: 50%; animation: spin .8s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .loading-msg { font-size: 14px; color: var(--sub); font-weight: 700; }
+
+    /* ── Responsive ── */
+    @media (max-width: 640px) {
+      .nav-bar button { font-size: 12px; padding: 9px 10px; }
+      .form-row, .form-row.col3 { grid-template-columns: 1fr; }
+      .type-grid { grid-template-columns: 1fr; }
+      .activity-item { flex-wrap: wrap; }
+      .btn-dl { width: 100%; justify-content: center; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Title -->
+<div class="title-bar">
+  <h1>📚 학습동아리</h1>
+  <p>동아리 신청 · 활동현황 · 활동결과 통합 관리</p>
+</div>
+
+<!-- Nav -->
+<div class="nav-bar">
+  <button class="active" onclick="showPage('home',this)">🏠 홈</button>
+  <button onclick="showPage('apply',this)">📋 동아리 신청</button>
+  <button onclick="showPage('activity',this)">📁 활동현황</button>
+  <button onclick="showPage('result',this)">📊 활동결과</button>
+  <button onclick="showPage('admin',this)">⚙️ 관리</button>
+</div>
+
+<!-- ═══════════════════ 홈 ═══════════════════ -->
+<div id="page-home" class="page active">
+  <div class="info-box">
+    💡 <strong>학습동아리</strong>는 조직혁신의 일환으로 운영됩니다.
+    신청부터 활동현황 기록, 결과 제출까지 이 페이지에서 모두 관리할 수 있습니다.
+  </div>
+
+  <!-- 빠른 안내 카드 -->
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;margin-bottom:20px;">
+
+    <div class="card" style="border-left:4px solid var(--navy);cursor:pointer;" onclick="showPage('apply',document.querySelectorAll('.nav-bar button')[1])">
+      <div style="font-size:28px;margin-bottom:10px;">📋</div>
+      <h3 style="font-size:15px;font-weight:800;color:var(--navy);margin-bottom:6px;">동아리 신청</h3>
+      <p style="font-size:13px;color:var(--sub);line-height:1.7;">학습동아리 또는 자율기획형 동아리를 신청합니다. 서식을 다운받아 작성 후 업로드하세요.</p>
+    </div>
+
+    <div class="card" style="border-left:4px solid var(--green);cursor:pointer;" onclick="showPage('activity',document.querySelectorAll('.nav-bar button')[2])">
+      <div style="font-size:28px;margin-bottom:10px;">📁</div>
+      <h3 style="font-size:15px;font-weight:800;color:var(--navy);margin-bottom:6px;">활동현황</h3>
+      <p style="font-size:13px;color:var(--sub);line-height:1.7;">동아리별 활동 자료를 업로드하고 조회합니다. 리더·총무만 업로드 가능합니다.</p>
+    </div>
+
+    <div class="card" style="border-left:4px solid var(--orange);cursor:pointer;" onclick="showPage('result',document.querySelectorAll('.nav-bar button')[3])">
+      <div style="font-size:28px;margin-bottom:10px;">📊</div>
+      <h3 style="font-size:15px;font-weight:800;color:var(--navy);margin-bottom:6px;">활동결과</h3>
+      <p style="font-size:13px;color:var(--sub);line-height:1.7;">결과보고서를 제출하고 심사위원 평가결과를 확인합니다.</p>
+    </div>
+
+  </div>
+
+  <!-- 동아리 현황 -->
+  <div class="card">
+    <div class="section-title">운영 중인 동아리</div>
+    <div id="home-club-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px;">
+      <div class="empty"><div>⏳</div>불러오는 중...</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════ 동아리 신청 ═══════════════════ -->
+<div id="page-apply" class="page">
+
+  <!-- Step -->
+  <div class="card">
+    <div class="section-title">동아리 신청</div>
+    <div class="steps">
+      <div class="step-item">
+        <div class="step-dot active" id="sd1">1</div>
+        <div class="step-lbl active" id="sl1">유형 선택</div>
+      </div>
+      <div class="step-item">
+        <div class="step-dot" id="sd2">2</div>
+        <div class="step-lbl" id="sl2">서식 작성</div>
+      </div>
+      <div class="step-item">
+        <div class="step-dot" id="sd3">3</div>
+        <div class="step-lbl" id="sl3">신청 완료</div>
+      </div>
+    </div>
+
+    <!-- Step 1: 유형 선택 -->
+    <div id="apply-step1" class="step-panel active">
+      <p style="font-size:13px;color:var(--sub);margin-bottom:16px;line-height:1.7;">
+        신청할 동아리 유형을 선택하세요. 두 유형 모두 동일한 서식을 사용합니다.
+      </p>
+      <div class="type-grid">
+        <div class="type-card" id="type-study" onclick="selectType('학습동아리')">
+          <div class="type-ico">📖</div>
+          <h3>학습동아리</h3>
+          <p>특정 주제를 함께 공부하는<br>학습 중심 동아리</p>
+        </div>
+        <div class="type-card" id="type-free" onclick="selectType('자율기획형')">
+          <div class="type-ico">💡</div>
+          <h3>자율기획형 동아리</h3>
+          <p>자유로운 주제로 기획하는<br>창의·혁신 동아리</p>
+        </div>
+      </div>
+      <div class="err" id="err-type" style="display:block;text-align:center;"></div>
+      <button class="btn btn-navy" onclick="applyNext(2)" style="width:100%;justify-content:center;margin-top:4px;">다음 →</button>
+    </div>
+
+    <!-- Step 2: 서식 작성 & 업로드 -->
+    <div id="apply-step2" class="step-panel">
+      <div class="info-box" style="margin-bottom:16px;">
+        📎 아래 버튼으로 <strong>신청서식</strong>을 다운로드한 후, 작성을 완료하고 업로드하세요.
+      </div>
+      <div style="text-align:center;margin-bottom:20px;">
+        <a href="서식/학습동아리_서식.hwpx" download class="btn btn-navy btn-lg">
+          ⬇️ 신청서식 다운로드 (.hwpx)
+        </a>
+        <div class="text-sub" style="margin-top:8px;">※ 한글(HWP)에서 작성 후 저장하여 업로드해주세요</div>
+      </div>
+      <div class="divider"></div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>신청자 이름 <span class="field-req">*</span></label>
+          <input type="text" id="ap-name" placeholder="홍길동">
+          <div class="err" id="err-ap-name">이름을 입력해주세요.</div>
+        </div>
+        <div class="form-group">
+          <label>사번 <span class="field-req">*</span></label>
+          <input type="text" id="ap-empno" placeholder="숫자만 입력">
+          <div class="err" id="err-ap-empno">사번을 입력해주세요.</div>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>소속 부서 <span class="field-req">*</span></label>
+          <input type="text" id="ap-dept" placeholder="전략기획팀">
+        </div>
+        <div class="form-group">
+          <label>동아리 이름 <span class="field-req">*</span></label>
+          <input type="text" id="ap-clubname" placeholder="희망 동아리명">
+          <div class="err" id="err-ap-clubname">동아리 이름을 입력해주세요.</div>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>작성 완료된 신청서식 파일 <span class="field-req">*</span></label>
+        <div class="file-drop" id="ap-drop" onclick="document.getElementById('ap-file').click()"
+             ondragover="dropOver(event,'ap-drop')" ondragleave="dropLeave('ap-drop')" ondrop="dropFile(event,'ap-drop','ap-file-obj')">
+          <div class="drop-ico">📎</div>
+          <p>클릭하거나 파일을 드래그하세요</p>
+          <div class="file-limit">HWP, HWPX, PDF (최대 20MB)</div>
+          <div class="picked" id="ap-picked"></div>
+        </div>
+        <input type="file" id="ap-file" accept=".hwp,.hwpx,.pdf" style="display:none" onchange="pickFile(event,'ap-picked','ap-file-obj','ap-drop')">
+        <div class="err" id="err-ap-file">파일을 첨부해주세요.</div>
+      </div>
+      <div style="display:flex;gap:10px;">
+        <button class="btn btn-gray" onclick="goApplyStep(1)">← 이전</button>
+        <button class="btn btn-green" onclick="submitApply()" style="flex:1;justify-content:center;">신청 제출</button>
+      </div>
+    </div>
+
+    <!-- Step 3: 완료 -->
+    <div id="apply-step3" class="step-panel" style="text-align:center;padding:20px 0;">
+      <div style="font-size:50px;margin-bottom:16px;">🎉</div>
+      <h3 style="font-size:18px;font-weight:800;color:var(--navy);margin-bottom:8px;">신청이 완료되었습니다!</h3>
+      <p style="font-size:14px;color:var(--sub);line-height:1.7;margin-bottom:24px;">
+        담당자 검토 후 승인 여부를 안내해드립니다.<br>아래에서 신청 현황을 확인할 수 있습니다.
+      </p>
+      <button class="btn btn-navy" onclick="goApplyStep(1);loadMyApps()">새 신청하기</button>
+    </div>
+  </div>
+
+  <!-- 내 신청 현황 -->
+  <div class="card" style="margin-top:20px;">
+    <div class="flex-between">
+      <div class="section-title" style="margin:0;">내 신청 현황 조회</div>
+    </div>
+    <div class="form-row" style="margin-bottom:14px;">
+      <div class="form-group" style="margin:0;">
+        <label>이름</label>
+        <input type="text" id="lookup-name" placeholder="홍길동">
+      </div>
+      <div class="form-group" style="margin:0;">
+        <label>사번</label>
+        <input type="text" id="lookup-empno" placeholder="숫자만 입력">
+      </div>
+    </div>
+    <button class="btn btn-navy btn-sm" onclick="loadMyApps()" style="margin-bottom:16px;">조회</button>
+    <div id="my-app-list" class="app-list">
+      <div class="empty"><div>🔍</div>이름과 사번을 입력 후 조회하세요.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════ 활동현황 ═══════════════════ -->
+<div id="page-activity" class="page">
+
+  <div class="info-box">
+    📁 동아리를 선택하여 활동 자료를 조회하세요. 리더·총무는 <strong>자료 올리기</strong> 버튼으로 업로드할 수 있습니다.
+  </div>
+
+  <!-- 동아리 탭 -->
+  <div class="card">
+    <div class="flex-between">
+      <div class="section-title" style="margin:0;">동아리 선택</div>
+      <button class="btn btn-green btn-sm" onclick="openUploadModal()">⬆️ 자료 올리기</button>
+    </div>
+    <div class="club-tabs" id="club-tabs">
+      <button class="club-tab-btn active" onclick="selectClub('', this)">전체</button>
+    </div>
+  </div>
+
+  <!-- 활동 목록 -->
+  <div class="card">
+    <div class="flex-between">
+      <div class="section-title" style="margin:0;" id="activity-club-title">전체 활동 자료</div>
+      <select id="act-year-filter" onchange="loadActivities()" style="border:1.5px solid var(--border);border-radius:8px;padding:6px 12px;font-family:inherit;font-size:13px;outline:none;background:#fff;">
+        <option value="">전체 연도</option>
+      </select>
+    </div>
+    <div id="activity-list" class="activity-list">
+      <div class="empty"><div>⏳</div>불러오는 중...</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════ 활동결과 ═══════════════════ -->
+<div id="page-result" class="page">
+
+  <div class="result-tabs">
+    <button class="result-tab active" onclick="showResultTab('report',this)">📝 결과보고서</button>
+    <button class="result-tab" onclick="showResultTab('eval',this)">🏆 평가결과</button>
+  </div>
+
+  <!-- 결과보고서 -->
+  <div id="result-report" class="result-panel">
+    <div class="card">
+      <div class="info-box">
+        📎 결과보고서 서식을 다운받아 작성한 후, 아래에서 제출하세요. (리더·총무만 업로드 가능)
+      </div>
+      <div style="text-align:center;margin-bottom:20px;">
+        <a href="서식/학습동아리_서식.hwpx" download class="btn btn-navy">
+          ⬇️ 결과보고서 서식 다운로드
+        </a>
+      </div>
+      <div class="divider"></div>
+      <div class="section-title">결과보고서 제출</div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>이름 <span class="field-req">*</span></label>
+          <input type="text" id="rp-name" placeholder="홍길동">
+        </div>
+        <div class="form-group">
+          <label>사번 <span class="field-req">*</span></label>
+          <input type="text" id="rp-empno" placeholder="숫자만 입력">
+        </div>
+      </div>
+      <div class="form-group">
+        <label>제목 <span class="field-req">*</span></label>
+        <input type="text" id="rp-title" placeholder="예) 2026년 독서토론 동아리 활동결과보고서">
+        <div class="err" id="err-rp-title">제목을 입력해주세요.</div>
+      </div>
+      <div class="form-group">
+        <label>결과보고서 파일 <span class="field-req">*</span></label>
+        <div class="file-drop" id="rp-drop" onclick="document.getElementById('rp-file').click()"
+             ondragover="dropOver(event,'rp-drop')" ondragleave="dropLeave('rp-drop')" ondrop="dropFile(event,'rp-drop','rp-file-obj')">
+          <div class="drop-ico">📎</div>
+          <p>클릭하거나 파일을 드래그하세요</p>
+          <div class="file-limit">HWP, HWPX, PDF (최대 20MB)</div>
+          <div class="picked" id="rp-picked"></div>
+        </div>
+        <input type="file" id="rp-file" accept=".hwp,.hwpx,.pdf" style="display:none" onchange="pickFile(event,'rp-picked','rp-file-obj','rp-drop')">
+        <div class="err" id="err-rp-file">파일을 첨부해주세요.</div>
+      </div>
+      <button class="btn btn-green" onclick="submitReport()" style="width:100%;justify-content:center;">결과보고서 제출</button>
+    </div>
+
+    <!-- 제출된 보고서 목록 -->
+    <div class="card" style="margin-top:16px;">
+      <div class="flex-between">
+        <div class="section-title" style="margin:0;">제출된 결과보고서</div>
+        <select id="report-year-filter" onchange="loadReports()" style="border:1.5px solid var(--border);border-radius:8px;padding:6px 12px;font-family:inherit;font-size:13px;outline:none;background:#fff;">
+          <option value="">전체 연도</option>
+        </select>
+      </div>
+      <div id="report-list" class="activity-list">
+        <div class="empty"><div>⏳</div>불러오는 중...</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 평가결과 -->
+  <div id="result-eval" class="result-panel" style="display:none;">
+    <div class="info-box orange">
+      🏆 사내 심사위원의 평가 결과를 공개합니다. 평가결과 업로드는 <strong>관리자 메뉴</strong>에서만 가능합니다.
+    </div>
+    <div class="card">
+      <div class="flex-between">
+        <div class="section-title" style="margin:0;">평가결과 목록</div>
+        <select id="eval-year-filter" onchange="loadEvals()" style="border:1.5px solid var(--border);border-radius:8px;padding:6px 12px;font-family:inherit;font-size:13px;outline:none;background:#fff;">
+          <option value="">전체 연도</option>
+        </select>
+      </div>
+      <div id="eval-list" class="activity-list">
+        <div class="empty"><div>⏳</div>불러오는 중...</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════ 관리자 ═══════════════════ -->
+<div id="page-admin" class="page">
+
+  <!-- 로그인 -->
+  <div id="admin-lock" class="card" style="text-align:center;padding:40px 20px;max-width:380px;margin:0 auto;">
+    <div style="font-size:40px;margin-bottom:14px;">🔒</div>
+    <div class="section-title" style="justify-content:center;">관리자 로그인</div>
+    <div class="form-group">
+      <input type="password" id="adm-pw" placeholder="관리자 비밀번호" onkeydown="if(event.key==='Enter')adminLogin()">
+    </div>
+    <button class="btn btn-navy" style="width:100%;justify-content:center;" onclick="adminLogin()">로그인</button>
+    <div style="color:var(--danger);font-size:13px;margin-top:8px;" id="err-adm-pw"></div>
+  </div>
+
+  <!-- 관리 패널 -->
+  <div id="admin-panel" style="display:none;">
+    <div class="admin-nav">
+      <button class="admin-nav-btn active" onclick="showAdminPanel('adm-applications',this)">📋 신청 관리</button>
+      <button class="admin-nav-btn" onclick="showAdminPanel('adm-members',this)">👥 구성원 관리</button>
+      <button class="admin-nav-btn" onclick="showAdminPanel('adm-clubs',this)">🏷️ 동아리 관리</button>
+      <button class="admin-nav-btn" onclick="showAdminPanel('adm-eval-upload',this)">🏆 평가결과 등록</button>
+      <button class="admin-nav-btn" onclick="showAdminPanel('adm-files',this)">📁 자료 관리</button>
+    </div>
+
+    <!-- 신청 관리 -->
+    <div id="adm-applications" class="admin-panel active">
+      <div class="card">
+        <div class="flex-between">
+          <div class="section-title" style="margin:0;">동아리 신청 목록</div>
+          <select id="app-status-filter" onchange="loadApplications()" style="border:1.5px solid var(--border);border-radius:8px;padding:6px 12px;font-family:inherit;font-size:13px;outline:none;background:#fff;">
+            <option value="">전체</option><option value="대기">대기</option><option value="승인">승인</option><option value="반려">반려</option>
+          </select>
+        </div>
+        <div class="tbl-wrap">
+          <table>
+            <thead><tr><th>신청일</th><th>유형</th><th>동아리명</th><th>신청자</th><th>부서</th><th>서식</th><th>상태</th><th>관리</th></tr></thead>
+            <tbody id="app-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- 구성원 관리 -->
+    <div id="adm-members" class="admin-panel">
+      <div class="card">
+        <div class="flex-between">
+          <div class="section-title" style="margin:0;">구성원 목록</div>
+          <button class="btn btn-green btn-sm" onclick="openMemberModal()">+ 추가</button>
+        </div>
+        <div class="tbl-wrap">
+          <table>
+            <thead><tr><th>이름</th><th>부서</th><th>사번</th><th>동아리</th><th>역할</th><th>관리</th></tr></thead>
+            <tbody id="member-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- 동아리 관리 -->
+    <div id="adm-clubs" class="admin-panel">
+      <div class="card">
+        <div class="flex-between">
+          <div class="section-title" style="margin:0;">동아리 목록</div>
+          <button class="btn btn-green btn-sm" onclick="openClubModal()">+ 추가</button>
+        </div>
+        <div class="tbl-wrap">
+          <table>
+            <thead><tr><th>동아리명</th><th>유형</th><th>색상</th><th>운영상태</th><th>관리</th></tr></thead>
+            <tbody id="club-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- 평가결과 등록 -->
+    <div id="adm-eval-upload" class="admin-panel">
+      <div class="card">
+        <div class="section-title">평가결과 등록</div>
+        <div class="info-box orange">심사위원 평가 종료 후 결과 파일을 업로드합니다. 등록 즉시 활동결과 탭에 공개됩니다.</div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>대상 동아리 <span class="field-req">*</span></label>
+            <select id="ev-club"></select>
+          </div>
+          <div class="form-group">
+            <label>연도 <span class="field-req">*</span></label>
+            <input type="number" id="ev-year" value="2026" min="2020" max="2040">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>평가 등급</label>
+            <select id="ev-grade">
+              <option value="">선택</option>
+              <option>최우수</option><option>우수</option><option>장려</option><option>해당없음</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>평가 점수</label>
+            <input type="number" id="ev-score" placeholder="0~100" min="0" max="100">
+          </div>
+        </div>
+        <div class="form-group">
+          <label>평가 의견</label>
+          <textarea id="ev-comment" placeholder="심사 총평을 입력하세요"></textarea>
+        </div>
+        <div class="form-group">
+          <label>평가 결과 파일 (선택)</label>
+          <div class="file-drop" id="ev-drop" onclick="document.getElementById('ev-file').click()"
+               ondragover="dropOver(event,'ev-drop')" ondragleave="dropLeave('ev-drop')" ondrop="dropFile(event,'ev-drop','ev-file-obj')">
+            <div class="drop-ico">📎</div>
+            <p>평가결과 파일 첨부 (선택사항)</p>
+            <div class="file-limit">HWP, HWPX, PDF (최대 20MB)</div>
+            <div class="picked" id="ev-picked"></div>
+          </div>
+          <input type="file" id="ev-file" accept=".hwp,.hwpx,.pdf" style="display:none" onchange="pickFile(event,'ev-picked','ev-file-obj','ev-drop')">
+        </div>
+        <button class="btn btn-orange" onclick="submitEval()" style="width:100%;justify-content:center;">평가결과 등록</button>
+      </div>
+    </div>
+
+    <!-- 자료 관리 -->
+    <div id="adm-files" class="admin-panel">
+      <div class="card">
+        <div class="section-title">전체 자료 목록</div>
+        <div class="tbl-wrap">
+          <table>
+            <thead><tr><th>유형</th><th>동아리</th><th>제목</th><th>업로더</th><th>날짜</th><th>관리</th></tr></thead>
+            <tbody id="all-files-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /admin-panel -->
+</div>
+
+<!-- ═══ MODAL: 자료 올리기 (활동현황) ═══ -->
+<div class="modal-overlay" id="modal-upload">
+  <div class="modal">
+    <h3>⬆️ 활동 자료 올리기</h3>
+    <p class="modal-sub">리더·총무의 사번을 확인 후 자료를 등록합니다.</p>
+    <div class="form-group">
+      <label>이름 <span class="field-req">*</span></label>
+      <input type="text" id="up-name" placeholder="홍길동">
+    </div>
+    <div class="form-group">
+      <label>사번 <span class="field-req">*</span></label>
+      <input type="text" id="up-empno" placeholder="숫자만 입력">
+    </div>
+    <div id="up-verified-box" style="display:none;background:#f0fdf4;border:1.5px solid #86efac;border-radius:10px;padding:12px 14px;margin-bottom:12px;font-size:13px;">
+      ✅ <strong id="up-verified-name"></strong> (<span id="up-verified-role"></span>) — <span id="up-verified-club"></span>
+    </div>
+    <div id="up-form" style="display:none;">
+      <div class="form-group">
+        <label>자료 제목 <span class="field-req">*</span></label>
+        <input type="text" id="up-title" placeholder="예) 2026년 1월 독서토론 회의자료">
+        <div class="err" id="err-up-title">제목을 입력해주세요.</div>
+      </div>
+      <div class="form-group">
+        <label>유형</label>
+        <select id="up-category">
+          <option>활동자료</option><option>회의록</option><option>발표자료</option><option>참고자료</option><option>기타</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>설명 (선택)</label>
+        <textarea id="up-desc" placeholder="간단한 설명"></textarea>
+      </div>
+      <div class="form-group">
+        <label>파일 <span class="field-req">*</span></label>
+        <div class="file-drop" id="up-drop" onclick="document.getElementById('up-file').click()"
+             ondragover="dropOver(event,'up-drop')" ondragleave="dropLeave('up-drop')" ondrop="dropFile(event,'up-drop','up-file-obj')">
+          <div class="drop-ico">📎</div>
+          <p>클릭하거나 파일을 드래그하세요</p>
+          <div class="file-limit">최대 20MB</div>
+          <div class="picked" id="up-picked"></div>
+        </div>
+        <input type="file" id="up-file" style="display:none" onchange="pickFile(event,'up-picked','up-file-obj','up-drop')">
+        <div class="err" id="err-up-file">파일을 첨부해주세요.</div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-gray" onclick="closeModal('modal-upload')">취소</button>
+      <button class="btn btn-green" id="up-btn" onclick="uploadVerifyOrSubmit()">권한 확인</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ MODAL: 구성원 추가/수정 ═══ -->
+<div class="modal-overlay" id="modal-member">
+  <div class="modal">
+    <h3 id="member-modal-title">구성원 추가</h3>
+    <p class="modal-sub">사번으로 업로드 권한이 확인됩니다.</p>
+    <input type="hidden" id="m-rowid">
+    <div class="form-row">
+      <div class="form-group"><label>이름</label><input type="text" id="m-name" placeholder="홍길동"></div>
+      <div class="form-group"><label>사번</label><input type="text" id="m-empno" placeholder="숫자만"></div>
+    </div>
+    <div class="form-group"><label>부서</label><input type="text" id="m-dept" placeholder="전략기획팀"></div>
+    <div class="form-row">
+      <div class="form-group"><label>동아리</label><select id="m-club"></select></div>
+      <div class="form-group"><label>역할</label>
+        <select id="m-role"><option>회원</option><option>총무</option><option>리더</option></select>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-gray" onclick="closeModal('modal-member')">취소</button>
+      <button class="btn btn-green" onclick="saveMember()">저장</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ MODAL: 동아리 추가/수정 ═══ -->
+<div class="modal-overlay" id="modal-club">
+  <div class="modal">
+    <h3 id="club-modal-title">동아리 추가</h3>
+    <p class="modal-sub">동아리 기본 정보를 입력하세요.</p>
+    <input type="hidden" id="c-rowid">
+    <div class="form-group"><label>동아리 이름</label><input type="text" id="c-name" placeholder="예) 독서토론 동아리"></div>
+    <div class="form-group"><label>유형</label>
+      <select id="c-type"><option>학습동아리</option><option>자율기획형</option></select>
+    </div>
+    <div class="form-group"><label>설명</label><textarea id="c-desc" placeholder="동아리 소개"></textarea></div>
+    <div class="form-row">
+      <div class="form-group"><label>대표 색상</label><input type="color" id="c-color" value="#1e3a6e" style="height:42px;padding:4px 8px;cursor:pointer;"></div>
+      <div class="form-group"><label>운영 상태</label>
+        <select id="c-status"><option>운영중</option><option>종료</option></select>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-gray" onclick="closeModal('modal-club')">취소</button>
+      <button class="btn btn-green" onclick="saveClub()">저장</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ MODAL: 신청 처리 ═══ -->
+<div class="modal-overlay" id="modal-app-review">
+  <div class="modal">
+    <h3>신청서 검토</h3>
+    <p class="modal-sub" id="modal-app-info"></p>
+    <input type="hidden" id="app-review-id">
+    <div class="form-group">
+      <label>처리 의견 (반려 시 사유 필수)</label>
+      <textarea id="app-comment" placeholder="승인 또는 반려 사유를 입력하세요"></textarea>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-gray" onclick="closeModal('modal-app-review')">닫기</button>
+      <button class="btn btn-danger" onclick="reviewApp('반려')">반려</button>
+      <button class="btn btn-green" onclick="reviewApp('승인')">승인</button>
+    </div>
+  </div>
+</div>
+
+<!-- Loading / Toast -->
+<div class="loading-overlay" id="loading"><div class="spinner"></div><div class="loading-msg" id="loading-msg">처리 중...</div></div>
+<div class="toast" id="toast"></div>
+
+<script>
+// ══════════════════════════════════════════
+// 설정  ← 배포 후 실제 값으로 교체
+// ══════════════════════════════════════════
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbw4OZ8VqUnxEpvu5ZOM2w3CjdA2ShXg4BqMp4BJEBjRrX8AxfD4QWgyeSKToKuWP7rBRw/exec';
+const ADMIN_PW   = '1234';
+
+// ══════════════════════════════════════════
+// 상태
+// ══════════════════════════════════════════
+let clubs = [];
+let currentClubId = '';
+let selectedApplyType = '';
+let verifiedUploader = null;
+let uploadStep = 'verify'; // 'verify' | 'upload'
+const fileObjs = {};
+
+// ══════════════════════════════════════════
+// 초기 로드
+// ══════════════════════════════════════════
+document.addEventListener('DOMContentLoaded', async () => {
+  await loadClubs();
+  loadActivities();
+  loadReports();
+  loadEvals();
+  populateYearFilters();
+});
+
+// ══════════════════════════════════════════
+// API
+// ══════════════════════════════════════════
+async function api(params) {
+  const r = await fetch(SCRIPT_URL + '?' + new URLSearchParams(params));
+  return r.json();
+}
+async function apiPost(body) {
+  const r = await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify(body) });
+  return r.json();
+}
+
+// ══════════════════════════════════════════
+// 탭 전환
+// ══════════════════════════════════════════
+function showPage(id, btn) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-bar button').forEach(b => b.classList.remove('active'));
+  document.getElementById('page-' + id).classList.add('active');
+  if (btn) btn.classList.add('active');
+}
+function showResultTab(id, btn) {
+  document.querySelectorAll('.result-panel').forEach(p => p.style.display = 'none');
+  document.querySelectorAll('.result-tab').forEach(b => b.classList.remove('active'));
+  document.getElementById('result-' + id).style.display = 'block';
+  btn.classList.add('active');
+}
+function showAdminPanel(id, btn) {
+  document.querySelectorAll('.admin-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.admin-nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  btn.classList.add('active');
+}
+
+// ══════════════════════════════════════════
+// 동아리 목록
+// ══════════════════════════════════════════
+async function loadClubs() {
+  try {
+    clubs = await api({ action: 'getClubs' });
+  } catch(e) { clubs = []; }
+  renderHomeClubs();
+  renderClubTabs();
+  populateClubSelects();
+}
+
+function renderHomeClubs() {
+  const el = document.getElementById('home-club-grid');
+  const active = clubs.filter(c => c.status !== '종료');
+  if (!active.length) { el.innerHTML = '<div class="empty"><div>📋</div>운영 중인 동아리가 없습니다.</div>'; return; }
+  el.innerHTML = active.map(c => `
+    <div style="border:1px solid var(--border);border-radius:12px;padding:18px;background:var(--surface);cursor:pointer;transition:box-shadow .2s;"
+         onmouseover="this.style.boxShadow='0 4px 16px rgba(0,0,0,.1)'" onmouseout="this.style.boxShadow=''"
+         onclick="showPage('activity',document.querySelectorAll('.nav-bar button')[2]);setTimeout(()=>selectClubById('${c.id}'),80)">
+      <div style="height:4px;border-radius:2px;background:${c.color||'#1e3a6e'};margin-bottom:14px;"></div>
+      <h3 style="font-size:15px;font-weight:800;color:var(--navy);margin-bottom:4px;">${esc(c.name)}</h3>
+      <span class="badge ${c.type==='자율기획형'?'b-purple':'b-navy'}" style="margin-bottom:8px;">${esc(c.type||'학습동아리')}</span>
+      <p style="font-size:12px;color:var(--sub);line-height:1.6;margin-top:6px;">${esc(c.desc||'')}</p>
+    </div>
+  `).join('');
+}
+
+function renderClubTabs() {
+  const container = document.getElementById('club-tabs');
+  container.innerHTML = '<button class="club-tab-btn active" onclick="selectClub(\'\',this)">전체</button>' +
+    clubs.filter(c => c.status !== '종료').map(c =>
+      `<button class="club-tab-btn" onclick="selectClub('${c.id}',this)">${esc(c.name)}</button>`
+    ).join('');
+}
+
+function populateClubSelects() {
+  const opts = clubs.map(c => `<option value="${c.id}">${esc(c.name)}</option>`).join('');
+  ['m-club','ev-club'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.innerHTML = opts;
+  });
+}
+
+function selectClub(clubId, btn) {
+  currentClubId = clubId;
+  document.querySelectorAll('.club-tab-btn').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  const club = clubs.find(c => c.id === clubId);
+  document.getElementById('activity-club-title').textContent =
+    clubId ? (club?.name || '동아리') + ' 활동 자료' : '전체 활동 자료';
+  loadActivities();
+}
+
+function selectClubById(clubId) {
+  const btns = document.querySelectorAll('#club-tabs .club-tab-btn');
+  btns.forEach((btn, i) => {
+    if (i === 0 && !clubId) { selectClub('', btn); }
+    const id = btn.getAttribute('onclick')?.match(/'([^']+)'/)?.[1];
+    if (id === clubId) selectClub(clubId, btn);
+  });
+}
+
+// ══════════════════════════════════════════
+// 동아리 신청
+// ══════════════════════════════════════════
+function selectType(type) {
+  selectedApplyType = type;
+  document.getElementById('type-study').classList.toggle('selected', type === '학습동아리');
+  document.getElementById('type-free').classList.toggle('selected',  type === '자율기획형');
+  document.getElementById('err-type').textContent = '';
+}
+
+function applyNext(step) {
+  if (step === 2 && !selectedApplyType) {
+    document.getElementById('err-type').textContent = '동아리 유형을 선택해주세요.';
+    return;
+  }
+  goApplyStep(step);
+}
+
+function goApplyStep(n) {
+  [1,2,3].forEach(i => {
+    document.getElementById('apply-step' + i).classList.toggle('active', i === n);
+    const dot = document.getElementById('sd' + i);
+    const lbl = document.getElementById('sl' + i);
+    dot.classList.remove('active','done');
+    lbl.classList.remove('active');
+    if (i < n) dot.classList.add('done');
+    if (i === n) { dot.classList.add('active'); lbl.classList.add('active'); }
+  });
+}
+
+async function submitApply() {
+  const name    = v('ap-name'), empno = v('ap-empno');
+  const dept    = v('ap-dept'), cname = v('ap-clubname');
+  const file    = fileObjs['ap-file-obj'];
+  let ok = true;
+  if (!name)  { show('err-ap-name', true); ok=false; }  else show('err-ap-name', false);
+  if (!empno) { show('err-ap-empno', true); ok=false; } else show('err-ap-empno', false);
+  if (!cname) { show('err-ap-clubname', true); ok=false; } else show('err-ap-clubname', false);
+  if (!file)  { show('err-ap-file', true); ok=false; }  else show('err-ap-file', false);
+  if (!ok) return;
+
+  loading('신청서 제출 중...');
+  try {
+    const b64 = await toB64(file);
+    const res = await apiPost({ action:'submitApplication', type:selectedApplyType, name, empNo:empno, dept, clubName:cname, fileName:file.name, fileType:file.type, fileSize:file.size, fileData:b64 });
+    hide();
+    if (res.ok) { toast('신청이 완료되었습니다!','ok'); goApplyStep(3); }
+    else toast(res.error || '오류가 발생했습니다.','err');
+  } catch(e) { hide(); toast('오류가 발생했습니다.','err'); }
+}
+
+async function loadMyApps() {
+  const name  = v('lookup-name');
+  const empno = v('lookup-empno');
+  if (!name || !empno) { toast('이름과 사번을 모두 입력해주세요.','err'); return; }
+  const el = document.getElementById('my-app-list');
+  el.innerHTML = '<div class="empty"><div>⏳</div>조회 중...</div>';
+  try {
+    const data = await api({ action:'getMyApplications', name, empNo:empno });
+    if (!data.length) { el.innerHTML = '<div class="empty"><div>📋</div>신청 내역이 없습니다.</div>'; return; }
+    el.innerHTML = data.map(a => `
+      <div class="app-item">
+        <div class="app-info">
+          <h4>${esc(a.clubName)} <span class="badge ${a.type==='자율기획형'?'b-purple':'b-navy'}">${esc(a.type)}</span></h4>
+          <div class="app-meta">
+            <span>📅 ${fmtDate(a.submittedAt)}</span>
+            <span>👤 ${esc(a.name)} · ${esc(a.dept)}</span>
+          </div>
+          ${a.comment ? `<div class="app-comment">💬 ${esc(a.comment)}</div>` : ''}
+        </div>
+        <div>
+          <span class="badge ${a.status==='승인'?'b-ok':a.status==='반려'?'b-no':'b-wait'}">${esc(a.status||'대기')}</span>
+        </div>
+        ${a.driveUrl?`<a href="${a.driveUrl}" target="_blank" class="btn-dl btn-sm">열기</a>`:''}
+      </div>
+    `).join('');
+  } catch(e) { el.innerHTML = '<div class="empty"><div>⚠️</div>오류가 발생했습니다.</div>'; }
+}
+
+// ══════════════════════════════════════════
+// 활동현황
+// ══════════════════════════════════════════
+async function loadActivities() {
+  const el   = document.getElementById('activity-list');
+  const year = v('act-year-filter') || '';
+  el.innerHTML = '<div class="empty"><div>⏳</div>불러오는 중...</div>';
+  try {
+    const data = await api({ action:'getActivities', clubId:currentClubId, year });
+    if (!data.length) { el.innerHTML = '<div class="empty"><div>📂</div>등록된 활동 자료가 없습니다.</div>'; return; }
+    el.innerHTML = data.map(a => `
+      <div class="activity-item">
+        <div class="act-icon" style="background:#f0fdf4;">${fileEmoji(a.fileType)}</div>
+        <div class="act-info">
+          <h4>${esc(a.title)}</h4>
+          <div class="act-meta">
+            <span class="badge b-navy">${esc(a.clubName||'')}</span>
+            <span class="badge b-gray">${esc(a.category||'')}</span>
+            <span>📤 ${esc(a.uploadedBy||'')}</span>
+            <span>🗓️ ${fmtDate(a.uploadedAt)}</span>
+            <span>${fmtSize(a.fileSize)}</span>
+          </div>
+          ${a.desc?`<div style="font-size:12px;color:var(--sub);margin-top:4px;">${esc(a.desc)}</div>`:''}
+        </div>
+        <a href="${a.driveUrl}" target="_blank" class="btn-dl">⬇️ 다운로드</a>
+      </div>
+    `).join('');
+  } catch(e) { el.innerHTML = '<div class="empty"><div>⚠️</div>불러올 수 없습니다.</div>'; }
+}
+
+// 업로드 모달
+function openUploadModal() {
+  uploadStep = 'verify';
+  verifiedUploader = null;
+  ['up-name','up-empno','up-title','up-desc'].forEach(id => { if(document.getElementById(id)) document.getElementById(id).value=''; });
+  document.getElementById('up-verified-box').style.display='none';
+  document.getElementById('up-form').style.display='none';
+  document.getElementById('up-btn').textContent='권한 확인';
+  document.getElementById('up-picked').style.display='none';
+  fileObjs['up-file-obj'] = null;
+  openModal('modal-upload');
+}
+
+async function uploadVerifyOrSubmit() {
+  if (uploadStep === 'verify') {
+    const name=v('up-name'), empno=v('up-empno');
+    if (!name||!empno) { toast('이름과 사번을 입력해주세요.','err'); return; }
+    loading('권한 확인 중...');
+    try {
+      const res = await api({ action:'verifyMember', name, empNo:empno });
+      hide();
+      if (!res.found) { toast('등록된 구성원을 찾을 수 없습니다.','err'); return; }
+      if (res.role!=='리더'&&res.role!=='총무') { toast(`${res.role} 역할은 업로드 권한이 없습니다.`,'err'); return; }
+      verifiedUploader = res;
+      document.getElementById('up-verified-name').textContent = name;
+      document.getElementById('up-verified-role').textContent = res.role;
+      document.getElementById('up-verified-club').textContent = res.clubName;
+      document.getElementById('up-verified-box').style.display='block';
+      document.getElementById('up-form').style.display='block';
+      document.getElementById('up-btn').textContent='업로드';
+      uploadStep='upload';
+    } catch(e) { hide(); toast('오류가 발생했습니다.','err'); }
+  } else {
+    const title=v('up-title'), file=fileObjs['up-file-obj'];
+    if (!title) { show('err-up-title',true); return; } else show('err-up-title',false);
+    if (!file)  { show('err-up-file',true); return; }  else show('err-up-file',false);
+    loading('업로드 중...');
+    try {
+      const b64=await toB64(file);
+      const res=await apiPost({ action:'uploadActivity', clubId:verifiedUploader.clubId, clubName:verifiedUploader.clubName,
+        title, category:v('up-category'), desc:v('up-desc'),
+        uploadedBy:v('up-name'), fileName:file.name, fileType:file.type, fileSize:file.size, fileData:b64 });
+      hide();
+      if (res.ok) { toast('업로드되었습니다! 🎉','ok'); closeModal('modal-upload'); loadActivities(); }
+      else toast(res.error||'오류가 발생했습니다.','err');
+    } catch(e) { hide(); toast('오류가 발생했습니다.','err'); }
+  }
+}
+
+// ══════════════════════════════════════════
+// 활동결과 — 결과보고서
+// ══════════════════════════════════════════
+async function loadReports() {
+  const el=document.getElementById('report-list'), year=v('report-year-filter')||'';
+  el.innerHTML='<div class="empty"><div>⏳</div>불러오는 중...</div>';
+  try {
+    const data=await api({ action:'getReports', year });
+    if(!data.length){ el.innerHTML='<div class="empty"><div>📂</div>제출된 보고서가 없습니다.</div>'; return; }
+    el.innerHTML=data.map(r=>`
+      <div class="activity-item">
+        <div class="act-icon" style="background:#fff7ed;">${fileEmoji(r.fileType)}</div>
+        <div class="act-info">
+          <h4>${esc(r.title)}</h4>
+          <div class="act-meta">
+            <span class="badge b-orange">${esc(r.clubName||'')}</span>
+            <span>📤 ${esc(r.uploadedBy||'')}</span>
+            <span>🗓️ ${fmtDate(r.uploadedAt)}</span>
+          </div>
+        </div>
+        <a href="${r.driveUrl}" target="_blank" class="btn-dl">⬇️ 다운로드</a>
+      </div>
+    `).join('');
+  } catch(e){ el.innerHTML='<div class="empty"><div>⚠️</div>불러올 수 없습니다.</div>'; }
+}
+
+async function submitReport() {
+  const name=v('rp-name'), empno=v('rp-empno'), title=v('rp-title'), file=fileObjs['rp-file-obj'];
+  let ok=true;
+  if(!title){ show('err-rp-title',true); ok=false; } else show('err-rp-title',false);
+  if(!file) { show('err-rp-file',true); ok=false; }  else show('err-rp-file',false);
+  if(!name||!empno){ toast('이름과 사번을 입력해주세요.','err'); return; }
+  if(!ok) return;
+
+  loading('권한 확인 및 제출 중...');
+  try {
+    const verify=await api({ action:'verifyMember', name, empNo:empno });
+    if(!verify.found||( verify.role!=='리더'&&verify.role!=='총무')){
+      hide(); toast('리더 또는 총무만 결과보고서를 제출할 수 있습니다.','err'); return;
+    }
+    const b64=await toB64(file);
+    const res=await apiPost({ action:'uploadReport', clubId:verify.clubId, clubName:verify.clubName,
+      title, uploadedBy:name, fileName:file.name, fileType:file.type, fileSize:file.size, fileData:b64 });
+    hide();
+    if(res.ok){ toast('결과보고서가 제출되었습니다!','ok'); loadReports();
+      ['rp-name','rp-empno','rp-title'].forEach(id=>document.getElementById(id).value='');
+      document.getElementById('rp-picked').style.display='none'; fileObjs['rp-file-obj']=null;
+    } else toast(res.error||'오류가 발생했습니다.','err');
+  } catch(e){ hide(); toast('오류가 발생했습니다.','err'); }
+}
+
+// ══════════════════════════════════════════
+// 활동결과 — 평가결과
+// ══════════════════════════════════════════
+async function loadEvals() {
+  const el=document.getElementById('eval-list'), year=v('eval-year-filter')||'';
+  el.innerHTML='<div class="empty"><div>⏳</div>불러오는 중...</div>';
+  try {
+    const data=await api({ action:'getEvals', year });
+    if(!data.length){ el.innerHTML='<div class="empty"><div>🏆</div>등록된 평가결과가 없습니다.</div>'; return; }
+    el.innerHTML=data.map(e=>`
+      <div class="activity-item">
+        <div class="act-icon" style="background:#fef9c3;font-size:22px;">${e.grade==='최우수'?'🥇':e.grade==='우수'?'🥈':e.grade==='장려'?'🥉':'📋'}</div>
+        <div class="act-info">
+          <h4>${esc(e.clubName)} <span class="badge ${e.grade==='최우수'?'b-orange':e.grade==='우수'?'b-navy':'b-gray'}">${esc(e.grade||'-')}</span>
+            ${e.score?`<span style="font-size:12px;color:var(--sub);margin-left:6px;">${e.score}점</span>`:''}
+          </h4>
+          <div class="act-meta">
+            <span>📅 ${esc(e.year||'')}년</span>
+            ${e.comment?`<span>💬 ${esc(e.comment)}</span>`:''}
+          </div>
+        </div>
+        ${e.driveUrl?`<a href="${e.driveUrl}" target="_blank" class="btn-dl">⬇️ 평가결과</a>`:''}
+      </div>
+    `).join('');
+  } catch(e){ el.innerHTML='<div class="empty"><div>⚠️</div>불러올 수 없습니다.</div>'; }
+}
+
+// ══════════════════════════════════════════
+// 관리자
+// ══════════════════════════════════════════
+function adminLogin() {
+  if(v('adm-pw')===ADMIN_PW){
+    document.getElementById('admin-lock').style.display='none';
+    document.getElementById('admin-panel').style.display='block';
+    loadApplications(); loadMemberTable(); loadClubTable(); loadAllFiles();
+    populateClubSelects();
+  } else {
+    document.getElementById('err-adm-pw').textContent='비밀번호가 올바르지 않습니다.';
+  }
+}
+
+/* 신청 관리 */
+async function loadApplications() {
+  const tbody=document.getElementById('app-tbody'), filter=v('app-status-filter');
+  tbody.innerHTML='<tr><td colspan="8" style="text-align:center;color:var(--sub);">불러오는 중...</td></tr>';
+  try {
+    const data=await api({ action:'getApplications', pw:ADMIN_PW, status:filter });
+    if(!data.length){ tbody.innerHTML='<tr><td colspan="8" style="text-align:center;color:var(--sub);">신청 내역이 없습니다.</td></tr>'; return; }
+    tbody.innerHTML=data.map(a=>`
+      <tr>
+        <td>${fmtDate(a.submittedAt)}</td>
+        <td><span class="badge ${a.type==='자율기획형'?'b-purple':'b-navy'}">${esc(a.type)}</span></td>
+        <td><strong>${esc(a.clubName)}</strong></td>
+        <td>${esc(a.name)}</td>
+        <td>${esc(a.dept)}</td>
+        <td>${a.driveUrl?`<a href="${a.driveUrl}" target="_blank" class="btn btn-gray btn-sm">열기</a>`:'-'}</td>
+        <td><span class="badge ${a.status==='승인'?'b-ok':a.status==='반려'?'b-no':'b-wait'}">${esc(a.status||'대기')}</span></td>
+        <td><button class="btn btn-navy btn-sm" onclick="openAppReview('${a.id}','${esc(a.clubName)} · ${esc(a.name)}')">처리</button></td>
+      </tr>
+    `).join('');
+  } catch(e){ tbody.innerHTML='<tr><td colspan="8" style="text-align:center;color:var(--danger);">오류</td></tr>'; }
+}
+
+function openAppReview(id, info) {
+  document.getElementById('app-review-id').value=id;
+  document.getElementById('modal-app-info').textContent=info;
+  document.getElementById('app-comment').value='';
+  openModal('modal-app-review');
+}
+async function reviewApp(status) {
+  const id=document.getElementById('app-review-id').value;
+  const comment=v('app-comment');
+  if(status==='반려'&&!comment){ toast('반려 사유를 입력해주세요.','err'); return; }
+  loading('처리 중...');
+  try {
+    await apiPost({ action:'reviewApplication', pw:ADMIN_PW, id, status, comment });
+    hide(); closeModal('modal-app-review'); toast('처리되었습니다.','ok');
+    loadApplications();
+  } catch(e){ hide(); toast('오류가 발생했습니다.','err'); }
+}
+
+/* 구성원 */
+async function loadMemberTable() {
+  const tbody=document.getElementById('member-tbody');
+  tbody.innerHTML='<tr><td colspan="6" style="text-align:center;color:var(--sub);">불러오는 중...</td></tr>';
+  try {
+    const data=await api({ action:'getMembers', pw:ADMIN_PW });
+    window._members=data;
+    if(!data.length){ tbody.innerHTML='<tr><td colspan="6" style="text-align:center;">구성원이 없습니다.</td></tr>'; return; }
+    tbody.innerHTML=data.map((m,i)=>`
+      <tr>
+        <td>${esc(m.name)}</td><td>${esc(m.dept)}</td><td>${esc(m.empNo)}</td>
+        <td>${esc(m.clubName||'')}</td>
+        <td><span class="badge ${m.role==='리더'?'b-navy':m.role==='총무'?'b-ok':'b-gray'}">${esc(m.role)}</span></td>
+        <td>
+          <button class="btn btn-gray btn-sm" onclick="openMemberModal(${i})">수정</button>
+          <button class="btn btn-danger btn-sm" onclick="deleteMember('${m.rowId}')">삭제</button>
+        </td>
+      </tr>
+    `).join('');
+  } catch(e){ tbody.innerHTML='<tr><td colspan="6" style="text-align:center;color:var(--danger);">오류</td></tr>'; }
+}
+function openMemberModal(idx) {
+  const m=idx!==undefined?window._members[idx]:null;
+  document.getElementById('member-modal-title').textContent=m?'구성원 수정':'구성원 추가';
+  document.getElementById('m-rowid').value=m?.rowId||'';
+  document.getElementById('m-name').value=m?.name||'';
+  document.getElementById('m-empno').value=m?.empNo||'';
+  document.getElementById('m-dept').value=m?.dept||'';
+  document.getElementById('m-role').value=m?.role||'회원';
+  document.getElementById('m-club').innerHTML=clubs.map(c=>`<option value="${c.id}" ${c.id===m?.clubId?'selected':''}>${esc(c.name)}</option>`).join('');
+  openModal('modal-member');
+}
+async function saveMember() {
+  const rowId=v('m-rowid'), name=v('m-name'), empNo=v('m-empno'), dept=v('m-dept');
+  const clubId=document.getElementById('m-club').value;
+  const role=document.getElementById('m-role').value;
+  const clubName=clubs.find(c=>c.id===clubId)?.name||'';
+  if(!name||!empNo||!clubId){ toast('필수 항목을 입력해주세요.','err'); return; }
+  loading('저장 중...');
+  try {
+    await apiPost({ action:'saveMember', pw:ADMIN_PW, rowId, name, empNo, dept, clubId, clubName, role });
+    hide(); closeModal('modal-member'); toast('저장되었습니다.','ok'); loadMemberTable();
+  } catch(e){ hide(); toast('오류가 발생했습니다.','err'); }
+}
+async function deleteMember(rowId) {
+  if(!confirm('삭제하시겠습니까?')) return;
+  loading('삭제 중...');
+  try {
+    await apiPost({ action:'deleteMember', pw:ADMIN_PW, rowId });
+    hide(); toast('삭제되었습니다.','ok'); loadMemberTable();
+  } catch(e){ hide(); toast('오류가 발생했습니다.','err'); }
+}
+
+/* 동아리 */
+async function loadClubTable() {
+  const tbody=document.getElementById('club-tbody');
+  tbody.innerHTML='<tr><td colspan="5" style="text-align:center;color:var(--sub);">불러오는 중...</td></tr>';
+  await loadClubs();
+  tbody.innerHTML=clubs.map((c,i)=>`
+    <tr>
+      <td><strong>${esc(c.name)}</strong></td>
+      <td><span class="badge ${c.type==='자율기획형'?'b-purple':'b-navy'}">${esc(c.type||'학습동아리')}</span></td>
+      <td><span style="display:inline-block;width:22px;height:22px;border-radius:5px;background:${c.color||'#1e3a6e'};vertical-align:middle;"></span></td>
+      <td><span class="badge ${c.status==='종료'?'b-gray':'b-ok'}">${esc(c.status||'운영중')}</span></td>
+      <td>
+        <button class="btn btn-gray btn-sm" onclick="openClubModal(${i})">수정</button>
+        <button class="btn btn-danger btn-sm" onclick="deleteClub('${c.id}')">삭제</button>
+      </td>
+    </tr>
+  `).join('');
+}
+function openClubModal(idx) {
+  const c=idx!==undefined?clubs[idx]:null;
+  document.getElementById('club-modal-title').textContent=c?'동아리 수정':'동아리 추가';
+  document.getElementById('c-rowid').value=c?.id||'';
+  document.getElementById('c-name').value=c?.name||'';
+  document.getElementById('c-type').value=c?.type||'학습동아리';
+  document.getElementById('c-desc').value=c?.desc||'';
+  document.getElementById('c-color').value=c?.color||'#1e3a6e';
+  document.getElementById('c-status').value=c?.status||'운영중';
+  openModal('modal-club');
+}
+async function saveClub() {
+  const rowId=v('c-rowid'), name=v('c-name'), desc=v('c-desc');
+  const type=document.getElementById('c-type').value;
+  const color=v('c-color'), status=document.getElementById('c-status').value;
+  if(!name){ toast('동아리 이름을 입력해주세요.','err'); return; }
+  loading('저장 중...');
+  try {
+    await apiPost({ action:'saveClub', pw:ADMIN_PW, rowId, name, type, desc, color, status });
+    hide(); closeModal('modal-club'); toast('저장되었습니다.','ok'); loadClubTable();
+  } catch(e){ hide(); toast('오류가 발생했습니다.','err'); }
+}
+async function deleteClub(id) {
+  if(!confirm('동아리를 삭제하시겠습니까? 관련 자료는 남습니다.')) return;
+  loading('삭제 중...');
+  try {
+    await apiPost({ action:'deleteClub', pw:ADMIN_PW, clubId:id });
+    hide(); toast('삭제되었습니다.','ok'); loadClubTable();
+  } catch(e){ hide(); toast('오류가 발생했습니다.','err'); }
+}
+
+/* 평가결과 등록 */
+async function submitEval() {
+  const clubId=document.getElementById('ev-club').value;
+  const year=v('ev-year'), grade=document.getElementById('ev-grade').value;
+  const score=v('ev-score'), comment=v('ev-comment');
+  const file=fileObjs['ev-file-obj'];
+  if(!clubId||!year){ toast('동아리와 연도를 선택해주세요.','err'); return; }
+  const clubName=clubs.find(c=>c.id===clubId)?.name||'';
+  loading('등록 중...');
+  try {
+    let b64='', fileName='', fileType='', fileSize=0;
+    if(file){ b64=await toB64(file); fileName=file.name; fileType=file.type; fileSize=file.size; }
+    const res=await apiPost({ action:'uploadEval', pw:ADMIN_PW, clubId, clubName, year, grade, score:Number(score)||0, comment, fileName, fileType, fileSize, fileData:b64 });
+    hide();
+    if(res.ok){ toast('평가결과가 등록되었습니다.','ok'); loadEvals(); }
+    else toast(res.error||'오류가 발생했습니다.','err');
+  } catch(e){ hide(); toast('오류가 발생했습니다.','err'); }
+}
+
+/* 전체 파일 */
+async function loadAllFiles() {
+  const tbody=document.getElementById('all-files-tbody');
+  tbody.innerHTML='<tr><td colspan="6" style="text-align:center;color:var(--sub);">불러오는 중...</td></tr>';
+  try {
+    const data=await api({ action:'getAllFiles', pw:ADMIN_PW });
+    if(!data.length){ tbody.innerHTML='<tr><td colspan="6" style="text-align:center;">자료가 없습니다.</td></tr>'; return; }
+    tbody.innerHTML=data.map(f=>`
+      <tr>
+        <td><span class="badge b-gray">${esc(f.fileType_label||f.category||'')}</span></td>
+        <td>${esc(f.clubName||'')}</td>
+        <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc(f.title)}</td>
+        <td>${esc(f.uploadedBy||'')}</td>
+        <td>${fmtDate(f.uploadedAt)}</td>
+        <td>
+          ${f.driveUrl?`<a href="${f.driveUrl}" target="_blank" class="btn btn-gray btn-sm">열기</a>`:''}
+          <button class="btn btn-danger btn-sm" onclick="deleteFile('${f.id}','${f.sheetName}')">삭제</button>
+        </td>
+      </tr>
+    `).join('');
+  } catch(e){ tbody.innerHTML='<tr><td colspan="6" style="text-align:center;color:var(--danger);">오류</td></tr>'; }
+}
+async function deleteFile(id, sheet) {
+  if(!confirm('자료를 삭제하면 Drive 파일도 함께 삭제됩니다. 계속하시겠습니까?')) return;
+  loading('삭제 중...');
+  try {
+    await apiPost({ action:'deleteFile', pw:ADMIN_PW, id, sheetName:sheet });
+    hide(); toast('삭제되었습니다.','ok'); loadAllFiles();
+  } catch(e){ hide(); toast('오류가 발생했습니다.','err'); }
+}
+
+// ══════════════════════════════════════════
+// 파일 유틸
+// ══════════════════════════════════════════
+function pickFile(e, pickedId, objKey, dropId) {
+  const file=e.target.files[0];
+  if(!file) return;
+  if(file.size>20*1024*1024){ toast('파일 크기는 20MB 이하여야 합니다.','err'); return; }
+  fileObjs[objKey]=file;
+  const el=document.getElementById(pickedId);
+  el.textContent=`📎 ${file.name} (${fmtSize(file.size)})`;
+  el.style.display='block';
+  document.getElementById(dropId)?.classList.remove('over');
+}
+function dropOver(e, id){ e.preventDefault(); document.getElementById(id)?.classList.add('over'); }
+function dropLeave(id){ document.getElementById(id)?.classList.remove('over'); }
+function dropFile(e, dropId, objKey) {
+  e.preventDefault();
+  document.getElementById(dropId)?.classList.remove('over');
+  const file=e.dataTransfer.files[0];
+  if(!file) return;
+  fileObjs[objKey]=file;
+  const pickedId=dropId.replace('-drop','-picked');
+  const el=document.getElementById(pickedId);
+  if(el){ el.textContent=`📎 ${file.name} (${fmtSize(file.size)})`; el.style.display='block'; }
+}
+function toB64(file) {
+  return new Promise((res,rej)=>{ const r=new FileReader(); r.onload=e=>res(e.target.result.split(',')[1]); r.onerror=rej; r.readAsDataURL(file); });
+}
+
+// ══════════════════════════════════════════
+// 연도 필터
+// ══════════════════════════════════════════
+function populateYearFilters() {
+  const cur=new Date().getFullYear();
+  const opts=['<option value="">전체 연도</option>',...Array.from({length:5},(_, i)=>`<option value="${cur-i}">${cur-i}년</option>`)].join('');
+  ['act-year-filter','report-year-filter','eval-year-filter'].forEach(id=>{
+    const el=document.getElementById(id); if(el) el.innerHTML=opts;
+  });
+}
+
+// ══════════════════════════════════════════
+// UI 유틸
+// ══════════════════════════════════════════
+function openModal(id)  { document.getElementById(id).classList.add('show'); }
+function closeModal(id) { document.getElementById(id).classList.remove('show'); }
+document.querySelectorAll('.modal-overlay').forEach(o=>o.addEventListener('click',e=>{ if(e.target===o) o.classList.remove('show'); }));
+
+let _tt;
+function toast(msg, type='') {
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.className='toast show'+(type?' '+type:'');
+  clearTimeout(_tt); _tt=setTimeout(()=>t.className='toast',3200);
+}
+function loading(msg='처리 중...') {
+  document.getElementById('loading-msg').textContent=msg;
+  document.getElementById('loading').classList.add('show');
+}
+function hide() { document.getElementById('loading').classList.remove('show'); }
+function show(id, visible) { document.getElementById(id).style.display=visible?'block':'none'; }
+function v(id) { return document.getElementById(id)?.value?.trim()||''; }
+function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function fmtDate(d) {
+  if(!d) return '-';
+  const dt=new Date(d); if(isNaN(dt)) return d;
+  return `${dt.getFullYear()}.${String(dt.getMonth()+1).padStart(2,'0')}.${String(dt.getDate()).padStart(2,'0')}`;
+}
+function fmtSize(b) {
+  if(!b) return ''; b=Number(b);
+  if(b<1024) return b+'B'; if(b<1024*1024) return (b/1024).toFixed(1)+'KB';
+  return (b/1024/1024).toFixed(1)+'MB';
+}
+function fileEmoji(t='') {
+  const s=t.toLowerCase();
+  if(s.includes('pdf')) return '📕';
+  if(s.includes('word')||s.includes('doc')) return '📘';
+  if(s.includes('ppt')||s.includes('powerpoint')) return '📙';
+  if(s.includes('excel')||s.includes('sheet')) return '📗';
+  if(s.includes('image')||s.includes('png')||s.includes('jpg')) return '🖼️';
+  return '📄';
+}
+</script>
+</body>
+</html>
