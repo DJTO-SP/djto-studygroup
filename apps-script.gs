@@ -15,8 +15,8 @@
  */
 
 const SHEET_ID        = '1zars1TgcY1RtGg5wxPGPv1QhwbTeuyYu1I0dn-MgBek';
-const DRIVE_FOLDER_ID = 'YOUR_DRIVE_FOLDER_ID_HERE';
-const ADMIN_PW        = '1234';
+const DRIVE_FOLDER_ID = '1qx0jsbLXtkyF4Rgmxizqbj6fr7wGAXXb';
+const ADMIN_PW        = 'alsk0118**';
 
 // ── 시트 이름 상수 ──
 const S_CLUBS    = '동아리';
