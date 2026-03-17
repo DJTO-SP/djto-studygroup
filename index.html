@@ -20,8 +20,8 @@
     body { font-family: 'Noto Sans KR','Malgun Gothic',sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
 
     /* ── Title Bar ── */
-    .title-bar { background: #fff; border-bottom: 2px solid #e8edf5; overflow: hidden; }
-    .title-inner { max-width: 1100px; margin: 0 auto; display: flex; align-items: flex-end; justify-content: space-between; padding: 18px 32px 14px; }
+    .title-bar { background: #fff; border-bottom: 2px solid #e8edf5; overflow: hidden; min-height: 100px; }
+    .title-inner { max-width: 1100px; margin: 0 auto; display: flex; align-items: flex-end; justify-content: space-between; padding: 0 32px 14px; }
     .title-text .main { font-size: 26px; font-weight: 900; color: var(--text); letter-spacing: -1px; line-height: 1; }
     .title-text .main em { color: var(--green2); font-style: normal; }
     .title-logo-img { height: 80px; object-fit: contain; cursor: pointer; }
@@ -367,7 +367,7 @@
 
   <!-- 제출 섹션 -->
   <div class="card">
-    <div class="section-title">신청서 및 보고서 제출</div>
+    <div class="section-title">활동보고서 제출</div>
     <div class="info-box green">
       📌 동아리 고유 코드 인증 후 파일을 제출합니다. 코드를 모르는 경우 담당자(📞1148)에게 문의하세요.
     </div>
@@ -726,10 +726,9 @@ let ncAuth = null; // { isAdmin, clubId, clubName }
 let currentDetailItem = null;
 
 // ── 초기 로드 ──
-document.addEventListener('DOMContentLoaded', async () => {
-  await loadClubs();
-  loadNotices();
+document.addEventListener('DOMContentLoaded', () => {
   populateYearFilters();
+  Promise.all([loadClubs(), loadNotices()]);
 });
 
 // ── API ──
@@ -955,14 +954,13 @@ function extractFileId(driveUrl) {
 function openDetailModal(item) {
   currentDetailItem = item;
   document.getElementById('detail-title').textContent = item.title;
-  document.getElementById('detail-sub').textContent = (item.clubName||'') + (item.period ? '  |  ' + item.period : '');
+  document.getElementById('detail-sub').textContent = (item.clubName||'') + (item.year ? '  |  ' + item.year + '년' : '');
 
   const rv = item.reviewResult || '미정';
   document.getElementById('detail-info-grid').innerHTML = `
     <div class="detail-info-item"><label>동아리명</label><span>${esc(item.clubName||'—')}</span></div>
     <div class="detail-info-item"><label>연도</label><span>${esc(String(item.year||'—'))}</span></div>
     <div class="detail-info-item"><label>심사결과</label><span>${esc(rv)}</span></div>
-    <div class="detail-info-item"><label>기간</label><span>${esc(item.period||'—')}</span></div>
     ${item.desc ? `<div class="detail-info-item" style="grid-column:1/-1;"><label>설명</label><span>${esc(item.desc)}</span></div>` : ''}
   `;
 
