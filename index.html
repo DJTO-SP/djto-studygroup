@@ -1179,7 +1179,7 @@ async function saveClub() {
       code, status: document.getElementById('c-status').value
     });
     hide();
-    if (res.ok) { toast('저장되었습니다.', 'ok'); closeModal('modal-club'); loadAdmClubs(); await loadClubs(); }
+    if (res.ok) { toast('저장되었습니다.', 'ok'); closeModal('modal-club'); await loadAdmClubs(); await loadClubs(); }
     else toast(res.error || '오류', 'err');
   } catch(e) { hide(); toast('오류가 발생했습니다.', 'err'); }
 }
