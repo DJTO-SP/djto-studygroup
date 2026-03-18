@@ -24,7 +24,8 @@ const S_APPLY    = '신청';
 const S_ACTIVITY = '활동';
 const S_REPORT   = '결과보고서';
 const S_PAST     = '지난결과';
-const S_NOTICE   = '공지사항';
+const S_NOTICE        = '공지사항';
+const S_PORTAL_NOTICE = '포털공지';
 
 // ══════════════════════════════════════════
 // GET 라우터
@@ -43,6 +44,7 @@ function doGet(e) {
       case 'getPastResults':     result = getPastResults(p.year, p.clubId); break;
       case 'getStats':           result = getStats(); break;
       case 'getNotices':         result = getNotices(); break;
+      case 'getPortalNotices':   result = getPortalNotices(); break;
       default:                   result = {error: 'Unknown action'};
     }
   } catch(err) {
@@ -70,6 +72,8 @@ function doPost(e) {
       // 공지: 관리자 pw 또는 동아리 코드 인증으로 등록 가능
       case 'saveNotice':        result = saveNoticeAuth(d); break;
       case 'deleteNotice':      result = checkAdmin(d.pw) ? deleteNoticeById(d.id) : {error:'권한 없음'}; break;
+      case 'savePortalNotice':  result = checkAdmin(d.pw) ? savePortalNotice(d) : {error:'권한 없음'}; break;
+      case 'deletePortalNotice':result = checkAdmin(d.pw) ? deletePortalNoticeById(d.id) : {error:'권한 없음'}; break;
       default:                  result = {error: 'Unknown action'};
     }
   } catch(err) {
@@ -146,7 +150,12 @@ function deleteRowById(sheetName, id) {
 
 function saveToDrive(base64Data, fileName, mimeType, subFolder) {
   if (!base64Data) return { fileId: '', driveUrl: '' };
-  const folder = DriveApp.getFolderById(DRIVE_FOLDER_ID);
+  let folder;
+  try {
+    folder = DriveApp.getFolderById(DRIVE_FOLDER_ID);
+  } catch(e) {
+    folder = DriveApp.getRootFolder();
+  }
   let targetFolder = folder;
   if (subFolder) {
     const existing = folder.getFoldersByName(subFolder);
@@ -163,12 +172,17 @@ function saveToDrive(base64Data, fileName, mimeType, subFolder) {
 // ══════════════════════════════════════════
 // 공개 API: 코드 필드 제외
 function getClubs() {
-  return sheetToObjects(S_CLUBS)
+  const cache = CacheService.getScriptCache();
+  const cached = cache.get('clubs');
+  if (cached) return JSON.parse(cached);
+  const result = sheetToObjects(S_CLUBS)
     .filter(c => c.status !== '종료' || false)
     .map(c => ({
       id: c.id, name: c.name, type: c.type,
       desc: c.desc, color: c.color, status: c.status
     }));
+  cache.put('clubs', JSON.stringify(result), 300);
+  return result;
 }
 
 // 관리자 API: 코드 포함
@@ -190,6 +204,7 @@ function verifyClubCode(clubId, code) {
 }
 
 function saveClub(d) {
+  CacheService.getScriptCache().remove('clubs');
   initSheet(S_CLUBS, ['id','name','type','desc','color','code','status','createdAt']);
   if (d.rowId) {
     updateRowById(S_CLUBS, d.rowId, {
@@ -325,6 +340,7 @@ function getReports(year) {
 //        fileId, driveUrl, fileName, fileType, fileSize, uploadedAt
 // ══════════════════════════════════════════
 function savePastResult(d) {
+  CacheService.getScriptCache().remove('pastResults');
   initSheet(S_PAST, ['id','year','clubName','title','desc','reviewResult','period','fileId','driveUrl','fileName','fileType','fileSize','uploadedAt']);
   let fileId='', driveUrl='', fileName='', fileType='', fileSize=0;
   if (d.fileData) {
@@ -351,10 +367,17 @@ function savePastResult(d) {
 }
 
 function getPastResults(year, clubId) {
-  let list = sheetToObjects(S_PAST);
+  const cache = CacheService.getScriptCache();
+  const cacheKey = 'pastResults';
+  let list;
+  if (!year && !clubId) {
+    const cached = cache.get(cacheKey);
+    if (cached) return JSON.parse(cached);
+  }
+  list = sheetToObjects(S_PAST);
   if (year)   list = list.filter(r => String(r.year) === String(year));
   if (clubId) list = list.filter(r => r.clubId === clubId);
-  return list.sort((a,b) => {
+  const result = list.sort((a,b) => {
     if (String(b.year) !== String(a.year)) return String(b.year).localeCompare(String(a.year));
     return new Date(b.uploadedAt) - new Date(a.uploadedAt);
   }).map(r => ({
@@ -364,6 +387,8 @@ function getPastResults(year, clubId) {
     driveUrl:r.driveUrl, fileId:r.fileId||'',
     fileType:r.fileType, fileName:r.fileName, uploadedAt:r.uploadedAt
   }));
+  if (!year && !clubId) cache.put(cacheKey, JSON.stringify(result), 300);
+  return result;
 }
 
 // ══════════════════════════════════════════
@@ -374,7 +399,10 @@ function getPastResults(year, clubId) {
 // ══════════════════════════════════════════
 function getNotices() {
   try {
-    return sheetToObjects(S_NOTICE)
+    const cache = CacheService.getScriptCache();
+    const cached = cache.get('notices');
+    if (cached) return JSON.parse(cached);
+    const result = sheetToObjects(S_NOTICE)
       .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
       .map(n => ({
         id: n.id, title: n.title, content: n.content,
@@ -383,11 +411,14 @@ function getNotices() {
         fileId: n.fileId||'',
         createdAt: n.createdAt
       }));
+    cache.put('notices', JSON.stringify(result), 180);
+    return result;
   } catch(e) { return []; }
 }
 
 // 공지 등록: 관리자 pw 또는 동아리 코드 인증
 function saveNoticeAuth(d) {
+  CacheService.getScriptCache().remove('notices');
   initSheet(S_NOTICE, ['id','title','content','createdBy','clubName','fileId','driveUrl','fileName','createdAt']);
   const isAdmin = checkAdmin(d.pw);
   let authorClubName = '';
@@ -422,6 +453,7 @@ function saveNoticeAuth(d) {
 }
 
 function deleteNoticeById(id) {
+  CacheService.getScriptCache().remove('notices');
   // Drive 파일도 함께 삭제
   try {
     const list = sheetToObjects(S_NOTICE);
@@ -431,6 +463,60 @@ function deleteNoticeById(id) {
     }
   } catch(e) {}
   deleteRowById(S_NOTICE, id);
+  return { ok: true };
+}
+
+// ══════════════════════════════════════════
+// 포털 전용 공지 (S_PORTAL_NOTICE)
+// ══════════════════════════════════════════
+function getPortalNotices() {
+  try {
+    const cache = CacheService.getScriptCache();
+    const cached = cache.get('portalNotices');
+    if (cached) return JSON.parse(cached);
+    const result = sheetToObjects(S_PORTAL_NOTICE)
+      .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+      .map(n => ({
+        id: n.id, title: n.title, content: n.content,
+        driveUrl: n.driveUrl||'', fileName: n.fileName||'',
+        fileId: n.fileId||'', createdAt: n.createdAt
+      }));
+    cache.put('portalNotices', JSON.stringify(result), 180);
+    return result;
+  } catch(e) { return []; }
+}
+
+function savePortalNotice(d) {
+  CacheService.getScriptCache().remove('portalNotices');
+  initSheet(S_PORTAL_NOTICE, ['id','title','content','fileId','driveUrl','fileName','createdAt']);
+  let fileId='', driveUrl='', fileName='';
+  if (d.fileData && d.fileName) {
+    const saved = saveToDrive(d.fileData, d.fileName, d.fileType, '포털공지첨부');
+    fileId = saved.fileId; driveUrl = saved.driveUrl; fileName = d.fileName;
+  }
+  if (d.id) {
+    const updates = { title: d.title, content: d.content };
+    if (fileId) Object.assign(updates, { fileId, driveUrl, fileName });
+    updateRowById(S_PORTAL_NOTICE, d.id, updates);
+  } else {
+    saveToSheet(S_PORTAL_NOTICE, {
+      id: uid(), title: d.title, content: d.content,
+      fileId, driveUrl, fileName, createdAt: now()
+    });
+  }
+  return { ok: true };
+}
+
+function deletePortalNoticeById(id) {
+  CacheService.getScriptCache().remove('portalNotices');
+  try {
+    const list = sheetToObjects(S_PORTAL_NOTICE);
+    const item = list.find(r => r.id === id);
+    if (item?.fileId) {
+      try { DriveApp.getFileById(item.fileId).setTrashed(true); } catch(e) {}
+    }
+  } catch(e) {}
+  deleteRowById(S_PORTAL_NOTICE, id);
   return { ok: true };
 }
 
@@ -472,6 +558,7 @@ function setupAllSheets() {
   initSheet(S_ACTIVITY, ['id','clubId','clubName','title','category','desc','uploadedBy','fileId','driveUrl','fileName','fileType','fileSize','uploadedAt']);
   initSheet(S_REPORT,   ['id','clubId','clubName','year','title','uploadedBy','fileId','driveUrl','fileName','fileType','fileSize','uploadedAt']);
   initSheet(S_PAST,     ['id','year','clubName','title','desc','reviewResult','period','fileId','driveUrl','fileName','fileType','fileSize','uploadedAt']);
-  initSheet(S_NOTICE,   ['id','title','content','createdBy','clubName','fileId','driveUrl','fileName','createdAt']);
+  initSheet(S_NOTICE,        ['id','title','content','createdBy','clubName','fileId','driveUrl','fileName','createdAt']);
+  initSheet(S_PORTAL_NOTICE, ['id','title','content','fileId','driveUrl','fileName','createdAt']);
   SpreadsheetApp.getUi().alert('✅ 시트 초기화 완료!');
 }
