@@ -1178,10 +1178,18 @@ async function saveClub() {
       desc: document.getElementById('c-desc').value,
       code, status: document.getElementById('c-status').value
     });
+    if (res.ok) {
+      toast('저장되었습니다.', 'ok');
+      closeModal('modal-club');
+      setTimeout(async () => { await loadAdmClubs(); await loadClubs(); }, 1000);
+    } else {
+      toast(res.error || '오류', 'err');
+    }
+  } catch(e) {
+    toast('오류가 발생했습니다.', 'err');
+  } finally {
     hide();
-    if (res.ok) { toast('저장되었습니다.', 'ok'); closeModal('modal-club'); await loadAdmClubs(); await loadClubs(); }
-    else toast(res.error || '오류', 'err');
-  } catch(e) { hide(); toast('오류가 발생했습니다.', 'err'); }
+  }
 }
 
 async function loadAdmReports() {
