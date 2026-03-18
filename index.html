@@ -517,7 +517,7 @@
         </div>
         <div class="tbl-wrap">
           <table>
-            <thead><tr><th>연도</th><th>동아리</th><th>제목</th><th>심사결과</th><th>기간</th><th>파일</th><th>등록일</th><th>관리</th></tr></thead>
+            <thead><tr><th>연도</th><th>동아리</th><th>제목</th><th>심사결과</th><th>파일</th><th>등록일</th><th>관리</th></tr></thead>
             <tbody id="past-tbody"></tbody>
           </table>
         </div>
@@ -720,7 +720,7 @@ let currentDetailItem = null;
 // ── 초기 로드 ──
 document.addEventListener('DOMContentLoaded', () => {
   populateYearFilters();
-  Promise.all([loadClubs(), loadNotices()]);
+  Promise.all([loadClubs(), loadNotices(), loadPastResults()]);
 });
 
 // ── API ──
@@ -740,7 +740,7 @@ function showPage(id, btn) {
   document.getElementById('page-' + id).classList.add('active');
   if (btn) btn.classList.add('active');
   if (id === 'notice') loadNotices();
-  if (id === 'activity') loadPastResults();
+  if (id === 'activity') { if (!allPastResults.length) loadPastResults(); else renderResultTable(); }
   if (id === 'admin' && adminPw) { loadApplications(); loadAdmClubs(); loadAdmReports(); loadAdmPast(); loadAdmNotices(); }
 }
 function showAdminPanel(id, btn) {
@@ -1214,7 +1214,7 @@ async function loadAdmPast() {
   try {
     const data = await api({ action: 'getPastResults' });
     const tbody = document.getElementById('past-tbody');
-    if (!data || !data.length) { tbody.innerHTML = '<tr><td colspan="8" class="empty" style="padding:24px;">등록된 자료가 없습니다.</td></tr>'; return; }
+    if (!data || !data.length) { tbody.innerHTML = '<tr><td colspan="7" class="empty" style="padding:24px;">등록된 자료가 없습니다.</td></tr>'; return; }
     tbody.innerHTML = data.map(r => {
       const rv = r.reviewResult || '미정';
       const rvClass = rv === '우수' ? 'b-excel' : rv === '우량' ? 'b-ok' : rv === '보통' ? 'b-pass' : 'b-none';
@@ -1224,7 +1224,6 @@ async function loadAdmPast() {
         <td>${esc(r.clubName||'')}</td>
         <td>${esc(r.title)}</td>
         <td><span class="badge ${rvClass}">${esc(rv)}</span></td>
-        <td style="font-size:12px;color:var(--sub);">${esc(r.period||'—')}</td>
         <td>${r.driveUrl ? `<a href="${r.driveUrl}" target="_blank" class="btn btn-gray btn-sm">열기</a>` : '—'}</td>
         <td>${fmtDate(r.uploadedAt)}</td>
         <td style="display:flex;gap:4px;">
