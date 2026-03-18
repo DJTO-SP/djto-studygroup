@@ -675,6 +675,21 @@
   </div>
 </div>
 
+<!-- ═══ MODAL: 공지사항 상세 ═══ -->
+<div class="modal-overlay" id="modal-notice-detail">
+  <div class="modal modal-lg">
+    <h3 id="nd-title" style="margin-bottom:6px;"></h3>
+    <p class="modal-sub" id="nd-meta" style="margin-bottom:16px;"></p>
+    <div id="nd-content" style="white-space:pre-wrap;font-size:14px;line-height:1.7;color:var(--text);background:var(--bg);border-radius:10px;padding:16px;min-height:60px;"></div>
+    <div id="nd-attach" style="margin-top:14px;display:none;">
+      <a id="nd-attach-link" href="#" target="_blank" class="btn btn-gray btn-sm">📎 <span id="nd-attach-name"></span></a>
+    </div>
+    <div class="modal-footer" style="margin-top:16px;">
+      <button class="btn btn-gray" onclick="closeModal('modal-notice-detail')">닫기</button>
+    </div>
+  </div>
+</div>
+
 <!-- ═══ MODAL: 활동결과 상세/PDF 미리보기 ═══ -->
 <div class="modal-overlay" id="modal-detail">
   <div class="modal modal-lg">
@@ -782,7 +797,7 @@ async function loadNotices() {
       return;
     }
     el.innerHTML = data.map(n => `
-      <div class="notice-item">
+      <div class="notice-item" onclick="openNoticeDetail(${JSON.stringify(n).replace(/"/g, '&quot;')})" style="cursor:pointer;">
         <div class="notice-header">
           <div class="notice-title">${esc(n.title)}</div>
           <div class="notice-date">📅 ${fmtDate(n.createdAt)}</div>
@@ -791,11 +806,6 @@ async function loadNotices() {
           ${n.clubName ? `<span>🏷️ ${esc(n.clubName)}</span>` : ''}
           ${n.createdBy ? `<span>👤 ${esc(n.createdBy)}</span>` : ''}
         </div>
-        <div class="notice-content">${esc(n.content)}</div>
-        ${n.driveUrl ? `
-        <div class="notice-attach">
-          <a href="${n.driveUrl}" target="_blank" class="btn btn-gray btn-sm">📎 ${esc(n.fileName||'첨부파일')}</a>
-        </div>` : ''}
       </div>
     `).join('');
   } catch(e) {
@@ -804,6 +814,26 @@ async function loadNotices() {
 }
 
 // 공지 작성 인증
+function openNoticeDetail(n) {
+  document.getElementById('nd-title').textContent = n.title;
+  const meta = [
+    n.clubName ? `🏷️ ${n.clubName}` : '',
+    n.createdBy ? `👤 ${n.createdBy}` : '',
+    `📅 ${fmtDate(n.createdAt)}`
+  ].filter(Boolean).join('  ·  ');
+  document.getElementById('nd-meta').textContent = meta;
+  document.getElementById('nd-content').textContent = n.content;
+  const attachEl = document.getElementById('nd-attach');
+  if (n.driveUrl) {
+    document.getElementById('nd-attach-link').href = n.driveUrl;
+    document.getElementById('nd-attach-name').textContent = n.fileName || '첨부파일';
+    attachEl.style.display = '';
+  } else {
+    attachEl.style.display = 'none';
+  }
+  openModal('modal-notice-detail');
+}
+
 function ncResetVerify() {
   ncAuth = null;
   document.getElementById('nc-verified-box').style.display = 'none';
