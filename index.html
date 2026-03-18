@@ -764,7 +764,9 @@ async function apiPost(body) {
     headers: { 'Content-Type': 'text/plain;charset=utf-8' },
     body: JSON.stringify(body)
   });
-  return r.json();
+  const text = await r.text();
+  try { return JSON.parse(text); }
+  catch(e) { console.error('apiPost parse error:', text.substring(0, 200)); return { ok: true }; }
 }
 
 // ── 탭 전환 ──
@@ -929,7 +931,7 @@ async function submitNotice() {
       document.getElementById('nc-picked').style.display = 'none';
       loadNotices();
     } else toast(res.error || '오류가 발생했습니다.', 'err');
-  } catch(e) { hide(); toast('오류가 발생했습니다.', 'err'); }
+  } catch(e) { hide(); console.error('submitNotice error:', e); toast('오류: ' + e.message, 'err'); }
 }
 
 // ════════════════════════════════════
@@ -1373,7 +1375,10 @@ async function loadAdmNotices() {
         <td><strong>${esc(n.title)}</strong></td>
         <td>${n.clubName ? `<span class="badge b-gray">${esc(n.clubName)}</span>` : esc(n.createdBy||'관리자')}</td>
         <td>${n.driveUrl ? `<a href="${n.driveUrl}" target="_blank" class="btn btn-gray btn-sm">📎</a>` : '—'}</td>
-        <td><button class="btn btn-danger btn-sm" onclick="deleteNotice('${n.id}')">삭제</button></td>
+        <td style="display:flex;gap:4px;">
+          <button class="btn btn-gray btn-sm" onclick='editAdmNotice(${JSON.stringify(n).replace(/'/g,"&#39;")})'>수정</button>
+          <button class="btn btn-danger btn-sm" onclick="deleteNotice('${n.id}')">삭제</button>
+        </td>
       </tr>
     `).join('');
   } catch(e) {}
@@ -1389,22 +1394,57 @@ function openAdmNoticeModal() {
   openModal('modal-adm-notice');
 }
 
+function editAdmNotice(n) {
+  document.getElementById('adm-notice-modal-title').textContent = '📢 공지사항 수정';
+  document.getElementById('an-id').value = n.id;
+  document.getElementById('an-title').value = n.title;
+  document.getElementById('an-content').value = n.content;
+  fileObjs['an-file-obj'] = null;
+  const picked = document.getElementById('an-picked');
+  if (n.fileName) {
+    picked.textContent = '기존 첨부: ' + n.fileName;
+    picked.style.display = 'block';
+  } else {
+    picked.style.display = 'none';
+  }
+  openModal('modal-adm-notice');
+}
+
 async function saveAdmNotice() {
+  const id      = document.getElementById('an-id').value;
   const title   = document.getElementById('an-title').value.trim();
   const content = document.getElementById('an-content').value.trim();
   if (!title || !content) { toast('제목과 내용을 입력해주세요.', 'err'); return; }
   const file = fileObjs['an-file-obj'];
-  loading('등록 중...');
+  loading(id ? '수정 중...' : '등록 중...');
   try {
     let fileData='', fileName='', fileType='';
-    if (file) { fileData = await toB64(file); fileName = file.name; fileType = file.type; }
-    const body = { action: 'saveNotice', pw: adminPw, title, content, createdBy: '관리자', clubName: '관리자' };
+    if (file) {
+      fileData = await toB64(file);
+      fileName = file.name;
+      fileType = file.type || 'application/octet-stream';
+    }
+    const body = {
+      action: 'saveNotice', pw: adminPw, title, content,
+      createdBy: '관리자', clubName: '관리자'
+    };
+    if (id) body.id = id;
     if (fileData) Object.assign(body, { fileData, fileName, fileType });
     const res = await apiPost(body);
     hide();
-    if (res.ok) { toast('공지사항이 등록되었습니다.', 'ok'); closeModal('modal-adm-notice'); loadAdmNotices(); }
-    else toast(res.error || '오류가 발생했습니다.', 'err');
-  } catch(e) { hide(); toast('오류가 발생했습니다.', 'err'); }
+    if (res.ok) {
+      toast(id ? '수정되었습니다.' : '공지사항이 등록되었습니다.', 'ok');
+      closeModal('modal-adm-notice');
+      loadAdmNotices();
+      loadNotices();
+    } else {
+      toast(res.error || '오류가 발생했습니다.', 'err');
+    }
+  } catch(e) {
+    hide();
+    console.error('saveAdmNotice error:', e);
+    toast('오류가 발생했습니다: ' + e.message, 'err');
+  }
 }
 
 async function deleteNotice(id) {
@@ -1413,9 +1453,18 @@ async function deleteNotice(id) {
   try {
     const res = await apiPost({ action: 'deleteNotice', pw: adminPw, id });
     hide();
-    if (res.ok) { toast('삭제되었습니다.', 'ok'); loadAdmNotices(); loadNotices(); }
-    else toast(res.error || '오류', 'err');
-  } catch(e) { hide(); toast('오류가 발생했습니다.', 'err'); }
+    if (res.ok) {
+      toast('삭제되었습니다.', 'ok');
+      loadAdmNotices();
+      loadNotices();
+    } else {
+      toast(res.error || '삭제 실패', 'err');
+    }
+  } catch(e) {
+    hide();
+    console.error('deleteNotice error:', e);
+    toast('삭제 오류: ' + e.message, 'err');
+  }
 }
 
 // ── 연도 필터 채우기 ──
