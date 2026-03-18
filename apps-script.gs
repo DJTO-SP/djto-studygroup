@@ -553,7 +553,16 @@ function initSheet(name, headers) {
     s.appendRow(headers);
     s.setFrozenRows(1);
     s.getRange(1, 1, 1, headers.length).setFontWeight('bold').setBackground('#A5CD39').setFontColor('#ffffff');
+    return;
   }
+  // 기존 시트에 누락된 헤더 컬럼 자동 추가
+  const existing = s.getRange(1, 1, 1, s.getLastColumn()).getValues()[0];
+  headers.forEach(h => {
+    if (existing.indexOf(h) === -1) {
+      const newCol = s.getLastColumn() + 1;
+      s.getRange(1, newCol).setValue(h).setFontWeight('bold').setBackground('#A5CD39').setFontColor('#ffffff');
+    }
+  });
 }
 
 function setupAllSheets() {
