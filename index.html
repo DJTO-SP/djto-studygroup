@@ -20,8 +20,8 @@
     body { font-family: 'Noto Sans KR','Malgun Gothic',sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
 
     /* ── Title Bar ── */
-    .title-bar { background: #fff; border-bottom: 2px solid #e8edf5; overflow: hidden; min-height: 100px; }
-    .title-inner { max-width: 1100px; margin: 0 auto; display: flex; align-items: flex-end; justify-content: space-between; padding: 0 32px 14px; }
+    .title-bar { background: #fff; border-bottom: 2px solid #e8edf5; overflow: hidden; min-height: 130px; }
+    .title-inner { max-width: 1100px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; padding: 20px 32px; }
     .title-text .main { font-size: 26px; font-weight: 900; color: var(--text); letter-spacing: -1px; line-height: 1; }
     .title-text .main em { color: var(--green2); font-style: normal; }
     .title-logo-img { height: 80px; object-fit: contain; cursor: pointer; }
@@ -218,6 +218,14 @@
 <!-- ═══════════════════ 공지사항 ═══════════════════ -->
 <div id="page-notice" class="page active">
 
+  <!-- 공지 목록 -->
+  <div class="card">
+    <div class="section-title">공지사항</div>
+    <div id="notice-list">
+      <div class="empty"><div>⏳</div>불러오는 중...</div>
+    </div>
+  </div>
+
   <!-- 동아리 공지 등록 영역 -->
   <div class="card notice-write-area" id="notice-write-card">
     <div class="section-title" style="margin-bottom:14px;">📝 공지사항 등록 <span style="font-size:12px;font-weight:500;color:var(--sub);">(동아리 코드 또는 관리자)</span></div>
@@ -264,14 +272,6 @@
         <input type="file" id="nc-file" style="display:none" onchange="pickFile(event,'nc-picked','nc-file-obj','nc-drop')">
       </div>
       <button class="btn btn-green" onclick="submitNotice()" style="width:100%;justify-content:center;">공지 등록</button>
-    </div>
-  </div>
-
-  <!-- 공지 목록 -->
-  <div class="card">
-    <div class="section-title">공지사항</div>
-    <div id="notice-list">
-      <div class="empty"><div>⏳</div>불러오는 중...</div>
     </div>
   </div>
 </div>
@@ -613,24 +613,18 @@
       <label>제목 <span class="field-req">*</span></label>
       <input type="text" id="p-title" placeholder="예) 2025년 독서토론 동아리 활동결과">
     </div>
-    <div class="form-row">
-      <div class="form-group">
-        <label>심사결과</label>
-        <select id="p-review">
-          <option value="">미정</option>
-          <option value="우수">우수</option>
-          <option value="우량">우량</option>
-          <option value="보통">보통</option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label>기간</label>
-        <input type="text" id="p-period" placeholder="예) 2025.03 ~ 2025.12">
-      </div>
+    <div class="form-group">
+      <label>심사결과</label>
+      <select id="p-review">
+        <option value="">미정</option>
+        <option value="우수">우수</option>
+        <option value="우량">우량</option>
+        <option value="보통">보통</option>
+      </select>
     </div>
     <div class="form-group">
       <label>설명 (선택)</label>
-      <textarea id="p-desc" placeholder="간단한 설명" rows="2"></textarea>
+      <textarea id="p-desc" placeholder="간단한 설명" rows="5"></textarea>
     </div>
     <div class="form-group">
       <label>파일 <span id="p-file-req">*</span></label>
@@ -1244,7 +1238,7 @@ function openPastModal(r) {
   document.getElementById('p-clubname').value = r?.clubName || '';
   document.getElementById('p-title').value    = r?.title || '';
   document.getElementById('p-review').value   = r?.reviewResult || '';
-  document.getElementById('p-period').value   = r?.period || '';
+  // p-period 필드 제거됨
   document.getElementById('p-desc').value     = r?.desc || '';
   fileObjs['p-file-obj'] = null;
   document.getElementById('p-picked').style.display = 'none';
@@ -1273,7 +1267,7 @@ async function savePastResult() {
   const clubName = document.getElementById('p-clubname').value.trim();
   const title    = document.getElementById('p-title').value.trim();
   const review   = document.getElementById('p-review').value;
-  const period   = document.getElementById('p-period').value.trim();
+  const period   = '';
   const file     = fileObjs['p-file-obj'];
   if (!year || !clubName || !title) { toast('연도, 동아리명, 제목을 입력해주세요.', 'err'); return; }
   if (!rowId && !file) { show('err-p-file', true); return; }
