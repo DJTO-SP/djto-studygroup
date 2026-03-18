@@ -161,10 +161,12 @@ function saveToDrive(base64Data, fileName, mimeType, subFolder) {
     const existing = folder.getFoldersByName(subFolder);
     targetFolder = existing.hasNext() ? existing.next() : folder.createFolder(subFolder);
   }
-  const blob = Utilities.newBlob(Utilities.base64Decode(base64Data), mimeType, fileName);
+  const safeMime = mimeType || 'application/octet-stream';
+  const blob = Utilities.newBlob(Utilities.base64Decode(base64Data), safeMime, fileName);
   const file = targetFolder.createFile(blob);
   file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
-  return { fileId: file.getId(), driveUrl: file.getUrl() };
+  const fileId = file.getId();
+  return { fileId, driveUrl: 'https://drive.google.com/uc?export=download&id=' + fileId };
 }
 
 // ══════════════════════════════════════════
@@ -430,6 +432,8 @@ function saveNoticeAuth(d) {
     const v = verifyClubCode(d.clubId, d.clubCode);
     if (!v.ok) return { error: '동아리 코드가 올바르지 않습니다.' };
     authorClubName = v.clubName;
+  } else {
+    authorClubName = d.clubName || '';
   }
 
   let fileId='', driveUrl='', fileName='';

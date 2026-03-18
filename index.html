@@ -905,10 +905,15 @@ async function submitNotice() {
   loading('등록 중...');
   try {
     let fileData='', fileName='', fileType='';
-    if (file) { fileData = await toB64(file); fileName = file.name; fileType = file.type; }
+    if (file) {
+      fileData = await toB64(file);
+      fileName = file.name;
+      fileType = file.type || 'application/octet-stream';
+    }
     const body = {
       action: 'saveNotice', title, content,
       createdBy: author,
+      clubName: ncAuth.clubName || '',
       ...(ncAuth.isAdmin ? { pw: ncAuth.pw } : { clubId: ncAuth.clubId, clubCode: ncAuth.clubCode })
     };
     if (fileData) Object.assign(body, { fileData, fileName, fileType });
@@ -1393,7 +1398,7 @@ async function saveAdmNotice() {
   try {
     let fileData='', fileName='', fileType='';
     if (file) { fileData = await toB64(file); fileName = file.name; fileType = file.type; }
-    const body = { action: 'saveNotice', pw: adminPw, title, content };
+    const body = { action: 'saveNotice', pw: adminPw, title, content, createdBy: '관리자', clubName: '관리자' };
     if (fileData) Object.assign(body, { fileData, fileName, fileType });
     const res = await apiPost(body);
     hide();
