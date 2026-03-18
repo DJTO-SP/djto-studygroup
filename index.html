@@ -219,8 +219,22 @@
   <!-- 공지 목록 -->
   <div class="card">
     <div class="section-title">공지사항</div>
-    <div id="notice-list">
-      <div class="empty"><div>⏳</div>불러오는 중...</div>
+    <div class="result-table-wrap">
+      <table class="result-table">
+        <thead>
+          <tr>
+            <th>번호</th>
+            <th>제목</th>
+            <th>동아리명</th>
+            <th>작성자</th>
+            <th>등록일</th>
+            <th>첨부</th>
+          </tr>
+        </thead>
+        <tbody id="notice-list">
+          <tr><td colspan="6" class="empty" style="padding:40px;">⏳ 불러오는 중...</td></tr>
+        </tbody>
+      </table>
     </div>
   </div>
 
@@ -789,27 +803,25 @@ function populateClubSelects() {
 // ════════════════════════════════════
 async function loadNotices() {
   const el = document.getElementById('notice-list');
-  el.innerHTML = '<div class="empty"><div>⏳</div>불러오는 중...</div>';
+  el.innerHTML = '<tr><td colspan="6" class="empty" style="padding:40px;">⏳ 불러오는 중...</td></tr>';
   try {
     const data = await api({ action: 'getNotices' });
     if (!data || !data.length) {
-      el.innerHTML = '<div class="empty"><div>📭</div>등록된 공지사항이 없습니다.</div>';
+      el.innerHTML = '<tr><td colspan="6" class="empty" style="padding:40px;">📭 등록된 공지사항이 없습니다.</td></tr>';
       return;
     }
-    el.innerHTML = data.map(n => `
-      <div class="notice-item" onclick="openNoticeDetail(${JSON.stringify(n).replace(/"/g, '&quot;')})" style="cursor:pointer;">
-        <div class="notice-header">
-          <div class="notice-title">${esc(n.title)}</div>
-          <div class="notice-date">📅 ${fmtDate(n.createdAt)}</div>
-        </div>
-        <div class="notice-meta">
-          ${n.clubName ? `<span>🏷️ ${esc(n.clubName)}</span>` : ''}
-          ${n.createdBy ? `<span>👤 ${esc(n.createdBy)}</span>` : ''}
-        </div>
-      </div>
+    el.innerHTML = data.map((n, i) => `
+      <tr>
+        <td class="td-num">${data.length - i}</td>
+        <td class="td-title" onclick='openNoticeDetail(${JSON.stringify(n).replace(/'/g, "\\'")})'>${esc(n.title)}</td>
+        <td class="td-club"><span class="badge b-gray">${esc(n.clubName||'—')}</span></td>
+        <td style="font-size:12px;color:var(--sub);">${esc(n.createdBy||'—')}</td>
+        <td style="font-size:12px;color:var(--sub);white-space:nowrap;">${fmtDate(n.createdAt)}</td>
+        <td>${n.driveUrl ? `<a href="${n.driveUrl}" target="_blank" class="btn btn-gray btn-sm">📎</a>` : '—'}</td>
+      </tr>
     `).join('');
   } catch(e) {
-    el.innerHTML = '<div class="empty"><div>⚠️</div>오류가 발생했습니다.</div>';
+    el.innerHTML = '<tr><td colspan="6" class="empty" style="padding:40px;">⚠️ 오류가 발생했습니다.</td></tr>';
   }
 }
 
