@@ -218,7 +218,10 @@
 
   <!-- 공지 목록 -->
   <div class="card">
-    <div class="section-title">공지사항</div>
+    <div style="display:flex;align-items:center;justify-content:space-between">
+      <div class="section-title" style="margin:0">공지사항</div>
+      <button class="btn btn-green btn-sm" onclick="toggleNoticeWrite()" id="btn-notice-toggle" style="font-size:12px;padding:6px 14px">+ 등록</button>
+    </div>
     <div class="result-table-wrap">
       <table class="result-table">
         <thead>
@@ -239,7 +242,7 @@
   </div>
 
   <!-- 동아리 공지 등록 영역 -->
-  <div class="card notice-write-area" id="notice-write-card">
+  <div class="card notice-write-area" id="notice-write-card" style="display:none">
     <div class="section-title" style="margin-bottom:14px;">📝 공지사항 등록 <span style="font-size:12px;font-weight:500;color:var(--sub);">(동아리 코드 또는 관리자)</span></div>
     <div class="notice-code-row" id="notice-code-row">
       <div class="form-group">
@@ -860,6 +863,19 @@ function ncResetVerify() {
   document.getElementById('nc-verified-box').style.display = 'none';
   document.getElementById('nc-form').style.display = 'none';
   document.getElementById('err-nc-auth').style.display = 'none';
+}
+
+function toggleNoticeWrite() {
+  var card = document.getElementById('notice-write-card');
+  var btn = document.getElementById('btn-notice-toggle');
+  if (card.style.display === 'none') {
+    card.style.display = '';
+    btn.textContent = '✕ 닫기';
+    card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  } else {
+    card.style.display = 'none';
+    btn.textContent = '+ 등록';
+  }
 }
 
 async function noticeWriteAuth() {
