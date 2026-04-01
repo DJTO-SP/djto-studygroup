@@ -575,8 +575,8 @@
     <div class="form-group"><label>설명</label><textarea id="c-desc" placeholder="동아리 소개" rows="2"></textarea></div>
     <div class="form-row">
       <div class="form-group">
-        <label>고유 코드 <span class="field-req">*</span></label>
-        <input type="text" id="c-code" placeholder="예) READ2026" style="font-family:monospace;">
+        <label>고유 코드 <span style="font-size:11px;font-weight:500;color:var(--sub);">(자동 생성 · 수정 가능)</span></label>
+        <input type="text" id="c-code" placeholder="저장 시 자동 생성됩니다" style="font-family:monospace;">
       </div>
       <div class="form-group">
         <label>운영 상태</label>
@@ -1239,8 +1239,12 @@ function openClubModal(c) {
 
 async function saveClub() {
   const name = document.getElementById('c-name').value.trim();
-  const code = document.getElementById('c-code').value.trim();
-  if (!name || !code) { toast('동아리 이름과 코드를 입력해주세요.', 'err'); return; }
+  let code = document.getElementById('c-code').value.trim();
+  if (!name) { toast('동아리 이름을 입력해주세요.', 'err'); return; }
+  if (!code) {
+    code = name.substring(0, 2) + '-' + Math.random().toString(36).substring(2, 8);
+    document.getElementById('c-code').value = code;
+  }
   loading('저장 중...');
   try {
     const res = await apiPost({
