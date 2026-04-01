@@ -400,9 +400,13 @@
     </div>
   </div>
 
-  <!-- 제출 이력 조회 -->
+  <!-- 제출 이력 조회 (접힘) -->
   <div class="card" style="margin-top:16px;">
-    <div class="section-title">제출 이력 조회</div>
+    <div style="display:flex;align-items:center;justify-content:space-between;cursor:pointer;" onclick="toggleHistorySection()">
+      <div class="section-title" style="margin:0;">제출 이력 조회</div>
+      <button class="btn btn-gray btn-sm" id="history-toggle-btn" style="pointer-events:none;">펼치기 ▼</button>
+    </div>
+    <div id="history-section-body" style="display:none;margin-top:14px;">
     <div style="font-size:13px;color:var(--sub);margin-bottom:14px;">동아리 코드를 입력하면 제출한 보고서 목록을 확인할 수 있습니다.</div>
     <div class="form-row-inline" style="margin-bottom:10px;">
       <div class="form-group">
@@ -418,6 +422,7 @@
       <button class="btn btn-green btn-sm" onclick="lookupReports()" style="flex-shrink:0;margin-bottom:0;">조회</button>
     </div>
     <div id="hl-result"></div>
+    </div>
   </div>
 
   <!-- 신청 섹션 (접힘 상태) -->
@@ -836,6 +841,18 @@ async function lookupReports() {
         + '</tr>').join('')
       + '</tbody></table></div>';
   } catch(e) { el.innerHTML = '<div style="color:var(--danger);font-size:13px;padding:8px 0;">서버 연결 실패</div>'; }
+}
+
+function toggleHistorySection() {
+  const body = document.getElementById('history-section-body');
+  const btn = document.getElementById('history-toggle-btn');
+  if (body.style.display === 'none') {
+    body.style.display = 'block';
+    btn.textContent = '접기 ▲';
+  } else {
+    body.style.display = 'none';
+    btn.textContent = '펼치기 ▼';
+  }
 }
 
 function toggleApplySection() {
