@@ -1184,7 +1184,7 @@ function renderAppTable(data) {
       <td>${esc(a.dept||'')}</td>
       <td>${a.driveUrl ? `<a href="${a.driveUrl}" target="_blank" class="btn-dl btn-sm btn btn-gray">열기</a>` : '—'}</td>
       <td><span class="badge ${a.status==='승인'?'b-ok':a.status==='반려'?'b-no':'b-wait'}">${esc(a.status||'대기')}</span></td>
-      <td><button class="btn btn-gray btn-sm" onclick="openAppReview('${a.id}','${esc(a.clubName)}','${esc(a.name)}')">검토</button></td>
+      <td style="display:flex;gap:4px;"><button class="btn btn-gray btn-sm" onclick="openAppReview('${a.id}','${esc(a.clubName)}','${esc(a.name)}')">검토</button><button class="btn btn-danger btn-sm" onclick="deleteApplication('${a.id}','${esc(a.clubName)}','${esc(a.name)}')">삭제</button></td>
     </tr>
   `).join('');
 }
@@ -1206,6 +1206,17 @@ async function reviewApp(status) {
     hide();
     if (res.ok) { toast(`${status} 처리되었습니다.`, 'ok'); closeModal('modal-app-review'); loadApplications(); }
     else toast(res.error || '오류', 'err');
+  } catch(e) { hide(); toast('오류가 발생했습니다.', 'err'); }
+}
+
+async function deleteApplication(id, clubName, name) {
+  if (!confirm(`[${clubName}] ${name} 의 신청을 삭제하시겠습니까?`)) return;
+  loading('삭제 중...');
+  try {
+    const res = await apiPost({ action: 'deleteFile', pw: adminPw, id, sheetName: '신청' });
+    hide();
+    if (res.ok) { toast('삭제되었습니다.', 'ok'); loadApplications(); }
+    else toast(res.error || '삭제 실패', 'err');
   } catch(e) { hide(); toast('오류가 발생했습니다.', 'err'); }
 }
 
