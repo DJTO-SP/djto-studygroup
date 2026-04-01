@@ -26,6 +26,7 @@ const S_REPORT   = '결과보고서';
 const S_PAST     = '지난결과';
 const S_NOTICE        = '공지사항';
 const S_PORTAL_NOTICE = '포털공지';
+const S_POPUP         = '팝업';
 
 // ══════════════════════════════════════════
 // GET 라우터
@@ -46,6 +47,7 @@ function doGet(e) {
       case 'getReportsByCode':   result = getReportsByCode(p.clubId, p.code); break;
       case 'getNotices':         result = getNotices(); break;
       case 'getPortalNotices':   result = getPortalNotices(); break;
+      case 'getPopups':          result = getPopups(); break;
       default:                   result = {error: 'Unknown action'};
     }
   } catch(err) {
@@ -76,6 +78,8 @@ function doPost(e) {
       case 'savePortalNotice':  result = checkAdmin(d.pw) ? savePortalNotice(d) : {error:'권한 없음'}; break;
       case 'editPortalNotice':  result = checkAdmin(d.pw) ? savePortalNotice(d) : {error:'권한 없음'}; break;
       case 'deletePortalNotice':result = checkAdmin(d.pw) ? deletePortalNoticeById(d.id) : {error:'권한 없음'}; break;
+      case 'savePopup':         result = checkAdmin(d.pw) ? savePopup(d) : {error:'권한 없음'}; break;
+      case 'deletePopup':       result = checkAdmin(d.pw) ? deletePopup(d.id) : {error:'권한 없음'}; break;
       default:                  result = {error: 'Unknown action'};
     }
   } catch(err) {
@@ -588,5 +592,37 @@ function setupAllSheets() {
   initSheet(S_PAST,     ['id','year','clubName','title','desc','reviewResult','period','fileId','driveUrl','fileName','fileType','fileSize','uploadedAt']);
   initSheet(S_NOTICE,        ['id','title','content','createdBy','clubName','fileId','driveUrl','fileName','createdAt']);
   initSheet(S_PORTAL_NOTICE, ['id','title','content','fileId','driveUrl','fileName','createdAt']);
+  initSheet(S_POPUP, ['id','title','content','sites','enabled','createdAt']);
   SpreadsheetApp.getUi().alert('✅ 시트 초기화 완료!');
+}
+
+// ══════════════════════════════════════════
+// 팝업 관리
+// ══════════════════════════════════════════
+function getPopups() {
+  initSheet(S_POPUP, ['id','title','content','sites','enabled','createdAt']);
+  return sheetToObjects(S_POPUP).filter(p => p.enabled !== 'N').map(p => ({
+    id: p.id, title: p.title, content: p.content,
+    sites: p.sites, createdAt: p.createdAt
+  }));
+}
+
+function savePopup(d) {
+  initSheet(S_POPUP, ['id','title','content','sites','enabled','createdAt']);
+  if (d.id) {
+    // 수정
+    updateRowById(S_POPUP, d.id, { title: d.title, content: d.content, sites: d.sites, enabled: d.enabled || 'Y' });
+  } else {
+    // 신규
+    saveToSheet(S_POPUP, {
+      id: uid(), title: d.title, content: d.content,
+      sites: d.sites || 'all', enabled: 'Y', createdAt: now()
+    });
+  }
+  return { ok: true };
+}
+
+function deletePopup(id) {
+  deleteRowById(S_POPUP, id);
+  return { ok: true };
 }
