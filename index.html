@@ -1231,10 +1231,21 @@ async function loadAdmClubs() {
         <td><strong>${esc(c.name)}</strong> <span class="badge b-gray">${esc(c.type||'')}</span></td>
         <td><code style="background:#f1f5f9;padding:2px 8px;border-radius:5px;font-size:12px;">${esc(c.code||'')}</code></td>
         <td><span class="badge ${c.status==='운영중'?'b-ok':'b-gray'}">${esc(c.status||'')}</span></td>
-        <td><button class="btn btn-gray btn-sm" onclick='openClubModal(${JSON.stringify(c)})'>수정</button></td>
+        <td style="display:flex;gap:4px;"><button class="btn btn-gray btn-sm" onclick='openClubModal(${JSON.stringify(c)})'>수정</button><button class="btn btn-danger btn-sm" onclick="deleteClub('${c.id}','${esc(c.name)}')">삭제</button></td>
       </tr>
     `).join('');
   } catch(e) {}
+}
+
+async function deleteClub(id, name) {
+  if (!confirm(`"${name}" 동아리를 삭제하시겠습니까?`)) return;
+  loading('삭제 중...');
+  try {
+    const res = await apiPost({ action: 'deleteClub', pw: adminPw, clubId: id });
+    hide();
+    if (res.ok) { toast('삭제되었습니다.', 'ok'); loadAdmClubs(); loadClubs(); }
+    else toast(res.error || '삭제 실패', 'err');
+  } catch(e) { hide(); toast('오류가 발생했습니다.', 'err'); }
 }
 
 function openClubModal(c) {
