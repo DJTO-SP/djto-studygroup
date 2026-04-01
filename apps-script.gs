@@ -43,6 +43,7 @@ function doGet(e) {
       case 'getReports':         result = checkAdmin(p.pw) ? getReports(p.year) : {error:'권한 없음'}; break;
       case 'getPastResults':     result = getPastResults(p.year, p.clubId); break;
       case 'getStats':           result = getStats(); break;
+      case 'getReportsByCode':   result = getReportsByCode(p.clubId, p.code); break;
       case 'getNotices':         result = getNotices(); break;
       case 'getPortalNotices':   result = getPortalNotices(); break;
       default:                   result = {error: 'Unknown action'};
@@ -73,6 +74,7 @@ function doPost(e) {
       case 'saveNotice':        result = saveNoticeAuth(d); break;
       case 'deleteNotice':      result = checkAdmin(d.pw) ? deleteNoticeById(d.id) : {error:'권한 없음'}; break;
       case 'savePortalNotice':  result = checkAdmin(d.pw) ? savePortalNotice(d) : {error:'권한 없음'}; break;
+      case 'editPortalNotice':  result = checkAdmin(d.pw) ? savePortalNotice(d) : {error:'권한 없음'}; break;
       case 'deletePortalNotice':result = checkAdmin(d.pw) ? deletePortalNoticeById(d.id) : {error:'권한 없음'}; break;
       default:                  result = {error: 'Unknown action'};
     }
@@ -334,6 +336,19 @@ function getReports(year) {
     title:r.title, uploadedBy:r.uploadedBy,
     driveUrl:r.driveUrl, fileType:r.fileType, uploadedAt:r.uploadedAt
   }));
+}
+
+function getReportsByCode(clubId, code) {
+  const v = verifyClubCode(clubId, code);
+  if (!v.ok) return { error: '동아리 코드가 올바르지 않습니다.' };
+  let list = sheetToObjects(S_REPORT).filter(r => r.clubId === clubId);
+  return {
+    ok: true, clubName: v.clubName,
+    reports: list.sort((a,b) => new Date(b.uploadedAt) - new Date(a.uploadedAt)).map(r => ({
+      id:r.id, year:r.year, title:r.title, uploadedBy:r.uploadedBy,
+      driveUrl:r.driveUrl, fileName:r.fileName, uploadedAt:r.uploadedAt
+    }))
+  };
 }
 
 // ══════════════════════════════════════════

@@ -400,6 +400,26 @@
     </div>
   </div>
 
+  <!-- 제출 이력 조회 -->
+  <div class="card" style="margin-top:16px;">
+    <div class="section-title">제출 이력 조회</div>
+    <div style="font-size:13px;color:var(--sub);margin-bottom:14px;">동아리 코드를 입력하면 제출한 보고서 목록을 확인할 수 있습니다.</div>
+    <div class="form-row-inline" style="margin-bottom:10px;">
+      <div class="form-group">
+        <label>동아리 선택</label>
+        <select id="hl-club-sel">
+          <option value="">-- 동아리 선택 --</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>동아리 코드</label>
+        <input type="text" id="hl-code" placeholder="코드 입력" onkeydown="if(event.key==='Enter')lookupReports()">
+      </div>
+      <button class="btn btn-green btn-sm" onclick="lookupReports()" style="flex-shrink:0;margin-bottom:0;">조회</button>
+    </div>
+    <div id="hl-result"></div>
+  </div>
+
   <!-- 신청 섹션 (접힘 상태) -->
   <div class="card" style="margin-top:16px;">
     <div style="display:flex;align-items:center;justify-content:space-between;cursor:pointer;" onclick="toggleApplySection()">
@@ -464,6 +484,13 @@
   </div>
 
   <div id="admin-panel" style="display:none;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+      <div style="font-size:18px;font-weight:800;color:var(--navy);">관리자</div>
+      <div style="display:flex;gap:8px;">
+        <button class="btn btn-navy btn-sm" onclick="exportStudyExcel()">📥 Excel 다운로드</button>
+        <button class="btn btn-gray btn-sm" onclick="adminLogout()">로그아웃</button>
+      </div>
+    </div>
     <div class="admin-nav">
       <button class="admin-nav-btn active" onclick="showAdminPanel('adm-applications',this)">📝 신청 관리</button>
       <button class="admin-nav-btn" onclick="showAdminPanel('adm-clubs',this)">🏷️ 동아리 관리</button>
@@ -784,6 +811,33 @@ function showPage(id, btn) {
   if (id === 'activity') { if (!allPastResults.length) loadPastResults(); else renderResultTable(); }
   if (id === 'admin' && adminPw) { loadApplications(); loadAdmClubs(); loadAdmReports(); loadAdmPast(); loadAdmNotices(); }
 }
+async function lookupReports() {
+  const clubId = document.getElementById('hl-club-sel').value;
+  const code = document.getElementById('hl-code').value.trim();
+  const el = document.getElementById('hl-result');
+  if (!clubId || !code) { el.innerHTML = '<div style="color:var(--danger);font-size:13px;padding:8px 0;">동아리를 선택하고 코드를 입력해주세요.</div>'; return; }
+  el.innerHTML = '<div style="color:var(--sub);font-size:13px;padding:16px;text-align:center;">⏳ 조회 중...</div>';
+  try {
+    const res = await api({ action: 'getReportsByCode', clubId, code });
+    if (res.error) { el.innerHTML = '<div style="color:var(--danger);font-size:13px;padding:8px 0;">' + esc(res.error) + '</div>'; return; }
+    const reports = res.reports || [];
+    if (!reports.length) {
+      el.innerHTML = '<div style="text-align:center;padding:24px;color:var(--sub);font-size:13px;"><div style="font-size:28px;margin-bottom:6px;">📭</div>제출된 보고서가 없습니다.</div>';
+      return;
+    }
+    el.innerHTML = '<div style="font-size:13px;font-weight:700;color:var(--navy);margin-bottom:8px;">' + esc(res.clubName) + ' · 제출 이력 (' + reports.length + '건)</div>'
+      + '<div class="tbl-wrap"><table class="result-table"><thead><tr><th>연도</th><th>제목</th><th>제출자</th><th>제출일</th><th>파일</th></tr></thead><tbody>'
+      + reports.map(r => '<tr>'
+        + '<td>' + esc(r.year||'') + '</td>'
+        + '<td style="font-weight:600;">' + esc(r.title) + '</td>'
+        + '<td>' + esc(r.uploadedBy||'') + '</td>'
+        + '<td style="font-size:12px;color:var(--sub);">' + fmtDate(r.uploadedAt) + '</td>'
+        + '<td>' + (r.driveUrl ? '<a href="' + r.driveUrl + '" target="_blank" class="btn btn-gray btn-sm">열기</a>' : '—') + '</td>'
+        + '</tr>').join('')
+      + '</tbody></table></div>';
+  } catch(e) { el.innerHTML = '<div style="color:var(--danger);font-size:13px;padding:8px 0;">서버 연결 실패</div>'; }
+}
+
 function toggleApplySection() {
   const body = document.getElementById('apply-section-body');
   const btn = document.getElementById('apply-toggle-btn');
@@ -812,7 +866,7 @@ async function loadClubs() {
 
 function populateClubSelects() {
   const opts = clubs.map(c => `<option value="${c.id}">${esc(c.name)}</option>`).join('');
-  ['rp-club-sel','nc-club-sel'].forEach(id => {
+  ['rp-club-sel','nc-club-sel','hl-club-sel'].forEach(id => {
     const el = document.getElementById(id);
     if (!el) return;
     const placeholder = id === 'nc-club-sel'
@@ -1163,6 +1217,51 @@ async function submitReport() {
 // ════════════════════════════════════
 // 관리자
 // ════════════════════════════════════
+function adminLogout() {
+  adminPw = '';
+  document.getElementById('admin-lock').style.display = 'block';
+  document.getElementById('admin-panel').style.display = 'none';
+  document.getElementById('adm-pw').value = '';
+}
+
+async function exportStudyExcel() {
+  loading('데이터 불러오는 중...');
+  try {
+    const [appData, reportData, pastData] = await Promise.all([
+      api({ action: 'getApplications', pw: adminPw, status: '' }),
+      api({ action: 'getReports', pw: adminPw, year: '' }),
+      api({ action: 'getPastResults' })
+    ]);
+    hide();
+
+    const wb = XLSX.utils.book_new();
+
+    // Sheet1: 신청 목록
+    const apps = (Array.isArray(appData) ? appData : []).map(a => ({
+      '신청일': a.submittedAt || '', '동아리명': a.clubName || '', '신청자': a.name || '',
+      '부서': a.dept || '', '상태': a.status || '대기', '비고': a.comment || ''
+    }));
+    XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(apps.length ? apps : [{'안내':'데이터 없음'}]), '신청목록');
+
+    // Sheet2: 보고서 현황
+    const rpts = (Array.isArray(reportData) ? reportData : []).map(r => ({
+      '연도': r.year || '', '동아리명': r.clubName || '', '제목': r.title || '',
+      '제출자': r.uploadedBy || '', '제출일': r.uploadedAt || '', '파일링크': r.driveUrl || ''
+    }));
+    XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(rpts.length ? rpts : [{'안내':'데이터 없음'}]), '보고서현황');
+
+    // Sheet3: 활동결과
+    const past = (Array.isArray(pastData) ? pastData : []).map(p => ({
+      '연도': p.year || '', '동아리명': p.clubName || '', '제목': p.title || '',
+      '심사결과': p.reviewResult || '미정', '파일링크': p.driveUrl || ''
+    }));
+    XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(past.length ? past : [{'안내':'데이터 없음'}]), '활동결과');
+
+    XLSX.writeFile(wb, '학습동아리_관리현황_' + new Date().toISOString().slice(0,10) + '.xlsx');
+    toast('Excel 다운로드 완료!', 'ok');
+  } catch(e) { hide(); toast('다운로드 실패', 'err'); }
+}
+
 async function adminLogin() {
   const pw = document.getElementById('adm-pw').value;
   if (!pw) return;
