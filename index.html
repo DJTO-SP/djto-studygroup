@@ -640,7 +640,7 @@
     <input type="hidden" id="c-rowid">
     <div class="form-group"><label>동아리 이름 <span class="field-req">*</span></label><input type="text" id="c-name" placeholder="예) 독서토론 동아리"></div>
     <div class="form-group"><label>유형</label>
-      <select id="c-type"><option>학습동아리</option><option>자율기획형</option></select>
+      <select id="c-type"><option>핵심과제형</option><option>자율기획형</option></select>
     </div>
     <div class="form-group"><label>설명</label><textarea id="c-desc" placeholder="동아리 소개" rows="2"></textarea></div>
     <div class="form-row">
@@ -1186,11 +1186,14 @@ function editFromDetail() {
 // 신청
 // ════════════════════════════════════
 async function submitCoreApply() {
-  const name = v('core-name'), dept = v('core-dept'), cname = v('core-clubname');
+  const name = v('core-name'), dept = v('core-dept');
+  const sel = document.getElementById('core-clubname');
+  const cname = sel.options[sel.selectedIndex] ? sel.options[sel.selectedIndex].text : '';
+  const cnameVal = sel.value;
   let ok = true;
   if (!name)  { show('err-core-name', true); ok = false; }    else show('err-core-name', false);
   if (!dept)  { show('err-core-dept', true); ok = false; }    else show('err-core-dept', false);
-  if (!cname) { show('err-core-clubname', true); ok = false; } else show('err-core-clubname', false);
+  if (!cnameVal) { show('err-core-clubname', true); ok = false; } else show('err-core-clubname', false);
   if (!ok) return;
   loading('신청 중...');
   try {
