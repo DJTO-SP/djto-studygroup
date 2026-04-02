@@ -907,6 +907,11 @@ function showAdminPanel(id, btn) {
   document.querySelectorAll('.admin-nav-btn').forEach(b => b.classList.remove('active'));
   document.getElementById(id).classList.add('active');
   btn.classList.add('active');
+  if (id === 'adm-applications') loadApplications();
+  if (id === 'adm-clubs') loadAdmClubs();
+  if (id === 'adm-reports') loadAdmReports();
+  if (id === 'adm-past') loadAdmPast();
+  if (id === 'adm-notices') loadAdmNotices();
 }
 
 // ── 동아리 목록 ──
@@ -1354,7 +1359,6 @@ async function adminLogin() {
       document.getElementById('admin-lock').style.display = 'none';
       document.getElementById('admin-panel').style.display = 'block';
       renderAppTable(res);
-      loadAdmClubs(); loadAdmReports(); loadAdmPast(); loadAdmNotices();
     }
   } catch(e) { hide(); toast('오류가 발생했습니다.', 'err'); }
 }
