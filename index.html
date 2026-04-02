@@ -551,7 +551,7 @@
         </div>
         <div class="tbl-wrap">
           <table>
-            <thead><tr><th>신청일</th><th>동아리명</th><th>신청자</th><th>부서</th><th>서식</th><th>상태</th><th>관리</th></tr></thead>
+            <thead><tr><th>신청일</th><th>유형</th><th>동아리명</th><th>신청자</th><th>부서</th><th>서식</th><th>상태</th><th>관리</th></tr></thead>
             <tbody id="app-tbody"></tbody>
           </table>
         </div>
@@ -1323,7 +1323,7 @@ async function exportStudyExcel() {
 
     // Sheet1: 신청 목록
     const apps = (Array.isArray(appData) ? appData : []).map(a => ({
-      '신청일': a.submittedAt || '', '동아리명': a.clubName || '', '신청자': a.name || '',
+      '신청일': a.submittedAt || '', '유형': a.type || '학습동아리', '동아리명': a.clubName || '', '신청자': a.name || '',
       '부서': a.dept || '', '상태': a.status || '대기', '비고': a.comment || ''
     }));
     XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(apps.length ? apps : [{'안내':'데이터 없음'}]), '신청목록');
@@ -1372,10 +1372,11 @@ async function loadApplications() {
 
 function renderAppTable(data) {
   const tbody = document.getElementById('app-tbody');
-  if (!data || !data.length) { tbody.innerHTML = '<tr><td colspan="7" class="empty" style="padding:24px;">신청 내역이 없습니다.</td></tr>'; return; }
+  if (!data || !data.length) { tbody.innerHTML = '<tr><td colspan="8" class="empty" style="padding:24px;">신청 내역이 없습니다.</td></tr>'; return; }
   tbody.innerHTML = data.map(a => `
     <tr>
       <td>${fmtDate(a.submittedAt)}</td>
+      <td><span class="badge ${a.type==='핵심과제형'?'b-navy':'b-green'}">${esc(a.type||'학습동아리')}</span></td>
       <td><strong>${esc(a.clubName)}</strong></td>
       <td>${esc(a.name)}</td>
       <td>${esc(a.dept||'')}</td>
