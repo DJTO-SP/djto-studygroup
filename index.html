@@ -339,7 +339,8 @@
   <div class="card">
     <div class="section-title">핵심과제형 동아리 신청</div>
     <div class="info-box green">
-      📋 핵심과제형 동아리에 참여를 신청합니다. 이름, 부서, 동아리명을 입력해주세요.
+      📋 핵심과제형 동아리에 참여를 신청합니다. 이름, 부서, 동아리명을 입력해주세요.<br>
+      <span style="font-size:12px;color:#64748b;">※ 희망 동아리 목록이 표시되지 않으면 잠시만 기다려주세요. 자동으로 불러옵니다.</span>
     </div>
     <div class="form-row-3">
       <div class="form-group">
@@ -819,10 +820,23 @@ let ncAuth = null; // { isAdmin, clubId, clubName }
 // 상세 보기 현재 항목
 let currentDetailItem = null;
 
-// ── 초기 로드 ──
+// ── 캐시 키 ──
+const CACHE = { clubs: 'sg_cache_clubs', notices: 'sg_cache_notices', past: 'sg_cache_past' };
+function cacheGet(key) { try { return JSON.parse(localStorage.getItem(key)); } catch(e) { return null; } }
+function cacheSet(key, data) { try { localStorage.setItem(key, JSON.stringify(data)); } catch(e) {} }
+
+// ── 초기 로드 (캐시 우선 → 백그라운드 갱신) ──
 document.addEventListener('DOMContentLoaded', () => {
   populateYearFilters();
-  Promise.all([loadClubs(), loadNotices(), loadPastResults()]);
+  // 캐시에서 즉시 표시
+  const cachedClubs = cacheGet(CACHE.clubs);
+  if (cachedClubs && cachedClubs.length) { clubs = cachedClubs; populateClubSelects(); }
+  const cachedNotices = cacheGet(CACHE.notices);
+  if (cachedNotices) renderNoticeTable(cachedNotices);
+  const cachedPast = cacheGet(CACHE.past);
+  if (cachedPast && cachedPast.length) { allPastResults = cachedPast; buildYearFilter(); renderResultTable(); }
+  // 서버에서 최신 데이터 갱신
+  loadClubs(); loadNotices(); loadPastResults();
 });
 
 // ── API ──
@@ -917,8 +931,8 @@ function showAdminPanel(id, btn) {
 
 // ── 동아리 목록 ──
 async function loadClubs() {
-  try { clubs = await api({ action: 'getClubs' }); }
-  catch(e) { clubs = []; }
+  try { clubs = await api({ action: 'getClubs' }); cacheSet(CACHE.clubs, clubs); }
+  catch(e) { if (!clubs.length) clubs = []; }
   populateClubSelects();
 }
 
@@ -937,29 +951,35 @@ function populateClubSelects() {
 // ════════════════════════════════════
 // 공지사항
 // ════════════════════════════════════
+function renderNoticeTable(data) {
+  const el = document.getElementById('notice-list');
+  if (!data || !data.length) {
+    el.innerHTML = '<tr><td colspan="6" class="empty" style="padding:40px;">📭 등록된 공지사항이 없습니다.</td></tr>';
+    return;
+  }
+  el.innerHTML = data.map((n, i) => {
+    const ext = n.fileName ? n.fileName.split('.').pop().toUpperCase() : '';
+    return `
+    <tr>
+      <td class="td-num">${data.length - i}</td>
+      <td class="td-title" onclick='openNoticeDetail(${JSON.stringify(n).replace(/'/g, "\\'")})'>${esc(n.title)}</td>
+      <td class="td-club">${n.clubName ? `<span class="badge b-gray">${esc(n.clubName)}</span>` : '—'}</td>
+      <td style="font-size:12px;color:var(--sub);">${esc(n.createdBy||'—')}</td>
+      <td style="font-size:12px;color:var(--sub);white-space:nowrap;">${fmtDate(n.createdAt)}</td>
+      <td>${n.driveUrl ? `<a href="${n.driveUrl}" target="_blank" class="btn btn-gray btn-sm">${ext||'파일'}</a>` : '—'}</td>
+    </tr>`;
+  }).join('');
+}
+
 async function loadNotices() {
   const el = document.getElementById('notice-list');
-  el.innerHTML = '<tr><td colspan="6" class="empty" style="padding:40px;">⏳ 불러오는 중...</td></tr>';
+  if (!cacheGet(CACHE.notices)) el.innerHTML = '<tr><td colspan="6" class="empty" style="padding:40px;">⏳ 불러오는 중...</td></tr>';
   try {
     const data = await api({ action: 'getNotices' });
-    if (!data || !data.length) {
-      el.innerHTML = '<tr><td colspan="6" class="empty" style="padding:40px;">📭 등록된 공지사항이 없습니다.</td></tr>';
-      return;
-    }
-    el.innerHTML = data.map((n, i) => {
-      const ext = n.fileName ? n.fileName.split('.').pop().toUpperCase() : '';
-      return `
-      <tr>
-        <td class="td-num">${data.length - i}</td>
-        <td class="td-title" onclick='openNoticeDetail(${JSON.stringify(n).replace(/'/g, "\\'")})'>${esc(n.title)}</td>
-        <td class="td-club">${n.clubName ? `<span class="badge b-gray">${esc(n.clubName)}</span>` : '—'}</td>
-        <td style="font-size:12px;color:var(--sub);">${esc(n.createdBy||'—')}</td>
-        <td style="font-size:12px;color:var(--sub);white-space:nowrap;">${fmtDate(n.createdAt)}</td>
-        <td>${n.driveUrl ? `<a href="${n.driveUrl}" target="_blank" class="btn btn-gray btn-sm">${ext||'파일'}</a>` : '—'}</td>
-      </tr>`;
-    }).join('');
+    cacheSet(CACHE.notices, data);
+    renderNoticeTable(data);
   } catch(e) {
-    el.innerHTML = '<tr><td colspan="6" class="empty" style="padding:40px;">⚠️ 오류가 발생했습니다.</td></tr>';
+    if (!cacheGet(CACHE.notices)) el.innerHTML = '<tr><td colspan="6" class="empty" style="padding:40px;">⚠️ 오류가 발생했습니다.</td></tr>';
   }
 }
 
@@ -1082,14 +1102,15 @@ async function submitNotice() {
 // 활동결과 (지난결과 리스트)
 // ════════════════════════════════════
 async function loadPastResults() {
-  document.getElementById('result-tbody').innerHTML =
+  if (!cacheGet(CACHE.past)) document.getElementById('result-tbody').innerHTML =
     '<tr><td colspan="6" class="empty" style="padding:40px;">⏳ 불러오는 중...</td></tr>';
   try {
     allPastResults = await api({ action: 'getPastResults' });
+    cacheSet(CACHE.past, allPastResults);
     buildYearFilter();
     renderResultTable();
   } catch(e) {
-    document.getElementById('result-tbody').innerHTML =
+    if (!cacheGet(CACHE.past)) document.getElementById('result-tbody').innerHTML =
       '<tr><td colspan="6" class="empty" style="padding:40px;">⚠️ 오류가 발생했습니다.</td></tr>';
   }
 }
