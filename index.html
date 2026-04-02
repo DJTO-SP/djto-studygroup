@@ -353,8 +353,10 @@
       </div>
       <div class="form-group">
         <label>희망 동아리명 <span class="field-req">*</span></label>
-        <input type="text" id="core-clubname" placeholder="예) 관광트렌드 연구">
-        <div class="err" id="err-core-clubname">동아리 이름을 입력해주세요.</div>
+        <select id="core-clubname">
+          <option value="">-- 동아리 선택 --</option>
+        </select>
+        <div class="err" id="err-core-clubname">동아리를 선택해주세요.</div>
       </div>
     </div>
     <button class="btn btn-green" onclick="submitCoreApply()" style="width:100%;justify-content:center;">신청</button>
@@ -370,9 +372,9 @@
   <div class="card" style="margin-top:16px;">
     <div style="display:flex;align-items:center;justify-content:space-between;cursor:pointer;" onclick="toggleApplySection()">
       <div class="section-title" style="margin:0;">자율기획형 동아리 신청</div>
-      <button class="btn btn-gray btn-sm" id="apply-toggle-btn" style="pointer-events:none;">펼치기 ▼</button>
+      <button class="btn btn-gray btn-sm" id="apply-toggle-btn" style="pointer-events:none;">접기 ▲</button>
     </div>
-    <div id="apply-section-body" style="display:none;margin-top:16px;">
+    <div id="apply-section-body" style="margin-top:16px;">
       <div class="info-box green">
         📎 공지사항에서 신청서식을 다운로드하여 작성 후 업로드해주세요.
       </div>
@@ -916,7 +918,7 @@ async function loadClubs() {
 
 function populateClubSelects() {
   const opts = clubs.map(c => `<option value="${c.id}">${esc(c.name)}</option>`).join('');
-  ['rp-club-sel','nc-club-sel','hl-club-sel'].forEach(id => {
+  ['rp-club-sel','nc-club-sel','hl-club-sel','core-clubname'].forEach(id => {
     const el = document.getElementById(id);
     if (!el) return;
     const placeholder = id === 'nc-club-sel'
