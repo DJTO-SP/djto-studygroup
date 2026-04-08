@@ -45,6 +45,7 @@ function doGet(e) {
       case 'getPastResults':     result = getPastResults(p.year, p.clubId); break;
       case 'getStats':           result = getStats(); break;
       case 'getReportsByCode':   result = getReportsByCode(p.clubId, p.code); break;
+      case 'getApplicationsByCode': result = getApplicationsByCode(p.clubId, p.code, p.status); break;
       case 'getNotices':         result = getNotices(); break;
       case 'getPortalNotices':   result = getPortalNotices(); break;
       case 'getPopups':          result = getPopups(); break;
@@ -66,6 +67,7 @@ function doPost(e) {
     switch (d.action) {
       case 'submitApplication': result = submitApplication(d); break;
       case 'reviewApplication': result = checkAdmin(d.pw) ? reviewApplication(d) : {error:'권한 없음'}; break;
+      case 'reviewApplicationByCode': result = reviewApplicationByCode(d); break;
       case 'uploadActivity':    result = uploadActivity(d); break;
       case 'uploadReport':      result = uploadReport(d); break;
       case 'savePastResult':    result = checkAdmin(d.pw) ? savePastResult(d) : {error:'권한 없음'}; break;
@@ -279,6 +281,35 @@ function getApplications(status) {
 }
 
 function reviewApplication(d) {
+  updateRowById(S_APPLY, d.id, { status: d.status, comment: d.comment||'' });
+  return { ok: true };
+}
+
+// 리더용: 동아리 코드로 해당 동아리 신청 목록 조회
+function getApplicationsByCode(clubId, code, status) {
+  const v = verifyClubCode(clubId, code);
+  if (!v.ok) return { error: '동아리 코드가 올바르지 않습니다.' };
+  let list = sheetToObjects(S_APPLY).filter(a => a.clubName === v.clubName);
+  if (status) list = list.filter(a => a.status === status);
+  return {
+    ok: true, clubName: v.clubName,
+    applications: list.sort((a,b) => new Date(b.submittedAt) - new Date(a.submittedAt)).map(a => ({
+      id: a.id, type: a.type, clubName: a.clubName,
+      name: a.name, dept: a.dept, contact: a.contact,
+      driveUrl: a.driveUrl, fileName: a.fileName,
+      status: a.status, comment: a.comment, submittedAt: a.submittedAt
+    }))
+  };
+}
+
+// 리더용: 동아리 코드로 신청 승인/반려
+function reviewApplicationByCode(d) {
+  const v = verifyClubCode(d.clubId, d.clubCode);
+  if (!v.ok) return { error: '동아리 코드가 올바르지 않습니다.' };
+  // 해당 동아리의 신청인지 확인
+  const apps = sheetToObjects(S_APPLY);
+  const app = apps.find(a => a.id === d.id);
+  if (!app || app.clubName !== v.clubName) return { error: '해당 동아리의 신청이 아닙니다.' };
   updateRowById(S_APPLY, d.id, { status: d.status, comment: d.comment||'' });
   return { ok: true };
 }

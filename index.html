@@ -414,6 +414,50 @@
       </div>
     </div>
   </div>
+
+  <!-- 리더용 신청 현황 확인 -->
+  <div class="card" style="margin-top:16px;">
+    <div style="display:flex;align-items:center;justify-content:space-between;cursor:pointer;" onclick="toggleLeaderApplySection()">
+      <div class="section-title" style="margin:0;">신청 현황 확인 (리더용)</div>
+      <button class="btn btn-gray btn-sm" id="leader-apply-toggle-btn" style="pointer-events:none;">펼치기 ▼</button>
+    </div>
+    <div id="leader-apply-body" style="display:none;margin-top:14px;">
+      <div class="info-box green">
+        🔑 동아리 고유 코드를 입력하면 해당 동아리의 신청 현황을 확인하고, 승인/반려 처리를 할 수 있습니다.
+      </div>
+      <div id="la-auth-section">
+        <div class="form-row-inline" style="margin-bottom:10px;">
+          <div class="form-group">
+            <label>동아리 선택 <span class="field-req">*</span></label>
+            <select id="la-club-sel">
+              <option value="">-- 동아리 선택 --</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>동아리 고유 코드 <span class="field-req">*</span></label>
+            <input type="text" id="la-code" placeholder="코드 입력" onkeydown="if(event.key==='Enter')leaderApplyLogin()">
+          </div>
+          <button class="btn btn-green btn-sm" onclick="leaderApplyLogin()" style="flex-shrink:0;margin-bottom:0;">확인</button>
+        </div>
+        <div class="err" id="err-la-code" style="margin-bottom:10px;"></div>
+      </div>
+      <div id="la-panel" style="display:none;">
+        <div class="verify-box" id="la-verified-box">✅ 코드 인증 완료 — <strong id="la-verified-name"></strong></div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin:12px 0 8px;">
+          <select id="la-status-filter" onchange="leaderLoadApplications()" style="border:1.5px solid var(--border);border-radius:8px;padding:6px 12px;font-family:inherit;font-size:13px;outline:none;background:#fff;">
+            <option value="">전체</option><option value="대기">대기</option><option value="승인">승인</option><option value="반려">반려</option>
+          </select>
+          <button class="btn btn-gray btn-sm" onclick="leaderApplyLogout()">인증 해제</button>
+        </div>
+        <div class="tbl-wrap">
+          <table>
+            <thead><tr><th>신청일</th><th>유형</th><th>신청자</th><th>부서</th><th>서식</th><th>상태</th><th>관리</th></tr></thead>
+            <tbody id="la-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 
 <!-- ═══════════════════ 제출 ═══════════════════ -->
@@ -676,6 +720,24 @@
   </div>
 </div>
 
+<!-- ═══ MODAL: 리더 신청 처리 ═══ -->
+<div class="modal-overlay" id="modal-la-review">
+  <div class="modal">
+    <h3>신청서 검토</h3>
+    <p class="modal-sub" id="modal-la-info"></p>
+    <input type="hidden" id="la-review-id">
+    <div class="form-group">
+      <label>처리 의견 (반려 시 사유 필수)</label>
+      <textarea id="la-comment" placeholder="승인 또는 반려 사유를 입력하세요"></textarea>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-gray" onclick="closeModal('modal-la-review')">닫기</button>
+      <button class="btn btn-danger" onclick="leaderReviewApp('반려')">반려</button>
+      <button class="btn btn-green" onclick="leaderReviewApp('승인')">승인</button>
+    </div>
+  </div>
+</div>
+
 <!-- ═══ MODAL: 활동결과 등록/수정 ═══ -->
 <div class="modal-overlay" id="modal-past">
   <div class="modal">
@@ -890,6 +952,95 @@ async function lookupReports() {
   } catch(e) { el.innerHTML = '<div style="color:var(--danger);font-size:13px;padding:8px 0;">서버 연결 실패</div>'; }
 }
 
+// ── 리더용 신청 현황 ──
+let leaderAuth = null; // { clubId, clubCode, clubName }
+
+function toggleLeaderApplySection() {
+  const body = document.getElementById('leader-apply-body');
+  const btn = document.getElementById('leader-apply-toggle-btn');
+  if (body.style.display === 'none') {
+    body.style.display = 'block';
+    btn.textContent = '접기 ▲';
+  } else {
+    body.style.display = 'none';
+    btn.textContent = '펼치기 ▼';
+  }
+}
+
+async function leaderApplyLogin() {
+  const clubId = document.getElementById('la-club-sel').value;
+  const code = document.getElementById('la-code').value.trim();
+  const errEl = document.getElementById('err-la-code');
+  if (!clubId || !code) { errEl.textContent = '동아리를 선택하고 코드를 입력해주세요.'; errEl.style.display = 'block'; return; }
+  errEl.style.display = 'none';
+  loading('인증 중...');
+  try {
+    const res = await api({ action: 'getApplicationsByCode', clubId, code, status: '' });
+    hide();
+    if (res.error) { errEl.textContent = res.error; errEl.style.display = 'block'; return; }
+    leaderAuth = { clubId, clubCode: code, clubName: res.clubName };
+    document.getElementById('la-verified-name').textContent = res.clubName;
+    document.getElementById('la-auth-section').style.display = 'none';
+    document.getElementById('la-panel').style.display = 'block';
+    renderLeaderAppTable(res.applications || []);
+  } catch(e) { hide(); toast('오류가 발생했습니다.', 'err'); }
+}
+
+function leaderApplyLogout() {
+  leaderAuth = null;
+  document.getElementById('la-auth-section').style.display = 'block';
+  document.getElementById('la-panel').style.display = 'none';
+  document.getElementById('la-code').value = '';
+  document.getElementById('la-status-filter').value = '';
+}
+
+async function leaderLoadApplications() {
+  if (!leaderAuth) return;
+  const status = document.getElementById('la-status-filter').value;
+  try {
+    const res = await api({ action: 'getApplicationsByCode', clubId: leaderAuth.clubId, code: leaderAuth.clubCode, status });
+    if (res.error) { toast(res.error, 'err'); return; }
+    renderLeaderAppTable(res.applications || []);
+  } catch(e) {}
+}
+
+function renderLeaderAppTable(data) {
+  const tbody = document.getElementById('la-tbody');
+  if (!data || !data.length) { tbody.innerHTML = '<tr><td colspan="7" class="empty" style="padding:24px;">신청 내역이 없습니다.</td></tr>'; return; }
+  tbody.innerHTML = data.map(a => `
+    <tr>
+      <td style="font-size:12px;color:var(--sub);white-space:nowrap;">${fmtDate(a.submittedAt)}</td>
+      <td><span class="badge ${a.type==='핵심과제형'?'b-navy':'b-green'}">${esc(a.type||'학습동아리')}</span></td>
+      <td><strong>${esc(a.name)}</strong></td>
+      <td>${esc(a.dept||'')}</td>
+      <td>${a.driveUrl ? '<a href="' + a.driveUrl + '" target="_blank" class="btn btn-gray btn-sm">열기</a>' : '—'}</td>
+      <td><span class="badge ${a.status==='승인'?'b-ok':a.status==='반려'?'b-no':'b-wait'}">${esc(a.status||'대기')}</span></td>
+      <td><button class="btn btn-gray btn-sm" onclick="openLeaderReview('${a.id}','${esc(a.name)}')">검토</button></td>
+    </tr>
+  `).join('');
+}
+
+function openLeaderReview(id, name) {
+  document.getElementById('la-review-id').value = id;
+  document.getElementById('modal-la-info').textContent = `[${leaderAuth.clubName}] ${name}의 신청서`;
+  document.getElementById('la-comment').value = '';
+  openModal('modal-la-review');
+}
+
+async function leaderReviewApp(status) {
+  if (!leaderAuth) return;
+  const id = document.getElementById('la-review-id').value;
+  const comment = document.getElementById('la-comment').value;
+  if (status === '반려' && !comment) { toast('반려 사유를 입력해주세요.', 'err'); return; }
+  loading('처리 중...');
+  try {
+    const res = await apiPost({ action: 'reviewApplicationByCode', clubId: leaderAuth.clubId, clubCode: leaderAuth.clubCode, id, status, comment });
+    hide();
+    if (res.ok) { toast(`${status} 처리되었습니다.`, 'ok'); closeModal('modal-la-review'); leaderLoadApplications(); }
+    else toast(res.error || '오류', 'err');
+  } catch(e) { hide(); toast('오류가 발생했습니다.', 'err'); }
+}
+
 function toggleHistorySection() {
   const body = document.getElementById('history-section-body');
   const btn = document.getElementById('history-toggle-btn');
@@ -935,7 +1086,7 @@ async function loadClubs() {
 
 function populateClubSelects() {
   const opts = clubs.map(c => `<option value="${c.id}">${esc(c.name)}</option>`).join('');
-  ['rp-club-sel','nc-club-sel','hl-club-sel','core-clubname'].forEach(id => {
+  ['rp-club-sel','nc-club-sel','hl-club-sel','core-clubname','la-club-sel'].forEach(id => {
     const el = document.getElementById(id);
     if (!el) return;
     const placeholder = id === 'nc-club-sel'
