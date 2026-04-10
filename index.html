@@ -580,6 +580,7 @@
       <button class="admin-nav-btn" onclick="showAdminPanel('adm-reports',this)">📊 보고서 현황</button>
       <button class="admin-nav-btn" onclick="showAdminPanel('adm-past',this)">📚 활동결과 등록</button>
       <button class="admin-nav-btn" onclick="showAdminPanel('adm-notices',this);loadAdmNotices()">📢 공지사항 관리</button>
+      <button class="admin-nav-btn" onclick="showAdminPanel('adm-bubble',this);loadBubbleNotice()">💬 말풍선 공지</button>
     </div>
 
     <!-- 신청 관리 -->
@@ -654,6 +655,22 @@
     </div>
 
     <!-- 공지사항 관리 -->
+    <!-- 말풍선 공지 -->
+    <div id="adm-bubble" class="admin-panel">
+      <div class="card">
+        <div class="section-title">💬 배너 말풍선 공지</div>
+        <p style="font-size:13px;color:var(--sub);margin-bottom:16px">배너 이미지 옆에 표시되는 짧은 공지 메시지입니다. 비워두면 말풍선이 숨겨집니다.</p>
+        <div style="display:flex;gap:10px;align-items:center;margin-bottom:16px">
+          <input class="form-group" id="bubble-notice-input" placeholder="예: 6/30까지 모집 중" style="flex:1;font-size:14px;margin:0;border:1.5px solid var(--border);border-radius:8px;padding:10px 12px;font-family:inherit;outline:none">
+          <button class="btn btn-navy" onclick="saveBubbleNotice()">저장</button>
+        </div>
+        <div id="bubble-notice-preview" style="display:none;background:#f5f6f8;border-radius:10px;padding:16px;text-align:center">
+          <div style="font-size:12px;color:var(--sub);margin-bottom:10px">미리보기</div>
+          <span style="background:#fff;color:#204473;font-size:14px;font-weight:800;padding:9px 18px;border-radius:20px;border:2.5px solid #204473;display:inline-block">📢 <span id="bubble-preview-text"></span></span>
+        </div>
+      </div>
+    </div>
+
     <div id="adm-notices" class="admin-panel">
       <div class="card">
         <div class="flex-between">
@@ -1945,6 +1962,65 @@ function toast(msg, type) {
 }
 function loading(msg) { document.getElementById('loading-msg').textContent = msg || '처리 중...'; document.getElementById('loading').classList.add('show'); }
 function hide() { document.getElementById('loading').classList.remove('show'); }
+
+// ── 말풍선 공지 ──
+async function loadBubbleNotice() {
+  try {
+    const res = await api({ action: 'getBubbleNotice' });
+    if (res && res.ok) {
+      const inp = document.getElementById('bubble-notice-input');
+      if (inp) inp.value = res.notice || '';
+      updateBubblePreview(res.notice || '');
+    }
+  } catch(e) {}
+}
+function updateBubblePreview(text) {
+  const preview = document.getElementById('bubble-notice-preview');
+  const pText = document.getElementById('bubble-preview-text');
+  if (!preview || !pText) return;
+  if (text) { pText.textContent = text; preview.style.display = 'block'; }
+  else { preview.style.display = 'none'; }
+}
+async function saveBubbleNotice() {
+  const notice = (document.getElementById('bubble-notice-input').value || '').trim();
+  try {
+    const res = await apiPost({ action: 'saveBubbleNotice', pw: adminPw, notice: notice });
+    if (res && res.ok) {
+      alert('✅ 말풍선 공지가 ' + (notice ? '저장' : '삭제') + '되었습니다.');
+      updateBubblePreview(notice);
+      renderBubble(notice);
+    } else { alert('❌ 저장 실패: ' + (res.error || '')); }
+  } catch(e) { alert('❌ 서버 오류'); }
+}
+async function loadAndShowBubble() {
+  try {
+    const res = await api({ action: 'getBubbleNotice' });
+    if (res && res.ok && res.notice) renderBubble(res.notice);
+  } catch(e) {}
+}
+function renderBubble(text) {
+  var existing = document.querySelector('.site-notice-bubble');
+  if (existing) existing.remove();
+  if (!text) return;
+  var inner = document.querySelector('.title-inner');
+  if (!inner) return;
+  var img = inner.querySelector('img');
+  if (!img) return;
+  var wrap = img.parentElement;
+  if (!wrap.classList.contains('pn-img-wrap')) {
+    wrap = document.createElement('div');
+    wrap.className = 'pn-img-wrap';
+    wrap.style.cssText = 'position:relative;display:inline-block';
+    img.parentElement.insertBefore(wrap, img);
+    wrap.appendChild(img);
+  }
+  var bubble = document.createElement('div');
+  bubble.className = 'site-notice-bubble';
+  bubble.style.cssText = 'position:absolute;right:calc(100% + 10px);top:50%;transform:translateY(-50%);z-index:10';
+  bubble.innerHTML = '<div style="position:relative;background:#fff;color:#204473;font-size:14px;font-weight:800;padding:9px 18px;border-radius:20px;border:2.5px solid #204473;white-space:nowrap">📢 ' + text + '<span style="position:absolute;right:-18px;top:50%;margin-top:-7px;border:8px solid transparent;border-left:10px solid #204473"></span><span style="position:absolute;right:-14px;top:50%;margin-top:-6px;border:7px solid transparent;border-left:9px solid #fff"></span></div>';
+  wrap.appendChild(bubble);
+}
+document.addEventListener('DOMContentLoaded', function() { setTimeout(loadAndShowBubble, 500); });
 </script>
 </body>
 </html>

@@ -47,6 +47,7 @@ function doGet(e) {
       case 'getReportsByCode':   result = getReportsByCode(p.clubId, p.code); break;
       case 'getApplicationsByCode': result = getApplicationsByCode(p.clubId, p.code, p.status); break;
       case 'getNotices':         result = getNotices(); break;
+      case 'getBubbleNotice':    result = getBubbleNotice(); break;
       case 'getPortalNotices':   result = getPortalNotices(); break;
       case 'getPopups':          result = getPopups(); break;
       default:                   result = {error: 'Unknown action'};
@@ -76,6 +77,7 @@ function doPost(e) {
       case 'deleteFile':        result = checkAdmin(d.pw) ? deleteFile(d.id, d.sheetName) : {error:'권한 없음'}; break;
       // 공지: 관리자 pw 또는 동아리 코드 인증으로 등록 가능
       case 'saveNotice':        result = saveNoticeAuth(d); break;
+      case 'saveBubbleNotice':  result = checkAdmin(d.pw) ? saveBubbleNotice(d) : {error:'권한 없음'}; break;
       case 'deleteNotice':      result = checkAdmin(d.pw) ? deleteNoticeById(d.id) : {error:'권한 없음'}; break;
       case 'savePortalNotice':  result = checkAdmin(d.pw) ? savePortalNotice(d) : {error:'권한 없음'}; break;
       case 'editPortalNotice':  result = checkAdmin(d.pw) ? savePortalNotice(d) : {error:'권한 없음'}; break;
@@ -449,6 +451,26 @@ function getPastResults(year, clubId) {
 // 등록: 관리자 pw 또는 동아리 코드 인증
 // 삭제: 관리자만 가능
 // ══════════════════════════════════════════
+// ── 말풍선 공지 ──
+function getBubbleNotice() {
+  try {
+    const s = ss().getSheetByName('말풍선공지');
+    if (!s || s.getLastRow() < 2) return { ok: true, notice: '' };
+    return { ok: true, notice: String(s.getRange(2, 1).getValue() || '') };
+  } catch(e) { return { ok: true, notice: '' }; }
+}
+
+function saveBubbleNotice(d) {
+  let s = ss().getSheetByName('말풍선공지');
+  if (!s) {
+    s = ss().insertSheet('말풍선공지');
+    s.getRange(1, 1).setValue('내용');
+    s.getRange(1, 1).setFontWeight('bold').setBackground('#e8edf5');
+  }
+  s.getRange(2, 1).setValue(d.notice || '');
+  return { ok: true };
+}
+
 function getNotices() {
   try {
     const cache = CacheService.getScriptCache();
