@@ -893,6 +893,8 @@ let adminPw = '';
 const fileObjs = {};
 // 공지 작성 인증 상태
 let ncAuth = null; // { isAdmin, clubId, clubName }
+// 공지 데이터 캐시 (id → notice)
+let noticesById = {};
 // 상세 보기 현재 항목
 let currentDetailItem = null;
 
@@ -1119,21 +1121,30 @@ function populateClubSelects() {
 function renderNoticeTable(data) {
   const el = document.getElementById('notice-list');
   if (!data || !data.length) {
+    noticesById = {};
     el.innerHTML = '<tr><td colspan="6" class="empty" style="padding:40px;">📭 등록된 공지사항이 없습니다.</td></tr>';
     return;
   }
+  noticesById = {};
+  data.forEach(n => { noticesById[n.id] = n; });
   el.innerHTML = data.map((n, i) => {
     const ext = n.fileName ? n.fileName.split('.').pop().toUpperCase() : '';
     return `
     <tr>
       <td class="td-num">${data.length - i}</td>
-      <td class="td-title" onclick='openNoticeDetail(${JSON.stringify(n).replace(/'/g, "\\'")})'>${esc(n.title)}</td>
+      <td class="td-title" onclick="openNoticeDetailById('${esc(n.id)}')">${esc(n.title)}</td>
       <td class="td-club">${n.clubName ? `<span class="badge b-gray">${esc(n.clubName)}</span>` : '—'}</td>
       <td style="font-size:12px;color:var(--sub);">${esc(n.createdBy||'—')}</td>
       <td style="font-size:12px;color:var(--sub);white-space:nowrap;">${fmtDate(n.createdAt)}</td>
       <td>${n.driveUrl ? `<a href="${n.driveUrl}" target="_blank" class="btn btn-gray btn-sm">${ext||'파일'}</a>` : '—'}</td>
     </tr>`;
   }).join('');
+}
+
+function openNoticeDetailById(id) {
+  const n = noticesById[id];
+  if (!n) return;
+  openNoticeDetail(n);
 }
 
 async function loadNotices() {
@@ -1800,6 +1811,8 @@ async function loadAdmNotices() {
       tbody.innerHTML = '<tr><td colspan="5" class="empty" style="padding:24px;">등록된 공지사항이 없습니다.</td></tr>';
       return;
     }
+    noticesById = {};
+    data.forEach(n => { noticesById[n.id] = n; });
     tbody.innerHTML = data.map(n => `
       <tr>
         <td>${fmtDate(n.createdAt)}</td>
@@ -1807,8 +1820,8 @@ async function loadAdmNotices() {
         <td>${n.clubName ? `<span class="badge b-gray">${esc(n.clubName)}</span>` : esc(n.createdBy||'관리자')}</td>
         <td>${n.driveUrl ? `<a href="${n.driveUrl}" target="_blank" class="btn btn-gray btn-sm">📎</a>` : '—'}</td>
         <td style="display:flex;gap:4px;">
-          <button class="btn btn-gray btn-sm" onclick='editAdmNotice(${JSON.stringify(n).replace(/'/g,"&#39;")})'>수정</button>
-          <button class="btn btn-danger btn-sm" onclick="deleteNotice('${n.id}')">삭제</button>
+          <button class="btn btn-gray btn-sm" onclick="editAdmNoticeById('${esc(n.id)}')">수정</button>
+          <button class="btn btn-danger btn-sm" onclick="deleteNotice('${esc(n.id)}')">삭제</button>
         </td>
       </tr>
     `).join('');
@@ -1823,6 +1836,12 @@ function openAdmNoticeModal() {
   fileObjs['an-file-obj'] = null;
   document.getElementById('an-picked').style.display = 'none';
   openModal('modal-adm-notice');
+}
+
+function editAdmNoticeById(id) {
+  const n = noticesById[id];
+  if (!n) return;
+  editAdmNotice(n);
 }
 
 function editAdmNotice(n) {
