@@ -3,13 +3,14 @@
 <head>
 <meta charset="UTF-8">
 <title>2026년 사내 학습동아리 중간평가</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 /* ══════════════════════════════════════════
    기본
    ══════════════════════════════════════════ */
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body {
-  font-family: 'Malgun Gothic', '맑은 고딕', -apple-system, sans-serif;
+  font-family: 'Noto Sans KR', 'Malgun Gothic', sans-serif;
   background: #f5f6f8; color: #1f2937; line-height: 1.6;
   min-width: 1100px;
 }
@@ -31,10 +32,10 @@ body {
 .wrap { width: 1080px; margin: 0 auto; padding: 28px 0 80px; }
 
 /* 페이지 제목 */
-.head { background: #1e3a6e; color: #fff; padding: 24px 32px; border-radius: 10px 10px 0 0; }
+.head { background: #4b7a1e; color: #fff; padding: 24px 32px; border-radius: 10px 10px 0 0; }
 .head h1 { font-size: 22px; font-weight: 700; letter-spacing: -0.4px; }
 .head .period { margin-top: 6px; font-size: 14px; opacity: 0.85; }
-.head .bar { height: 4px; background: #7aab2d; margin: 0 -32px -24px; margin-top: 20px; }
+.head .bar { height: 4px; background: #a3cf45; margin: 0 -32px -24px; margin-top: 20px; }
 
 .panel { background: #fff; border-radius: 0 0 10px 10px; box-shadow: 0 2px 10px rgba(0,0,0,.07); }
 
@@ -46,7 +47,7 @@ body {
 }
 .btn:hover { opacity: .88; }
 .btn:disabled { background: #cbd5e1 !important; color: #fff !important; cursor: not-allowed; opacity: 1; }
-.btn-navy  { background: #1e3a6e; color: #fff; }
+.btn-navy  { background: #4b7a1e; color: #fff; }
 .btn-green { background: #7aab2d; color: #fff; }
 .btn-gray  { background: #e2e8f0; color: #475569; }
 
@@ -65,11 +66,11 @@ body {
   width: 210px; padding: 13px 14px; border: 1px solid #cbd5e1; border-radius: 6px;
   font-size: 15px; font-family: inherit;
 }
-.login input:focus { outline: 2px solid #1e3a6e; outline-offset: -1px; border-color: transparent; }
+.login input:focus { outline: 2px solid #4b7a1e; outline-offset: -1px; border-color: transparent; }
 
 .guide { margin: 34px auto 0; width: 700px; text-align: left; background: #f8fafc;
          border: 1px solid #e2e8f0; border-radius: 8px; padding: 20px 24px; }
-.guide h3 { font-size: 14px; color: #1e3a6e; margin-bottom: 10px; }
+.guide h3 { font-size: 14px; color: #4b7a1e; margin-bottom: 10px; }
 .guide ul { list-style: none; font-size: 13.5px; color: #475569; }
 .guide li { padding-left: 14px; position: relative; margin-bottom: 5px; }
 .guide li:before { content: '·'; position: absolute; left: 3px; font-weight: 700; }
@@ -81,7 +82,7 @@ body {
    ══════════════════════════════════════════ */
 .who { display: flex; justify-content: space-between; align-items: center;
        padding: 16px 32px; background: #f8fafc; border-bottom: 1px solid #e2e8f0; font-size: 14px; }
-.who .me { color: #1e3a6e; font-weight: 600; }
+.who .me { color: #4b7a1e; font-weight: 600; }
 .who .me span { font-weight: 400; color: #64748b; margin-left: 8px; }
 .who .prog { color: #64748b; }
 .who .prog b { color: #7aab2d; }
@@ -92,7 +93,7 @@ body {
   padding: 11px 22px; border-radius: 7px 7px 0 0; cursor: pointer;
   font-family: inherit; font-size: 14.5px; font-weight: 600; position: relative; top: 1px;
 }
-.tab.active { background: #fff; color: #1e3a6e; border-color: #e2e8f0; }
+.tab.active { background: #fff; color: #4b7a1e; border-color: #e2e8f0; }
 .tab .dot { display: inline-block; width: 7px; height: 7px; border-radius: 50%;
             background: #cbd5e1; margin-left: 8px; vertical-align: middle; }
 .tab.done .dot { background: #7aab2d; }
@@ -101,7 +102,7 @@ body {
 .main { flex: 1; padding: 26px 32px 32px; border-right: 1px solid #eef1f5; }
 .side { width: 288px; padding: 26px 24px; background: #fafbfc; }
 
-.club-name { font-size: 19px; font-weight: 700; color: #1e3a6e; }
+.club-name { font-size: 19px; font-weight: 700; color: #4b7a1e; }
 .club-desc { font-size: 13.5px; color: #64748b; margin-top: 3px; }
 .notice-box { margin: 16px 0 26px; background: #fffbeb; border: 1px solid #fde68a;
               border-radius: 6px; padding: 12px 16px; font-size: 13.5px; color: #92400e; }
@@ -117,34 +118,36 @@ body {
   flex: 1; text-align: center; border: 1px solid #d7dee7; border-radius: 6px;
   padding: 11px 4px; cursor: pointer; background: #fff; transition: all .12s;
 }
-.scale label:hover { border-color: #1e3a6e; }
+.scale label:hover { border-color: #4b7a1e; }
 .scale input { display: none; }
 .scale .n { display: block; font-size: 17px; font-weight: 700; color: #334155; }
 .scale .l { display: block; font-size: 12px; color: #94a3b8; margin-top: 2px; }
 .scale input:checked + .n { color: #fff; }
-.scale label.on { background: #1e3a6e; border-color: #1e3a6e; }
+.scale label.on { background: #4b7a1e; border-color: #4b7a1e; }
 .scale label.on .n, .scale label.on .l { color: #fff; }
 
 .sum { text-align: right; font-size: 14px; color: #64748b; padding: 14px 0 0; border-top: 1px solid #eef1f5; }
-.sum b { font-size: 20px; color: #1e3a6e; margin-left: 6px; }
+.sum b { font-size: 20px; color: #4b7a1e; margin-left: 6px; }
 
 .q textarea {
   width: 100%; min-height: 78px; margin-top: 11px; padding: 12px 14px; resize: vertical;
   border: 1px solid #cbd5e1; border-radius: 6px; font-family: inherit; font-size: 14px; line-height: 1.6;
 }
-.q textarea:focus { outline: 2px solid #1e3a6e; outline-offset: -1px; border-color: transparent; }
+.q textarea:focus { outline: 2px solid #4b7a1e; outline-offset: -1px; border-color: transparent; }
 .q textarea::placeholder { color: #b6c0cc; }
 .cnt { text-align: right; font-size: 12.5px; color: #94a3b8; margin-top: 5px; }
 .cnt.ok { color: #7aab2d; }
 
 /* 사이드 */
-.side h4 { font-size: 13px; color: #1e3a6e; font-weight: 700; margin-bottom: 10px; }
+.side h4 { font-size: 13px; color: #4b7a1e; font-weight: 700; margin-bottom: 10px; }
 .side .block { margin-bottom: 24px; }
 .grade { font-size: 13px; }
-.grade div { display: flex; gap: 9px; padding: 5px 0; border-bottom: 1px dashed #e2e8f0; }
+.grade div { display: flex; gap: 10px; padding: 7px 0; border-bottom: 1px dashed #e2e8f0; }
 .grade div:last-child { border-bottom: 0; }
-.grade b { width: 26px; color: #1e3a6e; text-align: right; }
-.grade span { color: #64748b; }
+.grade b { width: 24px; color: #4b7a1e; text-align: right; flex-shrink: 0; }
+.grade span { color: #64748b; line-height: 1.45; }
+.grade em { display: block; font-style: normal; font-weight: 700; color: #334155; }
+.grade i { font-style: normal; font-weight: 400; font-size: 11.5px; color: #7aab2d; }
 .grade .base { background: #f0fdf4; margin: 0 -6px; padding: 5px 6px; border-radius: 4px; }
 .side ul { list-style: none; font-size: 12.8px; color: #64748b; }
 .side ul li { padding-left: 12px; position: relative; margin-bottom: 6px; line-height: 1.5; }
@@ -161,7 +164,7 @@ body {
 .done { padding: 62px 32px; text-align: center; }
 .done .mark { width: 62px; height: 62px; border-radius: 50%; background: #7aab2d; color: #fff;
               font-size: 32px; line-height: 62px; margin: 0 auto 20px; }
-.done h2 { font-size: 21px; color: #1e3a6e; margin-bottom: 10px; }
+.done h2 { font-size: 21px; color: #4b7a1e; margin-bottom: 10px; }
 .done p { color: #64748b; font-size: 14.5px; }
 .done .box { display: inline-block; margin-top: 26px; background: #f8fafc; border: 1px solid #e2e8f0;
              border-radius: 8px; padding: 18px 34px; text-align: left; font-size: 14px; }
@@ -208,13 +211,13 @@ body {
       <div class="guide">
         <h3>평가 안내</h3>
         <ul>
-          <li>본인이 소속된 동아리는 평가 대상에서 자동으로 제외됩니다. (2개 동아리 소속인 경우 둘 다 제외)</li>
-          <li>평가는 <b>그룹웨어 사내게시판</b>에 게시된 활동 결과보고서와 중간점검보고서를 근거로 실시합니다.</li>
+          <li>본인이 소속된 동아리는 평가 대상에서 자동으로 제외됩니다.</li>
+          <li>평가는 <b>그룹웨어 사내게시판</b>에 게시된 활동 결과보고서와 중간 성과보고서를 근거로 실시합니다.</li>
           <li>소요시간은 약 10분이며, 작성 중 <b>임시저장</b>하면 나중에 이어서 작성할 수 있습니다.</li>
           <li>제출 후에도 평가 기간 내에는 다시 접속하여 수정할 수 있습니다.</li>
           <li>개인별 점수와 의견은 공개되지 않으며, 동아리에는 취합·정리된 형태로만 전달됩니다.</li>
         </ul>
-        <div class="contact">문의 · 전략기획팀 (내선 1148)</div>
+        <div class="contact">문의 · 전략기획팀 이지민 주임 (내선 1148)</div>
       </div>
     </div>
 
@@ -233,11 +236,11 @@ body {
           <div class="block">
             <h4>평가등급 기준</h4>
             <div class="grade">
-              <div><b>25</b><span>매우 우수 — 기대 수준을 뚜렷하게 상회</span></div>
-              <div><b>20</b><span>우수 — 충실히 이행, 두드러진 점 확인됨</span></div>
-              <div class="base"><b>15</b><span>보통 — 계획대로 수행 중 <b style="width:auto">(기준)</b></span></div>
-              <div><b>10</b><span>미흡 — 내용·근거가 부족</span></div>
-              <div><b>5</b><span>매우 미흡 — 활동이 확인되지 않음</span></div>
+              <div><b>25</b><span><em>매우 우수</em>기대 수준을 뚜렷하게 상회</span></div>
+              <div><b>20</b><span><em>우수</em>충실히 이행, 두드러진 점 확인됨</span></div>
+              <div class="base"><b>15</b><span><em>보통 <i>(기준)</i></em>계획대로 수행 중</span></div>
+              <div><b>10</b><span><em>미흡</em>내용·근거가 부족</span></div>
+              <div><b>5</b><span><em>매우 미흡</em>활동이 확인되지 않음</span></div>
             </div>
           </div>
           <div class="block">
@@ -252,7 +255,7 @@ body {
           <div class="block">
             <h4>자료 열람</h4>
             <ul>
-              <li>그룹웨어 → 사내게시판에서 동아리별 활동 결과보고서와 중간점검보고서를 확인하실 수 있습니다.</li>
+              <li>그룹웨어 → 사내게시판에서 동아리별 활동 결과보고서와 중간 성과보고서를 확인하실 수 있습니다.</li>
             </ul>
           </div>
         </div>
@@ -445,7 +448,7 @@ function renderMain() {
   h += '<div class="club-name">' + esc(t.name) + '</div>';
   if (t.desc) h += '<div class="club-desc">' + esc(t.desc) + '</div>';
   h += '<div class="notice-box">그룹웨어 사내게시판에서 <b>' + esc(t.name) +
-       '</b> 의 활동 결과보고서와 중간점검보고서를 확인하신 뒤 평가해 주세요.</div>';
+       '</b> 의 활동 결과보고서와 중간 성과보고서를 확인하신 뒤 평가해 주세요.</div>';
 
   CRITERIA.forEach(function(c, ci) {
     h += '<div class="q">';
