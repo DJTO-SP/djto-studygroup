@@ -45,8 +45,6 @@ td.l, th.l { text-align: left; }
 tr.top td { background: #f0fdf4; }
 td.club { font-weight: 700; color: #4b7a1e; }
 td.fin { font-weight: 700; font-size: 15px; color: #4b7a1e; }
-input.adj { width: 62px; padding: 5px; border: 1px solid #cbd5e1; border-radius: 4px;
-            text-align: center; font-family: inherit; font-size: 13.5px; }
 
 .cards { display: flex; gap: 12px; }
 .card { flex: 1; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 14px 16px; }
@@ -110,12 +108,10 @@ var CRITERIA = [
   { key: 'feasibility', name: '실행가능성' },
   { key: 'performance', name: '활동 성과' }
 ];
-var ADJ_KEY = 'evalAdj2026';   // 가감점 임시 보관 (이 PC에만)
-
 /* ══════════════════════════════════════════
    공통
    ══════════════════════════════════════════ */
-var RAW = null, PW = '', ADJ = {};
+var RAW = null, PW = '';
 function $(id) { return document.getElementById(id); }
 function esc(s) {
   return String(s == null ? '' : s)
@@ -123,8 +119,6 @@ function esc(s) {
 }
 function r1(n) { return Math.round(n * 10) / 10; }
 function ekey(r) { return r.evaluatorName + '|' + r.evaluatorDept; }
-
-try { ADJ = JSON.parse(localStorage.getItem(ADJ_KEY) || '{}'); } catch(e) { ADJ = {}; }
 
 /* ══════════════════════════════════════════
    조회
@@ -218,9 +212,7 @@ function compute() {
     result[t] = {
       count: mine.length,
       raw: mine.length ? mine.reduce(function(x, a) { return x + a.raw; }, 0) / mine.length : 0,
-      votes: votes, base: fin, items: items,
-      adjust: Number(ADJ[t] || 0),
-      final: fin + Number(ADJ[t] || 0)
+      votes: votes, base: fin, items: items
     };
   });
 
@@ -271,9 +263,9 @@ function render() {
   h += '<h2 class="sec">평가 결과 <small>보정 → 동아리 단위 환산 → 최종</small></h2>';
   h += '<table><tr><th class="l">동아리</th><th>받은 평가</th><th>원점수 평균</th>';
   C.clubs.forEach(function(s) { h += '<th>' + esc(s) + '<br><span style="font-weight:400;font-size:11px;color:#94a3b8">의 표</span></th>'; });
-  h += '<th>환산 점수</th><th>가감점</th><th>최종</th></tr>';
+  h += '<th>최종 점수</th></tr>';
 
-  var order = C.clubs.slice().sort(function(a, b) { return C.result[b].final - C.result[a].final; });
+  var order = C.clubs.slice().sort(function(a, b) { return C.result[b].base - C.result[a].base; });
   C.clubs.forEach(function(t) {
     var R = C.result[t];
     var isTop = order.indexOf(t) < 2 && R.count > 0;
@@ -285,10 +277,7 @@ function render() {
       h += '<td>' + (s === t ? '<span style="color:#cbd5e1">—</span>'
                              : (R.votes[s] !== undefined ? r1(R.votes[s]) : '<span style="color:#cbd5e1">·</span>')) + '</td>';
     });
-    h += '<td>' + (R.count ? r1(R.base) : '-') + '</td>';
-    h += '<td><input class="adj" type="number" step="1" value="' + (ADJ[t] || 0) +
-         '" onchange="setAdj(\'' + esc(t) + '\', this.value)"></td>';
-    h += '<td class="fin">' + (R.count ? r1(R.final) : '-') + '</td>';
+    h += '<td class="fin">' + (R.count ? r1(R.base) : '-') + '</td>';
     h += '</tr>';
   });
   h += '</table>';
@@ -329,12 +318,6 @@ function render() {
   $('stamp').textContent = '응답 ' + C.subs.length + '건 · 조회 시점 기준';
 }
 
-function setAdj(club, v) {
-  ADJ[club] = Number(v) || 0;
-  try { localStorage.setItem(ADJ_KEY, JSON.stringify(ADJ)); } catch(e) {}
-  render();
-}
-
 /* ══════════════════════════════════════════
    CSV
    ══════════════════════════════════════════ */
@@ -343,10 +326,10 @@ $('btn-csv').onclick = function() {
   var L = [];
 
   L.push(['[집계 결과]']);
-  L.push(['동아리','받은 평가','원점수 평균','환산 점수','가감점','최종 점수']);
+  L.push(['동아리','받은 평가','원점수 평균','최종 점수']);
   C.clubs.forEach(function(t) {
     var R = C.result[t];
-    L.push([t, R.count, r1(R.raw), r1(R.base), R.adjust, r1(R.final)]);
+    L.push([t, R.count, r1(R.raw), r1(R.base)]);
   });
 
   L.push([]);
