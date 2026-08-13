@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>2026년 사내 학습동아리 중간평가</title>
+<style>
+/* ══════════════════════════════════════════
+   기본
+   ══════════════════════════════════════════ */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Malgun Gothic', '맑은 고딕', -apple-system, sans-serif;
+  background: #eef1f5; color: #1f2937; line-height: 1.6;
+  min-width: 1100px;
+}
+.wrap { width: 1080px; margin: 0 auto; padding: 32px 0 80px; }
+
+/* 헤더 */
+.head { background: #1e3a5f; color: #fff; padding: 26px 32px; border-radius: 10px 10px 0 0; }
+.head h1 { font-size: 23px; font-weight: 700; letter-spacing: -0.4px; }
+.head .period { margin-top: 6px; font-size: 14px; opacity: 0.85; }
+.head .bar { height: 4px; background: #A5CD39; margin: 0 -32px -26px; margin-top: 22px; border-radius: 0; }
+
+.panel { background: #fff; border-radius: 0 0 10px 10px; box-shadow: 0 2px 10px rgba(0,0,0,.07); }
+
+/* 공통 */
+.btn {
+  display: inline-block; border: 0; border-radius: 6px; cursor: pointer;
+  font-family: inherit; font-size: 15px; font-weight: 600; padding: 13px 30px;
+  transition: opacity .15s;
+}
+.btn:hover { opacity: .88; }
+.btn:disabled { background: #cbd5e1 !important; color: #fff !important; cursor: not-allowed; opacity: 1; }
+.btn-navy  { background: #1e3a5f; color: #fff; }
+.btn-green { background: #6b8f1f; color: #fff; }
+.btn-gray  { background: #e2e8f0; color: #475569; }
+
+.msg { padding: 12px 16px; border-radius: 6px; font-size: 14px; margin-top: 14px; display: none; }
+.msg.err  { background: #fef2f2; color: #b91c1c; border: 1px solid #fecaca; display: block; }
+.msg.info { background: #f0fdf4; color: #15803d; border: 1px solid #bbf7d0; display: block; }
+
+/* ══════════════════════════════════════════
+   1) 로그인
+   ══════════════════════════════════════════ */
+.login { padding: 54px 32px 46px; text-align: center; }
+.login h2 { font-size: 18px; font-weight: 600; margin-bottom: 8px; }
+.login p.sub { color: #64748b; font-size: 14px; margin-bottom: 30px; }
+.login .fields { display: inline-flex; gap: 10px; align-items: center; }
+.login input {
+  width: 210px; padding: 13px 14px; border: 1px solid #cbd5e1; border-radius: 6px;
+  font-size: 15px; font-family: inherit;
+}
+.login input:focus { outline: 2px solid #1e3a5f; outline-offset: -1px; border-color: transparent; }
+
+.guide { margin: 34px auto 0; width: 700px; text-align: left; background: #f8fafc;
+         border: 1px solid #e2e8f0; border-radius: 8px; padding: 20px 24px; }
+.guide h3 { font-size: 14px; color: #1e3a5f; margin-bottom: 10px; }
+.guide ul { list-style: none; font-size: 13.5px; color: #475569; }
+.guide li { padding-left: 14px; position: relative; margin-bottom: 5px; }
+.guide li:before { content: '·'; position: absolute; left: 3px; font-weight: 700; }
+.guide .contact { margin-top: 12px; padding-top: 12px; border-top: 1px dashed #cbd5e1;
+                  font-size: 13px; color: #64748b; }
+
+/* ══════════════════════════════════════════
+   2) 평가
+   ══════════════════════════════════════════ */
+.who { display: flex; justify-content: space-between; align-items: center;
+       padding: 16px 32px; background: #f8fafc; border-bottom: 1px solid #e2e8f0; font-size: 14px; }
+.who .me { color: #1e3a5f; font-weight: 600; }
+.who .me span { font-weight: 400; color: #64748b; margin-left: 8px; }
+.who .prog { color: #64748b; }
+.who .prog b { color: #6b8f1f; }
+
+.tabs { display: flex; gap: 6px; padding: 16px 32px 0; border-bottom: 1px solid #e2e8f0; }
+.tab {
+  border: 1px solid #e2e8f0; border-bottom: 0; background: #f1f5f9; color: #64748b;
+  padding: 11px 22px; border-radius: 7px 7px 0 0; cursor: pointer;
+  font-family: inherit; font-size: 14.5px; font-weight: 600; position: relative; top: 1px;
+}
+.tab.active { background: #fff; color: #1e3a5f; border-color: #e2e8f0; }
+.tab .dot { display: inline-block; width: 7px; height: 7px; border-radius: 50%;
+            background: #cbd5e1; margin-left: 8px; vertical-align: middle; }
+.tab.done .dot { background: #6b8f1f; }
+
+.body { display: flex; }
+.main { flex: 1; padding: 26px 32px 32px; border-right: 1px solid #eef1f5; }
+.side { width: 288px; padding: 26px 24px; background: #fafbfc; }
+
+.club-name { font-size: 19px; font-weight: 700; color: #1e3a5f; }
+.club-desc { font-size: 13.5px; color: #64748b; margin-top: 3px; }
+.notice-box { margin: 16px 0 26px; background: #fffbeb; border: 1px solid #fde68a;
+              border-radius: 6px; padding: 12px 16px; font-size: 13.5px; color: #92400e; }
+
+.q { padding: 22px 0; border-top: 1px solid #eef1f5; }
+.q:first-of-type { border-top: 0; padding-top: 4px; }
+.q .t { font-size: 15.5px; font-weight: 700; color: #1f2937; }
+.q .d { font-size: 13.5px; color: #64748b; margin-top: 3px; }
+.q .focus { font-size: 12.5px; color: #94a3b8; margin-top: 6px; }
+
+.scale { display: flex; gap: 8px; margin-top: 13px; }
+.scale label {
+  flex: 1; text-align: center; border: 1px solid #d7dee7; border-radius: 6px;
+  padding: 11px 4px; cursor: pointer; background: #fff; transition: all .12s;
+}
+.scale label:hover { border-color: #1e3a5f; }
+.scale input { display: none; }
+.scale .n { display: block; font-size: 17px; font-weight: 700; color: #334155; }
+.scale .l { display: block; font-size: 12px; color: #94a3b8; margin-top: 2px; }
+.scale input:checked + .n { color: #fff; }
+.scale label.on { background: #1e3a5f; border-color: #1e3a5f; }
+.scale label.on .n, .scale label.on .l { color: #fff; }
+
+.sum { text-align: right; font-size: 14px; color: #64748b; padding: 14px 0 0; border-top: 1px solid #eef1f5; }
+.sum b { font-size: 20px; color: #1e3a5f; margin-left: 6px; }
+
+.q textarea {
+  width: 100%; min-height: 78px; margin-top: 11px; padding: 12px 14px; resize: vertical;
+  border: 1px solid #cbd5e1; border-radius: 6px; font-family: inherit; font-size: 14px; line-height: 1.6;
+}
+.q textarea:focus { outline: 2px solid #1e3a5f; outline-offset: -1px; border-color: transparent; }
+.q textarea::placeholder { color: #b6c0cc; }
+.cnt { text-align: right; font-size: 12.5px; color: #94a3b8; margin-top: 5px; }
+.cnt.ok { color: #6b8f1f; }
+
+/* 사이드 */
+.side h4 { font-size: 13px; color: #1e3a5f; font-weight: 700; margin-bottom: 10px; }
+.side .block { margin-bottom: 24px; }
+.grade { font-size: 13px; }
+.grade div { display: flex; gap: 9px; padding: 5px 0; border-bottom: 1px dashed #e2e8f0; }
+.grade div:last-child { border-bottom: 0; }
+.grade b { width: 26px; color: #1e3a5f; text-align: right; }
+.grade span { color: #64748b; }
+.grade .base { background: #f0fdf4; margin: 0 -6px; padding: 5px 6px; border-radius: 4px; }
+.side ul { list-style: none; font-size: 12.8px; color: #64748b; }
+.side ul li { padding-left: 12px; position: relative; margin-bottom: 6px; line-height: 1.5; }
+.side ul li:before { content: '·'; position: absolute; left: 2px; font-weight: 700; }
+
+/* 하단 */
+.foot { padding: 20px 32px; background: #f8fafc; border-top: 1px solid #e2e8f0;
+        display: flex; justify-content: space-between; align-items: center; }
+.foot .left { font-size: 13px; color: #94a3b8; }
+
+/* ══════════════════════════════════════════
+   3) 완료
+   ══════════════════════════════════════════ */
+.done { padding: 62px 32px; text-align: center; }
+.done .mark { width: 62px; height: 62px; border-radius: 50%; background: #6b8f1f; color: #fff;
+              font-size: 32px; line-height: 62px; margin: 0 auto 20px; }
+.done h2 { font-size: 21px; color: #1e3a5f; margin-bottom: 10px; }
+.done p { color: #64748b; font-size: 14.5px; }
+.done .box { display: inline-block; margin-top: 26px; background: #f8fafc; border: 1px solid #e2e8f0;
+             border-radius: 8px; padding: 18px 34px; text-align: left; font-size: 14px; }
+.done .box div { padding: 4px 0; }
+.done .box b { display: inline-block; width: 110px; color: #64748b; font-weight: 400; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="head">
+    <h1>2026년 사내 학습동아리 중간평가</h1>
+    <div class="period" id="hd-period"></div>
+    <div class="bar"></div>
+  </div>
+
+  <div class="panel">
+
+    <!-- ── 1) 로그인 ─────────────────────── -->
+    <div id="step-login" class="login">
+      <h2>동아리 코드와 이름을 입력해 주세요</h2>
+      <p class="sub">명단 확인 후 평가가 시작됩니다.</p>
+      <div class="fields">
+        <input id="in-code" type="text" placeholder="동아리 코드" autocomplete="off">
+        <input id="in-name" type="text" placeholder="이름" autocomplete="off">
+        <button class="btn btn-navy" id="btn-login">평가 시작</button>
+      </div>
+      <div class="msg" id="login-msg"></div>
+
+      <div class="guide">
+        <h3>평가 안내</h3>
+        <ul>
+          <li>본인이 소속된 동아리는 평가 대상에서 자동으로 제외됩니다. (2개 동아리 소속인 경우 둘 다 제외)</li>
+          <li>평가는 <b>그룹웨어 사내게시판</b>에 게시된 활동 결과보고서와 중간점검보고서를 근거로 실시합니다.</li>
+          <li>소요시간은 약 10분이며, 작성 중 <b>임시저장</b>하면 나중에 이어서 작성할 수 있습니다.</li>
+          <li>제출 후에도 평가 기간 내에는 다시 접속하여 수정할 수 있습니다.</li>
+          <li>개인별 점수와 의견은 공개되지 않으며, 동아리에는 취합·정리된 형태로만 전달됩니다.</li>
+        </ul>
+        <div class="contact">문의 · 전략기획팀 (내선 1148)</div>
+      </div>
+    </div>
+
+    <!-- ── 2) 평가 ───────────────────────── -->
+    <div id="step-eval" style="display:none">
+      <div class="who">
+        <div class="me" id="me-info"></div>
+        <div class="prog" id="me-prog"></div>
+      </div>
+
+      <div class="tabs" id="tabs"></div>
+
+      <div class="body">
+        <div class="main" id="main"></div>
+        <div class="side">
+          <div class="block">
+            <h4>평가등급 기준</h4>
+            <div class="grade">
+              <div><b>25</b><span>매우 우수 — 기대 수준을 뚜렷하게 상회</span></div>
+              <div><b>20</b><span>우수 — 충실히 이행, 두드러진 점 확인됨</span></div>
+              <div class="base"><b>15</b><span>보통 — 계획대로 수행 중 <b style="width:auto">(기준)</b></span></div>
+              <div><b>10</b><span>미흡 — 내용·근거가 부족</span></div>
+              <div><b>5</b><span>매우 미흡 — 활동이 확인되지 않음</span></div>
+            </div>
+          </div>
+          <div class="block">
+            <h4>유의사항</h4>
+            <ul>
+              <li>정상적으로 수행되었다면 <b>15점</b>이 기준입니다.</li>
+              <li>모든 항목을 선택해야 제출됩니다.</li>
+              <li>서술 문항은 각 15자 이상 작성해 주세요.</li>
+              <li id="tip-same">모든 동아리에 같은 총점은 부여할 수 없습니다.</li>
+            </ul>
+          </div>
+          <div class="block">
+            <h4>자료 열람</h4>
+            <ul>
+              <li>그룹웨어 → 사내게시판에서 동아리별 활동 결과보고서와 중간점검보고서를 확인하실 수 있습니다.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="foot">
+        <div class="left" id="save-state">작성 내용은 자동으로 임시 보관됩니다.</div>
+        <div>
+          <button class="btn btn-gray"  id="btn-temp">임시저장</button>
+          <button class="btn btn-green" id="btn-submit">최종 제출</button>
+        </div>
+      </div>
+      <div style="padding:0 32px 22px"><div class="msg" id="eval-msg"></div></div>
+    </div>
+
+    <!-- ── 3) 완료 ───────────────────────── -->
+    <div id="step-done" class="done" style="display:none">
+      <div class="mark">✓</div>
+      <h2>제출이 완료되었습니다</h2>
+      <p>참여해 주셔서 감사합니다. 결과는 취합 후 동아리별로 안내드리겠습니다.</p>
+      <div class="box" id="done-box"></div>
+      <div style="margin-top:26px">
+        <button class="btn btn-gray" id="btn-back">수정하기</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+/* ══════════════════════════════════════════
+   DATA — 이 구역만 수정하면 됩니다
+   ══════════════════════════════════════════ */
+var SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz09Zkvveie1252E4ZO9MD6qe7XKYj7npGNmv4R8NwwFJhx0xG59c7d7HcQJxM92AhGiA/exec';
+
+var PERIOD  = '평가기간  2026. 9. 3.(목) ~ 9. 8.(화) 18:00';
+var MIN_LEN = 15;                       // 서술 문항 최소 글자수
+var SCALE   = [
+  { v: 25, l: '매우 우수' },
+  { v: 20, l: '우수' },
+  { v: 15, l: '보통' },
+  { v: 10, l: '미흡' },
+  { v: 5,  l: '매우 미흡' }
+];
+
+var CRITERIA = [
+  { key: 'org',         name: '학습동아리 조직 운영',
+    desc: '동아리 본연의 목적 달성을 위한 운영이 계획대로 이루어지고 있는가?',
+    focus: '정기 모임 개최 실적 / 구성원 참여의 균형 / 회의록 등 기록 관리 수준' },
+  { key: 'innovation',  name: '혁신 및 창의성',
+    desc: '과제가 창의적으로 선정·수행되어 조직 발전에 기여하고 있는가?',
+    focus: '주제 선정의 새로움 / 기존 방식과의 차별점 / 조직 발전과의 연결성' },
+  { key: 'feasibility', name: '실행가능성',
+    desc: '과제가 현장 실무에 직·간접적으로 도움이 될 수 있는가?',
+    focus: '적용 대상 업무의 구체성 / 적용 시점·주체의 명확성 / 실현 가능한 범위인지' },
+  { key: 'performance', name: '학습동아리 활동 성과',
+    desc: '구성원의 역량을 바탕으로 한 운영성과가 충실히 나타나고 있는가?',
+    focus: '산출물의 실체 / 3개월 진행에 걸맞은 진척도 / 당초 계획 대비 이행률' }
+];
+
+var TEXTAREAS = [
+  { key: 'good',    label: '인상 깊었던 점',
+    hint: '이 동아리의 활동 중 좋게 본 점을 구체적으로 적어 주세요.',
+    ph: '예) 주 1회 모임을 3개월간 빠짐없이 유지한 점이 인상적입니다' },
+  { key: 'improve', label: '보완하면 좋을 점',
+    hint: '하반기 활동에 도움이 될 제안을 적어 주세요.',
+    ph: '예) 학습 내용이 실제 업무에 어떻게 적용될지 구체화되면 좋겠습니다' }
+];
+
+/* ══════════════════════════════════════════
+   상태
+   ══════════════════════════════════════════ */
+var ME = null;        // { club, name, dept, role, targets[] }
+var DATA = {};        // { 동아리명: { org, innovation, ..., good, improve } }
+var CUR = 0;          // 현재 탭 index
+var DRAFT_KEY = '';
+
+function $(id) { return document.getElementById(id); }
+function esc(s) {
+  return String(s == null ? '' : s)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function api(payload) {
+  return fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify(payload) })
+    .then(function(r) { return r.json(); });
+}
+function show(el, cls, text) {
+  el.className = 'msg ' + cls;
+  el.textContent = text;
+  if (cls === 'info') setTimeout(function() { el.className = 'msg'; }, 4000);
+}
+
+/* ══════════════════════════════════════════
+   1) 로그인
+   ══════════════════════════════════════════ */
+$('hd-period').textContent = PERIOD;
+
+$('btn-login').onclick = doLogin;
+$('in-code').onkeydown = function(e) { if (e.key === 'Enter') $('in-name').focus(); };
+$('in-name').onkeydown = function(e) { if (e.key === 'Enter') doLogin(); };
+
+function doLogin() {
+  var code = $('in-code').value.trim();
+  var name = $('in-name').value.trim();
+  var msg  = $('login-msg');
+  if (!code || !name) { show(msg, 'err', '동아리 코드와 이름을 모두 입력해 주세요.'); return; }
+
+  var btn = $('btn-login');
+  btn.disabled = true; btn.textContent = '확인 중...';
+  msg.className = 'msg';
+
+  api({ action: 'evalLogin', clubCode: code, name: name })
+    .then(function(res) {
+      btn.disabled = false; btn.textContent = '평가 시작';
+      if (!res || !res.ok) { show(msg, 'err', (res && res.error) || '확인에 실패했습니다.'); return; }
+
+      ME = res;
+      DRAFT_KEY = 'eval2026_' + res.club + '_' + res.name;
+
+      // 서버 응답 → 로컬 임시본 순으로 채움
+      DATA = {};
+      res.targets.forEach(function(t) { DATA[t.name] = {}; });
+      if (res.answers && res.answers.items) {
+        Object.keys(res.answers.items).forEach(function(k) {
+          if (DATA[k]) DATA[k] = res.answers.items[k];
+        });
+      }
+      try {
+        var d = localStorage.getItem(DRAFT_KEY);
+        if (d) {
+          var parsed = JSON.parse(d);
+          Object.keys(parsed).forEach(function(k) { if (DATA[k]) DATA[k] = parsed[k]; });
+        }
+      } catch(e) {}
+
+      startEval();
+    })
+    .catch(function() {
+      btn.disabled = false; btn.textContent = '평가 시작';
+      show(msg, 'err', '서버 연결에 실패했습니다. 잠시 후 다시 시도해 주세요.');
+    });
+}
+
+/* ══════════════════════════════════════════
+   2) 평가 화면
+   ══════════════════════════════════════════ */
+function startEval() {
+  $('step-login').style.display = 'none';
+  $('step-done').style.display  = 'none';
+  $('step-eval').style.display  = 'block';
+
+  var clubs = (ME.myClubs && ME.myClubs.length ? ME.myClubs : [ME.club]).join(' · ');
+  var role  = ME.role ? ' · ' + ME.role : '';
+  $('me-info').innerHTML = esc(clubs) + role + ' <span>' + esc(ME.name) + ' 님 (' + esc(ME.dept) + ')</span>';
+
+  // 소속이 많아 평가 대상이 1개뿐인 경우 '동일 총점 차단' 안내는 감춘다
+  $('tip-same').style.display = ME.targets.length >= 2 ? '' : 'none';
+
+  CUR = 0;
+  renderTabs();
+  renderMain();
+}
+
+function isDone(club) {
+  var d = DATA[club] || {};
+  for (var i = 0; i < CRITERIA.length; i++) if (!d[CRITERIA[i].key]) return false;
+  for (var j = 0; j < TEXTAREAS.length; j++) {
+    if (String(d[TEXTAREAS[j].key] || '').trim().length < MIN_LEN) return false;
+  }
+  return true;
+}
+
+function renderTabs() {
+  var done = 0;
+  $('tabs').innerHTML = ME.targets.map(function(t, i) {
+    var ok = isDone(t.name); if (ok) done++;
+    return '<button class="tab' + (i === CUR ? ' active' : '') + (ok ? ' done' : '') +
+           '" onclick="goTab(' + i + ')">' + esc(t.name) + '<span class="dot"></span></button>';
+  }).join('');
+  $('me-prog').innerHTML = '작성 완료 <b>' + done + '</b> / ' + ME.targets.length + '개 동아리';
+}
+
+function goTab(i) { CUR = i; renderTabs(); renderMain(); }
+
+function renderMain() {
+  var t = ME.targets[CUR];
+  var d = DATA[t.name] || {};
+  var h = '';
+
+  h += '<div class="club-name">' + esc(t.name) + '</div>';
+  if (t.desc) h += '<div class="club-desc">' + esc(t.desc) + '</div>';
+  h += '<div class="notice-box">그룹웨어 사내게시판에서 <b>' + esc(t.name) +
+       '</b> 의 활동 결과보고서와 중간점검보고서를 확인하신 뒤 평가해 주세요.</div>';
+
+  CRITERIA.forEach(function(c, ci) {
+    h += '<div class="q">';
+    h += '<div class="t">' + (ci + 1) + '. ' + esc(c.name) + '</div>';
+    h += '<div class="d">' + esc(c.desc) + '</div>';
+    h += '<div class="scale">';
+    SCALE.forEach(function(s) {
+      var on = Number(d[c.key]) === s.v;
+      h += '<label class="' + (on ? 'on' : '') + '" onclick="pick(\'' + c.key + '\',' + s.v + ')">' +
+           '<span class="n">' + s.v + '</span><span class="l">' + s.l + '</span></label>';
+    });
+    h += '</div>';
+    h += '<div class="focus">착안사항 · ' + esc(c.focus) + '</div>';
+    h += '</div>';
+  });
+
+  var sum = 0;
+  CRITERIA.forEach(function(c) { sum += Number(d[c.key]) || 0; });
+  h += '<div class="sum">소계 <b>' + sum + '</b> / 100점</div>';
+
+  TEXTAREAS.forEach(function(ta) {
+    var val = String(d[ta.key] || '');
+    var len = val.trim().length;
+    h += '<div class="q">';
+    h += '<div class="t">' + esc(ta.label) + ' <span style="font-size:13px;font-weight:400;color:#94a3b8">(' + MIN_LEN + '자 이상)</span></div>';
+    h += '<div class="d">' + esc(ta.hint) + '</div>';
+    h += '<textarea id="ta-' + ta.key + '" placeholder="' + esc(ta.ph) + '" ' +
+         'oninput="typed(\'' + ta.key + '\', this.value)">' + esc(val) + '</textarea>';
+    h += '<div class="cnt' + (len >= MIN_LEN ? ' ok' : '') + '" id="cnt-' + ta.key + '">' +
+         len + ' / ' + MIN_LEN + '자</div>';
+    h += '</div>';
+  });
+
+  $('main').innerHTML = h;
+}
+
+function pick(key, val) {
+  var club = ME.targets[CUR].name;
+  if (!DATA[club]) DATA[club] = {};
+  DATA[club][key] = val;
+  saveDraft();
+  renderMain();
+  renderTabs();
+}
+
+function typed(key, val) {
+  var club = ME.targets[CUR].name;
+  if (!DATA[club]) DATA[club] = {};
+  DATA[club][key] = val;
+  var len = val.trim().length;
+  var el = $('cnt-' + key);
+  if (el) {
+    el.textContent = len + ' / ' + MIN_LEN + '자';
+    el.className = 'cnt' + (len >= MIN_LEN ? ' ok' : '');
+  }
+  saveDraft();
+  renderTabs();
+}
+
+function saveDraft() {
+  try { localStorage.setItem(DRAFT_KEY, JSON.stringify(DATA)); } catch(e) {}
+  $('save-state').textContent = '작성 내용이 이 PC에 임시 보관되었습니다.';
+}
+
+/* ══════════════════════════════════════════
+   저장 / 제출
+   ══════════════════════════════════════════ */
+function collect() {
+  return ME.targets.map(function(t) {
+    var d = DATA[t.name] || {};
+    return {
+      targetClub: t.name,
+      org: d.org || '', innovation: d.innovation || '',
+      feasibility: d.feasibility || '', performance: d.performance || '',
+      good: d.good || '', improve: d.improve || ''
+    };
+  });
+}
+
+function send(status, btn, label) {
+  var msg = $('eval-msg');
+  msg.className = 'msg';
+  btn.disabled = true; btn.textContent = '처리 중...';
+
+  return api({
+    action: 'evalSave', status: status,
+    clubCode: $('in-code').value.trim(), name: $('in-name').value.trim(),
+    items: collect()
+  }).then(function(res) {
+    btn.disabled = false; btn.textContent = label;
+    if (!res || !res.ok) { show(msg, 'err', (res && res.error) || '저장에 실패했습니다.'); return false; }
+    return true;
+  }).catch(function() {
+    btn.disabled = false; btn.textContent = label;
+    show(msg, 'err', '서버 연결에 실패했습니다. 잠시 후 다시 시도해 주세요.');
+    return false;
+  });
+}
+
+$('btn-temp').onclick = function() {
+  send('임시저장', this, '임시저장').then(function(ok) {
+    if (ok) show($('eval-msg'), 'info', '임시저장되었습니다. 나중에 같은 코드와 이름으로 접속하면 이어서 작성할 수 있습니다.');
+  });
+};
+
+$('btn-submit').onclick = function() {
+  var btn = this;
+  var notDone = ME.targets.filter(function(t) { return !isDone(t.name); });
+  if (notDone.length) {
+    show($('eval-msg'), 'err', '작성이 완료되지 않은 동아리가 있습니다 — ' +
+      notDone.map(function(t) { return t.name; }).join(', '));
+    return;
+  }
+  if (!confirm('최종 제출하시겠습니까?\n제출 후에도 평가 기간 내에는 수정할 수 있습니다.')) return;
+
+  send('제출', btn, '최종 제출').then(function(ok) {
+    if (!ok) return;
+    try { localStorage.removeItem(DRAFT_KEY); } catch(e) {}
+    var h = '';
+    ME.targets.forEach(function(t) {
+      var d = DATA[t.name] || {}, s = 0;
+      CRITERIA.forEach(function(c) { s += Number(d[c.key]) || 0; });
+      h += '<div><b>' + esc(t.name) + '</b>' + s + '점</div>';
+    });
+    $('done-box').innerHTML = h;
+    $('step-eval').style.display = 'none';
+    $('step-done').style.display = 'block';
+    window.scrollTo(0, 0);
+  });
+};
+
+$('btn-back').onclick = function() { startEval(); window.scrollTo(0, 0); };
+</script>
+</body>
+</html>

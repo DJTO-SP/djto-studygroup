@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>학습동아리 중간평가 — 집계 (담당자용)</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Malgun Gothic', '맑은 고딕', -apple-system, sans-serif;
+       background: #eef1f5; color: #1f2937; line-height: 1.6; min-width: 1180px; }
+.wrap { width: 1160px; margin: 0 auto; padding: 30px 0 80px; }
+
+.head { background: #1e3a5f; color: #fff; padding: 22px 30px; border-radius: 10px 10px 0 0;
+        display: flex; justify-content: space-between; align-items: center; }
+.head h1 { font-size: 20px; font-weight: 700; }
+.head .tag { font-size: 12px; background: #6b8f1f; padding: 4px 11px; border-radius: 20px; }
+.panel { background: #fff; border-radius: 0 0 10px 10px; box-shadow: 0 2px 10px rgba(0,0,0,.07); padding: 26px 30px 34px; }
+
+.btn { border: 0; border-radius: 6px; cursor: pointer; font-family: inherit;
+       font-size: 14px; font-weight: 600; padding: 11px 22px; }
+.btn:hover { opacity: .88; }
+.btn-navy { background: #1e3a5f; color: #fff; }
+.btn-gray { background: #e2e8f0; color: #475569; }
+.btn-sm { padding: 7px 14px; font-size: 13px; }
+
+.msg { padding: 11px 15px; border-radius: 6px; font-size: 14px; margin-top: 14px; display: none; }
+.msg.err { background: #fef2f2; color: #b91c1c; border: 1px solid #fecaca; display: block; }
+
+/* 로그인 */
+.login { text-align: center; padding: 48px 0 40px; }
+.login p { color: #64748b; font-size: 14px; margin-bottom: 22px; }
+.login input { width: 240px; padding: 12px 14px; border: 1px solid #cbd5e1;
+               border-radius: 6px; font-size: 15px; font-family: inherit; }
+
+/* 섹션 */
+h2.sec { font-size: 16px; color: #1e3a5f; font-weight: 700; margin: 30px 0 12px;
+         padding-bottom: 8px; border-bottom: 2px solid #1e3a5f; }
+h2.sec:first-of-type { margin-top: 4px; }
+h2.sec small { font-weight: 400; font-size: 13px; color: #94a3b8; margin-left: 10px; }
+
+table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+th, td { border: 1px solid #e2e8f0; padding: 9px 11px; text-align: center; }
+th { background: #f1f5f9; color: #334155; font-weight: 600; }
+td.l, th.l { text-align: left; }
+tr.top td { background: #f0fdf4; }
+td.club { font-weight: 700; color: #1e3a5f; }
+td.fin { font-weight: 700; font-size: 15px; color: #1e3a5f; }
+input.adj { width: 62px; padding: 5px; border: 1px solid #cbd5e1; border-radius: 4px;
+            text-align: center; font-family: inherit; font-size: 13.5px; }
+
+.cards { display: flex; gap: 12px; }
+.card { flex: 1; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 14px 16px; }
+.card .k { font-size: 12.5px; color: #64748b; }
+.card .v { font-size: 22px; font-weight: 700; color: #1e3a5f; margin-top: 2px; }
+.card .v small { font-size: 13px; font-weight: 400; color: #94a3b8; }
+
+.note { background: #f8fafc; border-left: 3px solid #A5CD39; padding: 12px 16px;
+        font-size: 13px; color: #475569; margin-top: 12px; border-radius: 0 6px 6px 0; }
+.note b { color: #1e3a5f; }
+
+.cmt { border: 1px solid #e2e8f0; border-radius: 8px; margin-bottom: 14px; overflow: hidden; }
+.cmt h3 { background: #f1f5f9; padding: 10px 16px; font-size: 14.5px; color: #1e3a5f; }
+.cmt .row { padding: 11px 16px; border-top: 1px solid #eef1f5; font-size: 13.5px; }
+.cmt .row b { display: inline-block; width: 108px; color: #64748b; font-weight: 400; font-size: 12.5px; }
+.cmt .row.g b { color: #6b8f1f; }
+.cmt .row.i b { color: #b45309; }
+
+.bar-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
+.stamp { font-size: 12.5px; color: #94a3b8; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="head">
+    <h1>학습동아리 중간평가 — 집계</h1>
+    <span class="tag">담당자 전용</span>
+  </div>
+  <div class="panel">
+
+    <div id="login" class="login">
+      <p>관리자 비밀번호를 입력해 주세요.</p>
+      <input id="pw" type="password" placeholder="관리자 비밀번호">
+      <button class="btn btn-navy" id="btn-in" style="margin-left:8px">조회</button>
+      <div class="msg" id="login-msg"></div>
+    </div>
+
+    <div id="view" style="display:none">
+      <div class="bar-top">
+        <div class="stamp" id="stamp"></div>
+        <div>
+          <button class="btn btn-gray btn-sm" id="btn-reload">새로고침</button>
+          <button class="btn btn-navy btn-sm" id="btn-csv">엑셀(CSV) 내려받기</button>
+        </div>
+      </div>
+      <div id="out"></div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+/* ══════════════════════════════════════════
+   DATA
+   ══════════════════════════════════════════ */
+var SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz09Zkvveie1252E4ZO9MD6qe7XKYj7npGNmv4R8NwwFJhx0xG59c7d7HcQJxM92AhGiA/exec';
+
+var CRITERIA = [
+  { key: 'org',         name: '조직 운영' },
+  { key: 'innovation',  name: '혁신·창의성' },
+  { key: 'feasibility', name: '실행가능성' },
+  { key: 'performance', name: '활동 성과' }
+];
+var ADJ_KEY = 'evalAdj2026';   // 가감점 임시 보관 (이 PC에만)
+
+/* ══════════════════════════════════════════
+   공통
+   ══════════════════════════════════════════ */
+var RAW = null, PW = '', ADJ = {};
+function $(id) { return document.getElementById(id); }
+function esc(s) {
+  return String(s == null ? '' : s)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function r1(n) { return Math.round(n * 10) / 10; }
+function ekey(r) { return r.evaluatorName + '|' + r.evaluatorDept; }
+
+try { ADJ = JSON.parse(localStorage.getItem(ADJ_KEY) || '{}'); } catch(e) { ADJ = {}; }
+
+/* ══════════════════════════════════════════
+   조회
+   ══════════════════════════════════════════ */
+$('btn-in').onclick = load;
+$('pw').onkeydown = function(e) { if (e.key === 'Enter') load(); };
+$('btn-reload').onclick = function() { load(true); };
+
+function load(silent) {
+  var pw = silent ? PW : $('pw').value.trim();
+  if (!pw) return;
+  var btn = $('btn-in');
+  if (!silent) { btn.disabled = true; btn.textContent = '조회 중...'; }
+
+  fetch(SCRIPT_URL + '?' + new URLSearchParams({ action: 'evalResults', pw: pw }))
+    .then(function(r) { return r.json(); })
+    .then(function(res) {
+      btn.disabled = false; btn.textContent = '조회';
+      if (!res || res.error) {
+        $('login-msg').className = 'msg err';
+        $('login-msg').textContent = res && res.error ? res.error : '조회에 실패했습니다.';
+        return;
+      }
+      PW = pw; RAW = res;
+      $('login').style.display = 'none';
+      $('view').style.display = 'block';
+      render();
+    })
+    .catch(function() {
+      btn.disabled = false; btn.textContent = '조회';
+      $('login-msg').className = 'msg err';
+      $('login-msg').textContent = '서버 연결에 실패했습니다.';
+    });
+}
+
+/* ══════════════════════════════════════════
+   집계
+   ══════════════════════════════════════════
+   ① 평가자별 편차 보정 — 평가 대상 2개 이상인 평가자만
+   ② 동아리 단위 환산 — 평가자 소속 동아리별 평균 = 동아리당 1표
+   ③ 최종 점수 — 받은 표들의 평균
+   ══════════════════════════════════════════ */
+function compute() {
+  var clubs = RAW.clubs || [];
+  var subs  = (RAW.rows || []).filter(function(r) { return r.status === '제출'; });
+
+  // 전체 평균
+  var M = subs.length ? subs.reduce(function(s, r) { return s + Number(r.total || 0); }, 0) / subs.length : 0;
+
+  // 평가자별 묶기
+  var byEv = {};
+  subs.forEach(function(r) {
+    var k = ekey(r);
+    if (!byEv[k]) byEv[k] = [];
+    byEv[k].push(r);
+  });
+
+  // ① 보정
+  var adjusted = [];
+  Object.keys(byEv).forEach(function(k) {
+    var list = byEv[k];
+    var mean = list.reduce(function(s, r) { return s + Number(r.total || 0); }, 0) / list.length;
+    var shift = list.length >= 2 ? (mean - M) : 0;   // 1개뿐이면 보정하지 않음
+    list.forEach(function(r) {
+      adjusted.push({
+        row: r, raw: Number(r.total || 0),
+        adj: Number(r.total || 0) - shift,
+        corrected: list.length >= 2
+      });
+    });
+  });
+
+  // ②③ 동아리별
+  var result = {};
+  clubs.forEach(function(t) {
+    var mine = adjusted.filter(function(a) { return a.row.targetClub === t; });
+    var votes = {};      // 평가자 소속 동아리 → 보정점수 평균
+    clubs.forEach(function(s) {
+      var g = mine.filter(function(a) { return a.row.evaluatorClub === s; });
+      if (g.length) votes[s] = g.reduce(function(x, a) { return x + a.adj; }, 0) / g.length;
+    });
+    var vk = Object.keys(votes);
+    var fin = vk.length ? vk.reduce(function(x, s) { return x + votes[s]; }, 0) / vk.length : 0;
+
+    var items = {};
+    CRITERIA.forEach(function(c) {
+      var vals = mine.map(function(a) { return Number(a.row[c.key] || 0); }).filter(function(v) { return v > 0; });
+      items[c.key] = vals.length ? vals.reduce(function(x, v) { return x + v; }, 0) / vals.length : 0;
+    });
+
+    result[t] = {
+      count: mine.length,
+      raw: mine.length ? mine.reduce(function(x, a) { return x + a.raw; }, 0) / mine.length : 0,
+      votes: votes, base: fin, items: items,
+      adjust: Number(ADJ[t] || 0),
+      final: fin + Number(ADJ[t] || 0)
+    };
+  });
+
+  return { clubs: clubs, subs: subs, result: result, mean: M, adjusted: adjusted };
+}
+
+/* ══════════════════════════════════════════
+   화면
+   ══════════════════════════════════════════ */
+function render() {
+  var C = compute();
+  var evs = RAW.evaluators || [];
+  var h = '';
+
+  // ── 참여 현황 ──
+  var expected = evs.filter(function(e) { return e.targetCount > 0; });
+  var doneSet = {};
+  C.subs.forEach(function(r) { doneSet[ekey(r)] = 1; });
+  var doneCnt = Object.keys(doneSet).length;
+  var tempCnt = (RAW.rows || []).filter(function(r) { return r.status === '임시저장'; })
+                  .reduce(function(acc, r) { acc[ekey(r)] = 1; return acc; }, {});
+
+  h += '<h2 class="sec">참여 현황</h2>';
+  h += '<div class="cards">';
+  h += '<div class="card"><div class="k">제출 완료</div><div class="v">' + doneCnt +
+       '<small> / ' + expected.length + '명</small></div></div>';
+  h += '<div class="card"><div class="k">참여율</div><div class="v">' +
+       (expected.length ? Math.round(doneCnt / expected.length * 100) : 0) + '<small>%</small></div></div>';
+  h += '<div class="card"><div class="k">작성 중(임시저장)</div><div class="v">' +
+       Object.keys(tempCnt).length + '<small>명</small></div></div>';
+  h += '<div class="card"><div class="k">전체 평균</div><div class="v">' + r1(C.mean) +
+       '<small> / 100점</small></div></div>';
+  h += '</div>';
+
+  // 동아리별 참여
+  h += '<table style="margin-top:14px"><tr><th class="l">소속 동아리</th><th>대상 인원</th><th>제출</th><th>미제출</th><th class="l">미제출자</th></tr>';
+  C.clubs.forEach(function(cl) {
+    var mem = expected.filter(function(e) { return e.club === cl; });
+    var no = mem.filter(function(e) { return !doneSet[e.name + '|' + e.dept]; });
+    h += '<tr><td class="l club">' + esc(cl) + '</td><td>' + mem.length + '</td><td>' +
+         (mem.length - no.length) + '</td><td>' + (no.length ? '<b style="color:#b91c1c">' + no.length + '</b>' : '0') +
+         '</td><td class="l" style="color:#64748b">' +
+         esc(no.map(function(e) { return e.name; }).join(', ')) + '</td></tr>';
+  });
+  h += '</table>';
+
+  // ── 최종 결과 ──
+  h += '<h2 class="sec">평가 결과 <small>보정 → 동아리 단위 환산 → 최종</small></h2>';
+  h += '<table><tr><th class="l">동아리</th><th>받은 평가</th><th>원점수 평균</th>';
+  C.clubs.forEach(function(s) { h += '<th>' + esc(s) + '<br><span style="font-weight:400;font-size:11px;color:#94a3b8">의 표</span></th>'; });
+  h += '<th>환산 점수</th><th>가감점</th><th>최종</th></tr>';
+
+  var order = C.clubs.slice().sort(function(a, b) { return C.result[b].final - C.result[a].final; });
+  C.clubs.forEach(function(t) {
+    var R = C.result[t];
+    var isTop = order.indexOf(t) < 2 && R.count > 0;
+    h += '<tr' + (isTop ? ' class="top"' : '') + '>';
+    h += '<td class="l club">' + esc(t) + '</td>';
+    h += '<td>' + R.count + '건</td>';
+    h += '<td style="color:#94a3b8">' + (R.count ? r1(R.raw) : '-') + '</td>';
+    C.clubs.forEach(function(s) {
+      h += '<td>' + (s === t ? '<span style="color:#cbd5e1">—</span>'
+                             : (R.votes[s] !== undefined ? r1(R.votes[s]) : '<span style="color:#cbd5e1">·</span>')) + '</td>';
+    });
+    h += '<td>' + (R.count ? r1(R.base) : '-') + '</td>';
+    h += '<td><input class="adj" type="number" step="1" value="' + (ADJ[t] || 0) +
+         '" onchange="setAdj(\'' + esc(t) + '\', this.value)"></td>';
+    h += '<td class="fin">' + (R.count ? r1(R.final) : '-') + '</td>';
+    h += '</tr>';
+  });
+  h += '</table>';
+  h += '<div class="note"><b>읽는 법</b> · 가운데 칸은 <b>어느 동아리가 몇 점을 줬는지</b>입니다. ' +
+       '동아리마다 인원이 달라도 한 동아리가 한 표씩만 갖도록 환산했습니다. ' +
+       '평가 대상이 1개뿐인 복수소속자는 보정 대상에서 제외했습니다. ' +
+       '연한 초록은 상위 2개 동아리입니다.</div>';
+
+  // ── 항목별 ──
+  h += '<h2 class="sec">항목별 평균 <small>원점수 기준 · 참고용</small></h2>';
+  h += '<table><tr><th class="l">동아리</th>';
+  CRITERIA.forEach(function(c) { h += '<th>' + esc(c.name) + '<br><span style="font-weight:400;font-size:11px;color:#94a3b8">25점</span></th>'; });
+  h += '<th>합계</th></tr>';
+  C.clubs.forEach(function(t) {
+    var R = C.result[t];
+    h += '<tr><td class="l club">' + esc(t) + '</td>';
+    var sum = 0;
+    CRITERIA.forEach(function(c) { sum += R.items[c.key]; h += '<td>' + (R.count ? r1(R.items[c.key]) : '-') + '</td>'; });
+    h += '<td>' + (R.count ? r1(sum) : '-') + '</td></tr>';
+  });
+  h += '</table>';
+
+  // ── 코멘트 ──
+  h += '<h2 class="sec">서술 의견 <small>동아리별 피드백 자료 · 작성자 비공개</small></h2>';
+  C.clubs.forEach(function(t) {
+    var list = C.subs.filter(function(r) { return r.targetClub === t; });
+    h += '<div class="cmt"><h3>' + esc(t) + ' <span style="font-weight:400;font-size:12.5px;color:#94a3b8">' +
+         list.length + '건</span></h3>';
+    if (!list.length) h += '<div class="row" style="color:#94a3b8">아직 접수된 의견이 없습니다.</div>';
+    list.forEach(function(r) {
+      if (r.good)    h += '<div class="row g"><b>인상 깊었던 점</b>' + esc(r.good) + '</div>';
+      if (r.improve) h += '<div class="row i"><b>보완할 점</b>' + esc(r.improve) + '</div>';
+    });
+    h += '</div>';
+  });
+
+  $('out').innerHTML = h;
+  $('stamp').textContent = '응답 ' + C.subs.length + '건 · 조회 시점 기준';
+}
+
+function setAdj(club, v) {
+  ADJ[club] = Number(v) || 0;
+  try { localStorage.setItem(ADJ_KEY, JSON.stringify(ADJ)); } catch(e) {}
+  render();
+}
+
+/* ══════════════════════════════════════════
+   CSV
+   ══════════════════════════════════════════ */
+$('btn-csv').onclick = function() {
+  var C = compute();
+  var L = [];
+
+  L.push(['[집계 결과]']);
+  L.push(['동아리','받은 평가','원점수 평균','환산 점수','가감점','최종 점수']);
+  C.clubs.forEach(function(t) {
+    var R = C.result[t];
+    L.push([t, R.count, r1(R.raw), r1(R.base), R.adjust, r1(R.final)]);
+  });
+
+  L.push([]);
+  L.push(['[개별 응답]']);
+  L.push(['평가자 소속','이름','부서','역할','대상 동아리',
+          '조직 운영','혁신·창의성','실행가능성','활동 성과','총점',
+          '인상 깊었던 점','보완할 점','제출시각']);
+  C.subs.forEach(function(r) {
+    L.push([r.evaluatorClub, r.evaluatorName, r.evaluatorDept, r.evaluatorRole, r.targetClub,
+            r.org, r.innovation, r.feasibility, r.performance, r.total,
+            r.good, r.improve, r.submittedAt]);
+  });
+
+  var csv = L.map(function(row) {
+    return row.map(function(c) { return '"' + String(c == null ? '' : c).replace(/"/g, '""') + '"'; }).join(',');
+  }).join('\r\n');
+
+  var blob = new Blob(['﻿' + csv], { type: 'text/csv;charset=utf-8;' });
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = '학습동아리_중간평가_집계.csv';
+  a.click();
+};
+</script>
+</body>
+</html>
