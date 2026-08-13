@@ -291,7 +291,9 @@ body {
    ══════════════════════════════════════════ */
 var SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz09Zkvveie1252E4ZO9MD6qe7XKYj7npGNmv4R8NwwFJhx0xG59c7d7HcQJxM92AhGiA/exec';
 
-var PERIOD  = '평가기간  2026. 9. 3.(목) ~ 9. 8.(화) 18:00';
+// 평가기간 — 확정되면 아래에 입력하세요. 비워두면 제목 아래에 아무것도 표시되지 않습니다.
+// 예) '평가기간  2026. 9. 3.(목) ~ 9. 8.(화) 18:00'
+var PERIOD  = '';
 var MIN_LEN = 15;                       // 서술 문항 최소 글자수
 var SCALE   = [
   { v: 25, l: '매우 우수' },
@@ -351,7 +353,8 @@ function show(el, cls, text) {
 /* ══════════════════════════════════════════
    1) 로그인
    ══════════════════════════════════════════ */
-$('hd-period').textContent = PERIOD;
+if (PERIOD) $('hd-period').textContent = PERIOD;
+else $('hd-period').style.display = 'none';
 
 $('btn-login').onclick = doLogin;
 $('in-code').onkeydown = function(e) { if (e.key === 'Enter') $('in-name').focus(); };
